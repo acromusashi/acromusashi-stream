@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="acromusashi-stream" default="javadoc" basedir=".">
+
+    <!-- このビルド用のグローバルプロパティを設定する -->
+    <property name="src.path" location="src/main/java" />
+    <property name="lib.path" location="lib" />
+    <property name="libext.path" location="libext" />
+
+    <!-- Javadoc設定 -->
+    <property name="doc.path"         value="docs"/>
+    <property name="javadoc.package"  value="acromusashi.stream.*"/>
+    <property name="javadoc.title"    value="AcroMUSASHI Stream"/>
+    <property name="copyright"        value="Copyright (c) Acroquest Technology Co, Ltd. All Rights Reserved."/>
+
+    <!-- プロジェクトクラスパスの設定 -->
+    <path id="classpath">
+        <fileset dir="${lib.path}">
+            <include name="**/*.jar"/>
+	</fileset>
+   </path>
+
+    <!-- Javadoc 生成 -->
+    <target name="javadoc" description="Javadoc を生成する">
+        <!-- 過去に出力した Javadoc を削除 -->
+        <delete includeEmptyDirs="true" failonerror="false">
+            <fileset dir="${doc.path}"/>
+        </delete>
+
+        <!-- Javadoc 出力ディレクトリ作成 -->
+        <mkdir dir="${doc.path}" />
+
+        <!-- Javadoc 生成 -->
+        <javadoc packagenames  = "${javadoc.package}"
+                 sourcepath    = "${src.path}"
+                 classpathref  = "classpath"
+                 destdir       = "${doc.path}"
+                 access        = "protected"
+                 encoding      = "UTF-8"
+        	     charset       = "UTF-8"
+                 docencoding   = "UTF-8"
+                 locale        = "ja_JP"
+                 windowtitle   = "${javadoc.title}"
+                 bottom        = "${copyright}" />
+    </target>
+</project>

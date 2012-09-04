@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project name="acromusashi-stream" default="dist" basedir=".">
+
+	<!-- set global properties for this build -->
+	<property name="encoding" value="UTF-8" />
+
+	<tstamp>
+		<format property="buildTime" pattern="yyyy/MM/dd HH:mm:ss" />
+	</tstamp>
+
+	<!-- version -->
+	<property name="version" value="1.0.0" />
+	<!-- class file dir -->
+	<property name="dist" location="dist" />
+	<!-- release dir -->
+	<property name="release.base" location="release" />
+	<property name="release.dist" location="${release.base}/acromusashi-stream" />
+	<property name="release.lib" location="${release.dist}/lib" />
+	<!-- lib dir -->
+	<property name="lib" location="lib" />
+	<!-- src dir -->
+	<property name="src" location="src/main/java" />
+	<!-- class dir -->
+	<property name="classes" location="classes" />
+	<!-- jar file -->
+	<property name="jar" value="acromusashi-stream-${version}.jar" />
+
+	<!-- class path -->
+	<path id="classpath">
+		<fileset dir="${lib}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<target name="init" depends="clean">
+		<!-- Create the time stamp -->
+		<tstamp />
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${dist}" />
+		<mkdir dir="${release.base}" />
+		<mkdir dir="${release.lib}" />
+		<mkdir dir="${classes}" />
+	</target>
+
+	<!-- compile -->
+	<target name="compile" depends="init" description="compile the source">
+		<!-- Compile the java code from ${src} into ${classes} -->
+		<javac srcdir="${src}" destdir="${classes}" debug="yes" encoding="${encoding}">
+			<classpath refid="classpath" />
+		</javac>
+	</target>
+
+	<!-- make jar file -->
+	<target name="jar" depends="compile" description="generate the jar">
+		<!-- Create the distribution directory -->
+		<!-- Put everything in ${classes} into the ${target_jar} file -->
+		<jar jarfile="${dist}/${jar}" basedir="${classes}">
+		</jar>
+	</target>
+
+	<!-- Copy Release Files. -->
+	<target name="copy" depends="jar" description="Copy Release Files.">
+		<copy todir="${release.dist}" preservelastmodified="true">
+			<fileset dir="">
+				<patternset>
+					<include name="LICENSE.html" />
+				</patternset>
+			</fileset>
+		</copy>
+		<copy todir="${release.lib}" preservelastmodified="true">
+			<fileset dir="${lib}">
+				<patternset>
+					<include name="**/*.jar" />
+				</patternset>
+			</fileset>
+		</copy>
+		<copy todir="${release.lib}" preservelastmodified="true">
+			<fileset dir="${dist}">
+				<patternset>
+					<include name="${jar}" />
+				</patternset>
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- run(default) -->
+	<target name="dist" depends="copy" description="generate the distribution">
+		<zip destfile="${release.base}/acromusashi-stream-${version}.zip" basedir="${release.base}" />
+	</target>
+
+	<!-- clean -->
+	<target name="clean" description="clean up">
+		<delete dir="${dist}" />
+		<delete dir="${classes}" />
+		<delete dir="${release.base}" />
+	</target>
+
+</project>
