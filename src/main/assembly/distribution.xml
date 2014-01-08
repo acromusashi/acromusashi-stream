@@ -44,8 +44,6 @@
                 <exclude>commons-logging:commons-logging</exclude>
                 <exclude>log4j:log4j</exclude>
                 <exclude>com.google.guava:guava</exclude>
-                <exclude>org.mortbay.jetty:jetty</exclude>
-                <exclude>org.mortbay.jetty:jetty-util</exclude>
                 <!-- ↑不要な依存ライブラリを除去↑ -->
             </excludes>
         </dependencySet>
