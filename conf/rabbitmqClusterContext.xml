@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:beans="http://www.springframework.org/schema/beans" xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+                      http://www.springframework.org/schema/beans/spring-beans.xsd
+                      http://www.springframework.org/schema/util
+                      http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- ===================================================================================== -->
+    <!-- RabbitMQCluster共通定義 -->
+    <!-- ===================================================================================== -->
+    <!-- 使用するオブジェクトの変換クラス（Object>JSONの変換を行う） -->
+    <bean id="contextReader" class="acromusashi.stream.component.rabbitmq.RabbitmqClusterContextReader" />
+    <bean id="rabbitmqClientFactory" class="acromusashi.stream.component.rabbitmq.RabbitmqClientFactory">
+        <property name="reader" ref="contextReader" />
+    </bean>
+    <bean class="acromusashi.stream.component.rabbitmq.RabbitmqClient" factory-bean="rabbitmqClientFactory"
+        factory-method="createRabbitmqClient" scope="prototype">
+        <property name="retryInterval" value="1000" />
+    </bean>
+
+
+    <bean id="jsonMessageConverter" class="org.springframework.amqp.support.converter.JsonMessageConverter">
+    </bean>
+
+    <!-- ===================================================================================== -->
+    <!-- RabbitMQCluster定義 -->
+    <!-- ===================================================================================== -->
+    <!-- RabbitMQCluster全体が保持するキュー一覧 -->
+    <util:list id="allQueueList">
+        <ref bean="queueList0" />
+    </util:list>
+
+    <!-- RabbitMQCluster0が保持するキュー一覧 -->
+    <util:list id="queueList0">
+        <value>Message01</value>
+        <value>Message02</value>
+        <value>Message03</value>
+        <value>Message04</value>
+    </util:list>
+
+    <!-- RabbitCluster0用定義 -->
+    <bean id="mqCluster0" class="acromusashi.stream.component.rabbitmq.RabbitmqClusterContext">
+        <!-- RabbitMQプロセス一覧 -->
+        <property name="mqProcessList">
+            <util:list list-class="java.util.LinkedList">
+                <value>rabbitmq01:5672</value>
+                <value>rabbitmq02:5672</value>
+            </util:list>
+        </property>
+
+        <!-- キュー一覧 -->
+        <property name="queueList" ref="queueList0" />
+
+        <!-- 呼出元別、接続先RabbitMQプロセス定義 -->
+        <property name="connectionProcessMap">
+            <util:map>
+                <entry key="rabbitmq01_Message01">
+                    <value>rabbitmq01:5672</value>
+                </entry>
+                <entry key="rabbitmq01_Message02">
+                    <value>rabbitmq02:5672</value>
+                </entry>
+                <entry key="rabbitmq01_Message03">
+                    <value>rabbitmq01:5672</value>
+                </entry>
+                <entry key="rabbitmq01_Message04">
+                    <value>rabbitmq02:5672</value>
+                </entry>
+                <entry key="rabbitmq02_Message01">
+                    <value>rabbitmq01:5672</value>
+                </entry>
+                <entry key="rabbitmq02_Message02">
+                    <value>rabbitmq02:5672</value>
+                </entry>
+                <entry key="rabbitmq02_Message03">
+                    <value>rabbitmq01:5672</value>
+                </entry>
+                <entry key="rabbitmq02_Message04">
+                    <value>rabbitmq02:5672</value>
+                </entry>
+            </util:map>
+        </property>
+
+        <!-- ConnectionFactory -->
+        <property name="connectionFactory" ref="connectionFactory0" />
+
+        <!-- AmqpTemplate -->
+        <property name="amqpTemplate" ref="amqpTemplate0" />
+    </bean>
+
+    <!-- RabbitMQとのコネクションとなるクラス（RabbitMQへJSONを送信する、またはJSONを受信する） -->
+    <bean id="amqpTemplate0" class="org.springframework.amqp.rabbit.core.RabbitTemplate">
+        <property name="connectionFactory" ref="connectionFactory0" />
+        <property name="messageConverter" ref="jsonMessageConverter" />
+    </bean>
+
+    <!-- 使用するConnectionFactory （ユーザ名、パスワードを変更） -->
+    <bean id="connectionFactory0" class="acromusashi.stream.component.rabbitmq.CachingConnectionFactory">
+        <property name="username" value="guest" />
+        <property name="password" value="guest" />
+        <property name="channelCacheSize" value="10" />
+    </bean>
+</beans>

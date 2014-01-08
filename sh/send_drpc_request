@@ -1,0 +1,47 @@
+#!/bin/bash
+#--------------------------------------------------------------------------
+# 概要：
+#   DRPCリクエスト送信コマンド
+#
+# 使用方法：
+#   send_drpc_request <DRPCServerHost> <DRPCServerPort> <DRPCFunction> <DRPCArg> 
+#--------------------------------------------------------------------------
+
+#-----------
+# 変数初期化
+#-----------
+USAGE_MESSAGE='send_drpc_request <DRPCServerHost> <DRPCServerPort> <DRPCFunction> <DRPCArg>'
+
+STORM_HOME="/opt/storm"
+STORM_LIBPATH=${STORM_HOME}/lib
+
+# クラスパス
+export STORM_CLASSPATH=\
+${STORM_HOME}/*:\
+${STORM_HOME}/conf:\
+${STORM_LIBPATH}/*\
+
+#-----------
+# 関数定義
+#-----------
+#+ ----------------------------------------------------
+#+  指定引数の数が不正なパターンをUsageメッセージで除外
+#+ ----------------------------------------------------
+function checkArgNum {
+  # 引数が指定された場合はエラーとする
+  if [ $# -ne 4 ]
+  then
+    echo -e "${USAGE_MESSAGE}"
+    exit 1
+  fi
+}
+
+#-----------
+# メイン処理
+#-----------
+# 引数チェック
+checkArgNum $@
+
+# DRPCリクエスト送信
+java -classpath ${STORM_CLASSPATH} -Dlogfile.name=drpcclient.log acromusashi.stream.client.DrpcRequestClient -h $1 -p $2 -f $3 -a $4
+
