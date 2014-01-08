@@ -39,7 +39,7 @@ public abstract class BaseConfigurationSpout extends BaseRichSpout
     private SpoutOutputCollector collector;
 
     /**
-     * デフォルトコンストラクタ
+     * パラメータを指定せずにインスタンスを生成する。
      */
     public BaseConfigurationSpout()
     {}

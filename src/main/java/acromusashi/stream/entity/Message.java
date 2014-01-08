@@ -31,7 +31,7 @@ public class Message implements Serializable
     private Object            body;
 
     /**
-     * デフォルトコンストラクタ
+     * インスタンス化を防止するためのコンストラクタ
      */
     public Message()
     {}
@@ -68,6 +68,9 @@ public class Message implements Serializable
         this.body = body;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString()
     {

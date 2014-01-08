@@ -22,7 +22,8 @@ import net.sf.json.JSONObject;
 import org.apache.camel.Exchange;
 import org.apache.camel.converter.stream.InputStreamCache;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Exchangeオブジェクトに含まれるHTTP Post Resuestを取得し、第一要素のValueを抽出するクラス<br/>
@@ -34,7 +35,7 @@ import org.apache.log4j.Logger;
 public class JsonExtractor
 {
     /** logger */
-    private static final Logger logger             = Logger.getLogger(JsonExtractor.class);
+    private static final Logger logger             = LoggerFactory.getLogger(JsonExtractor.class);
 
     /** Key-Valueのセパレータ */
     private static final String KEYVALUE_SEPARATOR = "=";
@@ -43,7 +44,7 @@ public class JsonExtractor
     public boolean              isDoValidate;
 
     /**
-     * デフォルトコンストラクタ
+     * パラメータを指定せずにインスタンスを生成する。
      */
     public JsonExtractor()
     {}
@@ -57,8 +58,7 @@ public class JsonExtractor
      */
     public void extractJson(Exchange exchange)
     {
-        InputStreamCache iscache = exchange.getIn().getBody(
-                InputStreamCache.class);
+        InputStreamCache iscache = exchange.getIn().getBody(InputStreamCache.class);
 
         String postStr = null;
 
@@ -69,9 +69,7 @@ public class JsonExtractor
         }
         catch (IOException ioex)
         {
-            logger.warn(
-                    "Failed to extract string from Request. Dispose request.",
-                    ioex);
+            logger.warn("Failed to extract string from Request. Dispose request.", ioex);
             return;
         }
 

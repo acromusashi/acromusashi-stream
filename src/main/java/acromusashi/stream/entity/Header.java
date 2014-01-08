@@ -32,6 +32,9 @@ public class Header implements Serializable
     /** 共通メッセージに設定されるデフォルトのバージョン値　*/
     public static final String  DEFAULT_VERSION  = "1.0";
 
+    /** Message Key　*/
+    private String              messageKey       = "";
+
     /** Message Identifier　*/
     private String              messageId        = "";
 
@@ -51,10 +54,26 @@ public class Header implements Serializable
     private Map<String, String> additionalHeader = new LinkedHashMap<String, String>();
 
     /**
-     * デフォルトコンストラクタ
+     * インスタンス化を防止するためのコンストラクタ
      */
     public Header()
     {}
+
+    /**
+     * @return the messageKey
+     */
+    public String getMessageKey()
+    {
+        return this.messageKey;
+    }
+
+    /**
+     * @param messageKey the messageKey to set
+     */
+    public void setMessageKey(String messageKey)
+    {
+        this.messageKey = messageKey;
+    }
 
     /**
      * @return the messageId
@@ -163,11 +182,13 @@ public class Header implements Serializable
         this.additionalHeader.put(key, value);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString()
     {
-        String result = ToStringBuilder.reflectionToString(this,
-                ToStringStyle.SHORT_PREFIX_STYLE);
+        String result = ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
         return result;
     }
 }

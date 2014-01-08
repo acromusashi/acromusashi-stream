@@ -14,6 +14,7 @@ package acromusashi.stream.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import backtype.storm.Config;
 
@@ -25,7 +26,7 @@ import backtype.storm.Config;
 public class StormConfigUtil
 {
     /**
-     * デフォルトコンストラクタ（インスタンス化防止用）
+     * インスタンス化を防止するためのコンストラクタ
      */
     private StormConfigUtil()
     {}
@@ -39,8 +40,7 @@ public class StormConfigUtil
      * @param defaultValue デフォルト値
      * @return 個別設定値(String型)
      */
-    public static String getStringValue(Config stormConf, String key,
-            String defaultValue)
+    public static String getStringValue(Config stormConf, String key, String defaultValue)
     {
         Object config = stormConf.get(key);
 
@@ -92,5 +92,20 @@ public class StormConfigUtil
         }
 
         return configList;
+    }
+
+    /**
+     * Storm設定オブジェクトからMap型の設定値を取得する。<br/>
+     * 存在しない場合はnullを返す。
+     * 
+     * @param stormConf Storm設定オブジェクト
+     * @param key 設定値のキー
+     * @return 個別設定値(Map型)
+     */
+    @SuppressWarnings({"rawtypes"})
+    public static Map getMapValue(Config stormConf, String key)
+    {
+        Map configMap = (Map) stormConf.get(key);
+        return configMap;
     }
 }

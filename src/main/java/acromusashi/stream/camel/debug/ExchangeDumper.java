@@ -17,7 +17,8 @@ import java.io.IOException;
 import org.apache.camel.Exchange;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 受信したExchange内容をダンプ出力するデバッグ用クラス
@@ -27,10 +28,10 @@ import org.apache.log4j.Logger;
 public class ExchangeDumper
 {
     /** logger */
-    private static final Logger logger = Logger.getLogger(ExchangeDumper.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExchangeDumper.class);
 
     /**
-     * デフォルトコンストラクタ
+     * パラメータを指定せずにインスタンスを生成する。
      */
     public ExchangeDumper()
     {}
@@ -39,14 +40,13 @@ public class ExchangeDumper
      * Exchangeのdebug用メソッド。
      * 
      * @param exchange debug対象のExchange
-     * @throws IOException 
+     * @throws IOException 出力失敗時
      */
     public void dump(Exchange exchange) throws IOException
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug(ToStringBuilder.reflectionToString(
-                    exchange.getIn().getBody(),
+            logger.debug(ToStringBuilder.reflectionToString(exchange.getIn().getBody(),
                     ToStringStyle.SHORT_PREFIX_STYLE));
         }
     }

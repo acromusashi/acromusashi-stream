@@ -25,8 +25,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class TimeIntervalFormatUtil
 {
+    /** 切替インターバルのMAX値 */
+    private static final int INTERVAL_MAX = 100;
+
     /**
-     * デフォルトコンストラクタ(インスタンス化防止用)
+     * インスタンス化を防止するためのコンストラクタ
      */
     private TimeIntervalFormatUtil()
     {}
@@ -43,7 +46,7 @@ public class TimeIntervalFormatUtil
      */
     public static boolean checkValidInterval(int interval, TimeUnit unit)
     {
-        if (0 >= interval || 100 < interval)
+        if (0 >= interval || INTERVAL_MAX < interval)
         {
             return false;
         }
@@ -74,8 +77,8 @@ public class TimeIntervalFormatUtil
      * @return 整時用の基準時刻(long値)
      * @throws ParseException パース失敗時
      */
-    public static long generateInitialBaseTime(long initializeTime,
-            int intarval, TimeUnit intervalUnit) throws ParseException
+    public static long generateInitialBaseTime(long initializeTime, int intarval,
+            TimeUnit intervalUnit) throws ParseException
     {
         // １つ大きな単位をベースに基準時刻を取得する。
         // 例：10分間隔をインターバルとし、8:35を起動時刻とした場合、8:00を基準時刻とする。
@@ -84,8 +87,8 @@ public class TimeIntervalFormatUtil
         // 基準時刻から初期生成ファイル名称用の日時を算出する。
         // 例：10分間隔をインターバルとし、8:35を起動時刻とした場合、8:00を基準時刻とし、
         //    そこから8:10、8:20・・・とずらしていって初期生成ファイル名称用の日時(8:30)を算出する。
-        long initialBaseTime = generateNextFileBaseTime(initializeTime,
-                datumTime, intarval, intervalUnit);
+        long initialBaseTime = generateNextFileBaseTime(initializeTime, datumTime, intarval,
+                intervalUnit);
 
         return initialBaseTime;
     }
@@ -98,8 +101,7 @@ public class TimeIntervalFormatUtil
      * @return 整時用の基準時刻(long値)
      * @throws ParseException パース失敗時
      */
-    public static long generateDatumTime(long initializeTime, TimeUnit unit)
-            throws ParseException
+    public static long generateDatumTime(long initializeTime, TimeUnit unit) throws ParseException
     {
         // 初期に生成するファイル名称を基準となる値にするため、ファイル切替インターバル（単位）より１つ大きな単位を取得し
         // １つ大きな単位をベースに時刻を算出する。
@@ -109,8 +111,7 @@ public class TimeIntervalFormatUtil
 
         // １つ大きな単位をベースに基準時刻を取得し、初期生成ファイル名称用の日時を算出する。
         // 例：10分間隔をインターバルとし、8:35を起動時刻とした場合、8:00を基準時刻とする。
-        String datumTimeString = parentDateFormat.format(new Date(
-                initializeTime));
+        String datumTimeString = parentDateFormat.format(new Date(initializeTime));
 
         long datumTime = parentDateFormat.parse(datumTimeString).getTime();
         return datumTime;
@@ -125,8 +126,8 @@ public class TimeIntervalFormatUtil
      * @param intervalUnit ファイル切替インターバル（単位）
      * @return 次のファイル名称のベース時刻
      */
-    public static long generateNextFileBaseTime(long nowTime,
-            long oldSwitchTime, int intarval, TimeUnit intervalUnit)
+    public static long generateNextFileBaseTime(long nowTime, long oldSwitchTime, int intarval,
+            TimeUnit intervalUnit)
     {
         long nextBaseTime = oldSwitchTime;
 

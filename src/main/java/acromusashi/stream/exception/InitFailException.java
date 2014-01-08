@@ -23,7 +23,7 @@ public class InitFailException extends RuntimeException
     private static final long serialVersionUID = 70574633960070251L;
 
     /**
-     * デフォルトコンストラクタ
+     * パラメータを指定せずにインスタンスを生成する。
      */
     public InitFailException()
     {

@@ -23,7 +23,7 @@ public class ConvertFailException extends Exception
     private static final long serialVersionUID = -3457655487597730586L;
 
     /**
-     * デフォルトコンストラクタ
+     * パラメータを指定せずにインスタンスを生成する。
      */
     public ConvertFailException()
     {

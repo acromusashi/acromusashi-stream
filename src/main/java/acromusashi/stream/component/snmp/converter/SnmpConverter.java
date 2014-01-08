@@ -40,7 +40,7 @@ public class SnmpConverter extends AbstractMessageConverter
     public static final String SNMP_TRAP_OID    = "1.3.6.1.6.3.1.1.4.1.0";
 
     /**
-     * デフォルトコンストラクタ
+     * パラメータを指定せずにインスタンスを生成する。
      */
     public SnmpConverter()
     {}

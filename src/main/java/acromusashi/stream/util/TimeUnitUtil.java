@@ -25,10 +25,10 @@ import java.util.concurrent.TimeUnit;
 public class TimeUnitUtil
 {
     /** パターンマップ */
-    private static Map<TimeUnit, String> formatMap__;
+    private static Map<TimeUnit, String> formatMap;
 
     /**
-     * デフォルトコンストラクタ（インスタンス化防止用）
+     * インスタンス化を防止するためのコンストラクタ
      */
     private TimeUnitUtil()
     {}
@@ -41,7 +41,7 @@ public class TimeUnitUtil
         baseMap.put(TimeUnit.MINUTES, "yyyyMMddHHmm");
         baseMap.put(TimeUnit.SECONDS, "yyyyMMddHHmmss");
         baseMap.put(TimeUnit.MILLISECONDS, "yyyyMMddHHmmssSSS");
-        formatMap__ = Collections.unmodifiableMap(baseMap);
+        formatMap = Collections.unmodifiableMap(baseMap);
     }
 
     /**
@@ -52,7 +52,7 @@ public class TimeUnitUtil
      */
     public static String getDatePattern(TimeUnit unit)
     {
-        return formatMap__.get(unit);
+        return formatMap.get(unit);
     }
 
     /**

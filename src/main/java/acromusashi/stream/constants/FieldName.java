@@ -19,6 +19,9 @@ package acromusashi.stream.constants;
  */
 public interface FieldName
 {
-    /** 共通メッセージを格納するField名称 */
-    String MESSAGE = "message";
+    /** メッセージをグルーピングするKey用のフィールド名称 */
+    String MESSAGE_KEY   = "messageKey";
+
+    /** メッセージ値を格納するフィールド名称 */
+    String MESSAGE_VALUE = "messageValue";
 }

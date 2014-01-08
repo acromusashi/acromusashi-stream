@@ -33,7 +33,7 @@ import backtype.storm.Config;
 public class StormConfigGenerator
 {
     /**
-     * デフォルトコンストラクタ（インスタンス化防止用）
+     * インスタンス化を防止するためのコンストラクタ
      */
     private StormConfigGenerator()
     {}

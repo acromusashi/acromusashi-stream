@@ -27,7 +27,7 @@ import org.snmp4j.smi.UdpAddress;
 public class SnmpParser
 {
     /**
-     * デフォルトコンストラクタ
+     * パラメータを指定せずにインスタンスを生成する。
      */
     public SnmpParser()
     {}

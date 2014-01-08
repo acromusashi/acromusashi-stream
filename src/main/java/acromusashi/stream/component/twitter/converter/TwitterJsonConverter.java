@@ -36,7 +36,7 @@ public class TwitterJsonConverter extends AbstractMessageConverter
     public static final String DATE_FORMAT      = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
 
     /**
-     * デフォルトコンストラクタ
+     * パラメータを指定せずにインスタンスを生成する。
      */
     public TwitterJsonConverter()
     {}

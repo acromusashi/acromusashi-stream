@@ -18,7 +18,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.spring.Main;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Camelの初期化を行うクラス
@@ -31,13 +32,13 @@ public class CamelInitializer
     private static final int                     INITIALIZE_TIMEOUT = 60;
 
     /** logger */
-    private static final Logger                  logger             = Logger.getLogger(CamelInitializer.class);
+    private static final Logger                  logger             = LoggerFactory.getLogger(CamelInitializer.class);
 
     /** 初期化済みのProducerTemplateを保持するMap */
-    private static Map<Object, ProducerTemplate> templates__        = new HashMap<Object, ProducerTemplate>();
+    private static Map<Object, ProducerTemplate> templates          = new HashMap<Object, ProducerTemplate>();
 
     /**
-     * デフォルトコンストラクタ（インスタンス化防止用）
+     * インスタンス化を防止するためのコンストラクタ
      */
     private CamelInitializer()
     {}
@@ -51,13 +52,12 @@ public class CamelInitializer
      * @return Camelへの送信オブジェクト
      * @throws Exception 初期化失敗時
      */
-    public static ProducerTemplate generateTemplete(String contextUri)
-            throws Exception
+    public static ProducerTemplate generateTemplete(String contextUri) throws Exception
     {
         String initKey = contextUri.intern();
         synchronized (initKey)
         {
-            ProducerTemplate template = templates__.get(initKey);
+            ProducerTemplate template = templates.get(initKey);
 
             // 初期化済みの場合は、初期化済みのProducerTemplateを返す。
             if (template != null)
@@ -71,8 +71,7 @@ public class CamelInitializer
             main.enableHangupSupport();
 
             // run Camel
-            CamelInitializeThread initializeThread = new CamelInitializeThread(
-                    main);
+            CamelInitializeThread initializeThread = new CamelInitializeThread(main);
             initializeThread.start();
 
             int timeCounter = 0;
@@ -104,7 +103,7 @@ public class CamelInitializer
             // ProducerTemplateを取得する
             template = main.getCamelTemplate();
             // 初期化済みのProducerTemplateを保持する
-            templates__.put(initKey, template);
+            templates.put(initKey, template);
 
             return template;
         }

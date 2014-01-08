@@ -14,7 +14,8 @@ package acromusashi.stream.topology;
 
 import java.text.MessageFormat;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -31,7 +32,7 @@ import backtype.storm.topology.TopologyBuilder;
 public abstract class BaseTopology
 {
     /** logger */
-    private static final Logger logger  = Logger.getLogger(BaseTopology.class);
+    private static final Logger logger  = LoggerFactory.getLogger(BaseTopology.class);
 
     /** TopologyBuilder */
     private TopologyBuilder     builder = new TopologyBuilder();
