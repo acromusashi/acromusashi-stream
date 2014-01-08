@@ -8,7 +8,7 @@
 	
 	<Match>
 		<Class name="~.*Test" />
-		<BugCode name="UwF, NP" />
+		<BugCode name="UwF, NP, RV" />
 	</Match>
 
 </FindBugsFilter>

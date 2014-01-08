@@ -1,5 +1,5 @@
 #FindBugs User Preferences
-#Sat Sep 01 11:06:24 JST 2012
+#Thu Sep 05 15:57:50 JST 2013
 cloud_id=edu.umd.cs.findbugs.cloud.doNothingCloud
 detectorAppendingToAnObjectOutputStream=AppendingToAnObjectOutputStream|true
 detectorAtomicityProblem=AtomicityProblem|true
@@ -132,6 +132,6 @@ detectorXMLFactoryBypass=XMLFactoryBypass|true
 detector_threshold=2
 effort=default
 excludefilter0=findbugs-exclude.xml|true
-filter_settings=Medium|BAD_PRACTICE,CORRECTNESS,EXPERIMENTAL,I18N,MALICIOUS_CODE,MT_CORRECTNESS,PERFORMANCE,SECURITY,STYLE|false|15
-filter_settings_neg=NOISE|
+filter_settings=Medium|BAD_PRACTICE,CORRECTNESS,I18N,MALICIOUS_CODE,MT_CORRECTNESS,PERFORMANCE,SECURITY,STYLE|false|20
+filter_settings_neg=NOISE,EXPERIMENTAL|
 run_at_full_build=false
