@@ -19,7 +19,8 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.component.hbase.model.HBaseCell;
 import org.apache.camel.component.hbase.model.HBaseData;
 import org.apache.camel.component.hbase.model.HBaseRow;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import acromusashi.stream.bolt.MessageBolt;
 import acromusashi.stream.camel.CamelInitializer;
@@ -44,13 +45,13 @@ public class CamelHbaseStoreBolt extends MessageBolt
     private static final long          serialVersionUID = -668373233969623288L;
 
     /** logger */
-    private static final Logger        logger           = Logger.getLogger(CamelHbaseStoreBolt.class);
+    private static final Logger        logger           = LoggerFactory.getLogger(CamelHbaseStoreBolt.class);
 
-    /** Camel上での送信先として使用するendpointUri。 */
-    private String                     endpointUriTo    = "hbase:stream?mappingStrategyName=body";
+    /** ApplicationContextのファイルパス */
+    private String                     contextUri;
 
-    /** ApplicationContextのファイルパス。デフォルト値は"camel-context_hbase.xml" */
-    private String                     contextUri       = "camel-context_hbase.xml";
+    /** デフォルトのEndPoint */
+    private String                     defaultEndPoint  = "direct:hbase";
 
     /** HBase上の投入先を示すCell定義 */
     private List<CellDefine>           cellDefineList;
@@ -59,15 +60,14 @@ public class CamelHbaseStoreBolt extends MessageBolt
     private transient ProducerTemplate producerTemplate;
 
     /**
-     * デフォルトコンストラクタ
+     * パラメータを指定せずにインスタンスを生成する。
      */
     public CamelHbaseStoreBolt()
     {}
 
     @SuppressWarnings("rawtypes")
     @Override
-    public void prepare(Map stormConf, TopologyContext context,
-            OutputCollector collector)
+    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector)
     {
         super.prepare(stormConf, context, collector);
 
@@ -92,8 +92,7 @@ public class CamelHbaseStoreBolt extends MessageBolt
         // rowidを設定する。
         HBaseData data = new HBaseData();
         HBaseRow row = new HBaseRow();
-        row.setId(values.get("timestamp").toString() + "_"
-                + values.get("source").toString());
+        row.setId(values.get("timestamp").toString() + "_" + values.get("source").toString());
 
         List<String> bodyList = (List<String>) values.get("body");
 
@@ -110,20 +109,18 @@ public class CamelHbaseStoreBolt extends MessageBolt
 
         data.getRows().add(row);
 
-        insert(getEndpointUriTo(), data);
+        insert(data);
     }
 
     /**
      * endpointUriを指定して、DBにinsertを行う。
      * 
-     * @param endpointUri
-     *            CamelのendpointUri
      * @param values
      *            PreparedStatementに設定する値
      */
-    protected void insert(String endpointUri, HBaseData values)
+    protected void insert(HBaseData values)
     {
-        this.producerTemplate.sendBody(endpointUri, values);
+        this.producerTemplate.sendBody(this.defaultEndPoint, values);
     }
 
     /**
@@ -138,26 +135,6 @@ public class CamelHbaseStoreBolt extends MessageBolt
     public void setApplicationContextUri(String applicationContextUri)
     {
         this.contextUri = applicationContextUri;
-    }
-
-    /**
-     * 送信先EndPointを返す。
-     * 
-     * @return 送信先EndPoint
-     */
-    protected String getEndpointUriTo()
-    {
-        return this.endpointUriTo;
-    }
-
-    /**
-     * 送信先EndPointを設定する。
-     * 
-     * @param endpointUriTo 送信先EndPoint
-     */
-    public void setEndpointUriTo(String endpointUriTo)
-    {
-        this.endpointUriTo = endpointUriTo;
     }
 
     /**

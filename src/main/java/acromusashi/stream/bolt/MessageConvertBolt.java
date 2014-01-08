@@ -16,7 +16,8 @@ import java.text.MessageFormat;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import acromusashi.stream.constants.FieldName;
 import acromusashi.stream.converter.AbstractMessageConverter;
@@ -40,13 +41,13 @@ public class MessageConvertBolt extends BaseConfigurationBolt
     private static final long          serialVersionUID = 8285275433076201532L;
 
     /** logger */
-    private static final Logger        logger           = Logger.getLogger(MessageConvertBolt.class);
+    private static final Logger        logger           = LoggerFactory.getLogger(MessageConvertBolt.class);
 
     /** Message生成用のコンバータ */
     protected AbstractMessageConverter converter;
 
     /**
-     * デフォルトコンストラクタ
+     * パラメータを指定せずにインスタンスを生成する。
      */
     public MessageConvertBolt()
     {}
@@ -106,7 +107,7 @@ public class MessageConvertBolt extends BaseConfigurationBolt
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer)
     {
-        declarer.declare(new Fields(FieldName.MESSAGE));
+        declarer.declare(new Fields(FieldName.MESSAGE_VALUE));
     }
 
     /**

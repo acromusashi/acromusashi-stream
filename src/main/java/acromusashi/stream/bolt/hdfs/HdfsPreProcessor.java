@@ -18,7 +18,8 @@ import java.text.MessageFormat;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * HDFSSink起動時の前処理を行うクラス
@@ -28,10 +29,10 @@ import org.apache.log4j.Logger;
 public class HdfsPreProcessor
 {
     /** logger */
-    private static final Logger logger = Logger.getLogger(HdfsOutputSwitcher.class);
+    private static final Logger logger = LoggerFactory.getLogger(HdfsOutputSwitcher.class);
 
     /**
-     * デフォルトコンストラクタ（インスタンス化防止用）
+     * インスタンス化を防止するためのコンストラクタ
      */
     private HdfsPreProcessor()
     {}
@@ -45,8 +46,7 @@ public class HdfsPreProcessor
      * @param baseName ベース名称
      * @param tmpSuffix 一時ファイル名称パターン
      */
-    public static void execute(FileSystem hdfs, String baseUrl,
-            String baseName, String tmpSuffix)
+    public static void execute(FileSystem hdfs, String baseUrl, String baseName, String tmpSuffix)
     {
         String baseRealUrl = baseUrl;
 
@@ -55,8 +55,7 @@ public class HdfsPreProcessor
             baseRealUrl = baseRealUrl + "/";
         }
 
-        String targetPattern = baseRealUrl + baseName + "[0-9]*" + tmpSuffix
-                + "*";
+        String targetPattern = baseRealUrl + baseName + "[0-9]*" + tmpSuffix + "*";
         Path targetPathPattern = new Path(targetPattern);
 
         FileStatus[] targetTmpFiles = null;
@@ -67,9 +66,7 @@ public class HdfsPreProcessor
         }
         catch (IOException ioex)
         {
-            logger.warn(
-                    "Failed to search preprocess target files. Skip preprocess.",
-                    ioex);
+            logger.warn("Failed to search preprocess target files. Skip preprocess.", ioex);
             return;
         }
 
@@ -120,8 +117,7 @@ public class HdfsPreProcessor
      * @param targetTmpPath 前処理対象ファイルパス
      * @param tmpSuffix 一時ファイル名称パターン
      */
-    private static void renameTmpFile(FileSystem hdfs, String targetTmpPath,
-            String tmpSuffix)
+    private static void renameTmpFile(FileSystem hdfs, String targetTmpPath, String tmpSuffix)
     {
         String basePath = extractBasePath(targetTmpPath, tmpSuffix);
 
@@ -142,8 +138,7 @@ public class HdfsPreProcessor
         if (isFileExists)
         {
             String logFormat = "File exists renamed target. Skip file rename. : BeforeUri={0} , AfterUri={1}";
-            String logMessage = MessageFormat.format(logFormat, targetTmpPath,
-                    basePath);
+            String logMessage = MessageFormat.format(logFormat, targetTmpPath, basePath);
             logger.warn(logMessage);
         }
         else
@@ -155,8 +150,7 @@ public class HdfsPreProcessor
             catch (IOException ioex)
             {
                 String logFormat = "Failed to HDFS file rename. Skip rename file and continue preprocess. : BeforeUri={0} , AfterUri={1}";
-                String logMessage = MessageFormat.format(logFormat,
-                        targetTmpPath, basePath);
+                String logMessage = MessageFormat.format(logFormat, targetTmpPath, basePath);
                 logger.warn(logMessage, ioex);
             }
         }

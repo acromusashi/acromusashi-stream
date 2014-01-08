@@ -33,7 +33,7 @@ public class HdfsStreamWriter
     private boolean            isFileSyncEachTime = false;
 
     /**
-     * デフォルトコンストラクタ
+     * パラメータを指定せずにインスタンスを生成する。
      */
     public HdfsStreamWriter()
     {}

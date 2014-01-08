@@ -14,7 +14,8 @@ package acromusashi.stream.bolt;
 
 import java.text.MessageFormat;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import acromusashi.stream.constants.FieldName;
 import acromusashi.stream.converter.AbstractMessageConverter;
@@ -36,7 +37,7 @@ public abstract class MessageBolt extends BaseConfigurationBolt
     private static final long          serialVersionUID = -434252908894821429L;
 
     /** logger */
-    private static final Logger        logger           = Logger.getLogger(MessageBolt.class);
+    private static final Logger        logger           = LoggerFactory.getLogger(MessageBolt.class);
 
     /** Message生成用のコンバータ */
     protected AbstractMessageConverter converter;
@@ -52,7 +53,7 @@ public abstract class MessageBolt extends BaseConfigurationBolt
         }
 
         // Tupleのフィールド"message"にMessageが設定されていない場合はnullを返す
-        Object obj = input.getValueByField(FieldName.MESSAGE);
+        Object obj = input.getValueByField(FieldName.MESSAGE_VALUE);
         if (obj == null || !(obj instanceof Message))
         {
             String logFormat = "Failed to get message object. Skip message prosessing. : InputTuple={0}";

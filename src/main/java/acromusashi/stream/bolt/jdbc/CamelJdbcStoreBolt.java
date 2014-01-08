@@ -18,7 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.camel.ProducerTemplate;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import acromusashi.stream.bolt.MessageBolt;
 import acromusashi.stream.camel.CamelInitializer;
@@ -48,7 +49,7 @@ public class CamelJdbcStoreBolt extends MessageBolt
     private static final long          serialVersionUID = -668373233969623288L;
 
     /** logger */
-    private static final Logger        logger           = Logger.getLogger(CamelJdbcStoreBolt.class);
+    private static final Logger        logger           = LoggerFactory.getLogger(CamelJdbcStoreBolt.class);
 
     /** Camelで使用するendpointUri。デフォルト値は"direct:CamelSqlBolt" */
     private String                     endpointUri      = "direct:CamelJdbcBolt";
@@ -60,15 +61,14 @@ public class CamelJdbcStoreBolt extends MessageBolt
     private transient ProducerTemplate producerTemplate;
 
     /**
-     * デフォルトコンストラクタ
+     * パラメータを指定せずにインスタンスを生成する。
      */
     public CamelJdbcStoreBolt()
     {}
 
     @SuppressWarnings("rawtypes")
     @Override
-    public void prepare(Map stormConf, TopologyContext context,
-            OutputCollector collector)
+    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector)
     {
         super.prepare(stormConf, context, collector);
 
@@ -87,7 +87,7 @@ public class CamelJdbcStoreBolt extends MessageBolt
      * Message受信時の処理を行う
      * 
      * @param message 受信Message
-     * @throws ConvertFailException 
+     * @throws ConvertFailException 変換失敗時
      */
     @Override
     @SuppressWarnings("unchecked")

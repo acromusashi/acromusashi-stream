@@ -18,7 +18,8 @@ import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import acromusashi.stream.bolt.MessageBolt;
 import acromusashi.stream.entity.Message;
@@ -37,13 +38,13 @@ public class HdfsStoreBolt extends MessageBolt
     private static final long            serialVersionUID = -2877852415844943739L;
 
     /** logger */
-    private static final Logger          logger           = Logger.getLogger(HdfsStoreBolt.class);
+    private static final Logger          logger           = LoggerFactory.getLogger(HdfsStoreBolt.class);
 
     /** HDFSへの出力コンポーネント */
     private transient HdfsOutputSwitcher delegate         = null;
 
     /**
-     * デフォルトコンストラクタ
+     * パラメータを指定せずにインスタンスを生成する。
      */
     public HdfsStoreBolt()
     {}
@@ -53,8 +54,7 @@ public class HdfsStoreBolt extends MessageBolt
      */
     @SuppressWarnings("rawtypes")
     @Override
-    public void prepare(Map stormConf, TopologyContext context,
-            OutputCollector collector)
+    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector)
     {
         super.prepare(stormConf, context, collector);
 
@@ -63,10 +63,10 @@ public class HdfsStoreBolt extends MessageBolt
 
         HdfsStoreConfig config = new HdfsStoreConfig();
 
-        config.outputUri = (String) stormConf.get("hdfsstorebolt.outputuri");
-        config.fileNameHeader = (String) stormConf.get("hdfsstorebolt.filenameheader");
-        config.fileSwitchIntarval = ((Long) stormConf.get("hdfsstorebolt.interval")).intValue();
-        config.fileNameBody = "_" + componentId + "_" + taskId + "_";
+        config.setOutputUri((String) stormConf.get("hdfsstorebolt.outputuri"));
+        config.setFileNameHeader((String) stormConf.get("hdfsstorebolt.filenameheader"));
+        config.setFileSwitchIntarval(((Long) stormConf.get("hdfsstorebolt.interval")).intValue());
+        config.setFileNameBody("_" + componentId + "_" + taskId + "_");
 
         boolean isPreprocess = true;
         Object isPreprocessObj = stormConf.get("hdfsstorebolt.executepreprocess");
@@ -79,20 +79,19 @@ public class HdfsStoreBolt extends MessageBolt
         {
             // HDFSファイルシステム取得
             Configuration conf = new Configuration();
-            Path dstPath = new Path(config.outputUri);
+            Path dstPath = new Path(config.getOutputUri());
             FileSystem fileSystem = dstPath.getFileSystem(conf);
 
             // HDFSに対する前処理実施。一時ファイルを本ファイルにリネームする。
             if (isPreprocess)
             {
-                HdfsPreProcessor.execute(fileSystem, config.outputUri,
-                        config.fileNameHeader + config.fileNameBody,
-                        config.tmpFileSuffix);
+                HdfsPreProcessor.execute(fileSystem, config.getOutputUri(),
+                        config.getFileNameHeader() + config.getFileNameBody(),
+                        config.getTmpFileSuffix());
             }
 
             this.delegate = new HdfsOutputSwitcher();
-            this.delegate.initialize(fileSystem, config,
-                    System.currentTimeMillis());
+            this.delegate.initialize(fileSystem, config, System.currentTimeMillis());
         }
         catch (Exception ex)
         {

@@ -22,7 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import acromusashi.stream.util.TimeIntervalFormatUtil;
 import acromusashi.stream.util.TimeUnitUtil;
@@ -36,7 +37,7 @@ import acromusashi.stream.util.TimeUnitUtil;
 public class HdfsOutputSwitcher
 {
     /** logger */
-    private static final Logger logger             = Logger.getLogger(HdfsOutputSwitcher.class);
+    private static final Logger logger             = LoggerFactory.getLogger(HdfsOutputSwitcher.class);
 
     /** 一時ファイルのインデックス最大値 */
     private static final int    TMP_MAX            = 50;
@@ -66,13 +67,13 @@ public class HdfsOutputSwitcher
     private SimpleDateFormat    dateFormat         = null;
 
     /** ファイル切替インターバル（値） */
-    private int                 switchTimeInterval = 10;
+    private int                 switchTimeInterval = HdfsStoreConfig.DEFAULT_INTERVAL;
 
     /** ファイル切替インターバル（単位） */
     private TimeUnit            switchTimeUnit     = TimeUnit.MINUTES;
 
     /**
-     * デフォルトコンストラクタ
+     * パラメータを指定せずにインスタンスを生成する。
      */
     public HdfsOutputSwitcher()
     {}
@@ -86,37 +87,36 @@ public class HdfsOutputSwitcher
      * @throws IOException 入出力エラー発生時
      * @throws ParseException パースエラー発生時
      */
-    public void initialize(FileSystem fileSystem, HdfsStoreConfig config,
-            long initializeTime) throws IOException, ParseException
+    public void initialize(FileSystem fileSystem, HdfsStoreConfig config, long initializeTime)
+            throws IOException, ParseException
     {
         this.fileSystem = fileSystem;
         this.config = config;
 
-        if (this.config.outputUri.endsWith("/") == false)
+        if (this.config.getOutputUri().endsWith("/") == false)
         {
-            this.outputDirUri = this.config.outputUri + "/";
+            this.outputDirUri = this.config.getOutputUri() + "/";
         }
         else
         {
-            this.outputDirUri = this.config.outputUri;
+            this.outputDirUri = this.config.getOutputUri();
         }
 
         // ファイル切替間隔が不正の場合誤動作を誘発するため、
         // バリデーションをかけて不正な場合はログ出力を行ってデフォルト値を設定する。
-        initializeIntervalConf(this.config.fileSwitchIntarval,
-                this.config.fileSwitchIntervalUnit);
+        initializeIntervalConf(this.config.getFileSwitchIntarval(),
+                this.config.getFileSwitchIntervalUnit());
 
         // ファイル切替インターバル（単位）をベースに時刻部分のフォーマットを取得。
-        this.dateFormat = new SimpleDateFormat(
-                TimeUnitUtil.getDatePattern(this.switchTimeUnit));
+        this.dateFormat = new SimpleDateFormat(TimeUnitUtil.getDatePattern(this.switchTimeUnit));
 
         // ファイル名称初期化用の時刻を生成する。
-        long initialBaseTime = TimeIntervalFormatUtil.generateInitialBaseTime(
-                initializeTime, this.switchTimeInterval, this.switchTimeUnit);
+        long initialBaseTime = TimeIntervalFormatUtil.generateInitialBaseTime(initializeTime,
+                this.switchTimeInterval, this.switchTimeUnit);
 
         this.currentOutputUri = generateOutputFileBase(this.outputDirUri,
-                this.config.fileNameHeader, this.config.fileNameBody,
-                this.dateFormat, initialBaseTime);
+                this.config.getFileNameHeader(), this.config.getFileNameBody(), this.dateFormat,
+                initialBaseTime);
 
         this.nextSwitchTime = initialBaseTime
                 + this.switchTimeUnit.toMillis(this.switchTimeInterval);
@@ -171,16 +171,15 @@ public class HdfsOutputSwitcher
 
         // 次のファイル名称に用いる時刻を算出する。
         // ファイル出力の間が空いた時のために切り替えた時刻にあわせて次のファイル名用時刻を算出する。
-        long nextBaseTime = TimeIntervalFormatUtil.generateNextFileBaseTime(
-                nowTime, this.nextSwitchTime, this.switchTimeInterval,
-                this.switchTimeUnit);
+        long nextBaseTime = TimeIntervalFormatUtil.generateNextFileBaseTime(nowTime,
+                this.nextSwitchTime, this.switchTimeInterval, this.switchTimeUnit);
 
         this.currentOutputUri = generateOutputFileBase(this.outputDirUri,
-                this.config.fileNameHeader, this.config.fileNameBody,
-                this.dateFormat, nextBaseTime);
+                this.config.getFileNameHeader(), this.config.getFileNameBody(), this.dateFormat,
+                nextBaseTime);
 
         this.nextSwitchTime = nextBaseTime
-                + this.config.fileSwitchIntervalUnit.toMillis(this.switchTimeInterval);
+                + this.config.getFileSwitchIntervalUnit().toMillis(this.switchTimeInterval);
 
         updateWriter();
     }
@@ -197,8 +196,8 @@ public class HdfsOutputSwitcher
         catch (IOException ex)
         {
             String logFormat = "Failed to HDFS file close. Continue file switch. : TargetUri={0}";
-            String logMessage = MessageFormat.format(logFormat,
-                    this.currentOutputUri + this.currentSuffix);
+            String logMessage = MessageFormat.format(logFormat, this.currentOutputUri
+                    + this.currentSuffix);
             logger.warn(logMessage, ex);
         }
 
@@ -206,14 +205,12 @@ public class HdfsOutputSwitcher
 
         try
         {
-            isFileExists = this.fileSystem.exists(new Path(
-                    this.currentOutputUri));
+            isFileExists = this.fileSystem.exists(new Path(this.currentOutputUri));
         }
         catch (IOException ioex)
         {
             String logFormat = "Failed to search target file exists. Skip file rename. : TargetUri={0}";
-            String logMessage = MessageFormat.format(logFormat,
-                    this.currentOutputUri);
+            String logMessage = MessageFormat.format(logFormat, this.currentOutputUri);
             logger.warn(logMessage, ioex);
             return;
         }
@@ -221,24 +218,22 @@ public class HdfsOutputSwitcher
         if (isFileExists)
         {
             String logFormat = "File exists renamed target. Skip file rename. : BeforeUri={0} , AfterUri={1}";
-            String logMessage = MessageFormat.format(logFormat,
-                    this.currentOutputUri + this.currentSuffix,
-                    this.currentOutputUri);
+            String logMessage = MessageFormat.format(logFormat, this.currentOutputUri
+                    + this.currentSuffix, this.currentOutputUri);
             logger.warn(logMessage);
         }
         else
         {
             try
             {
-                this.fileSystem.rename(new Path(this.currentOutputUri
-                        + this.currentSuffix), new Path(this.currentOutputUri));
+                this.fileSystem.rename(new Path(this.currentOutputUri + this.currentSuffix),
+                        new Path(this.currentOutputUri));
             }
             catch (IOException ex)
             {
                 String logFormat = "Failed to HDFS file rename. Skip rename file. : BeforeUri={0} , AfterUri={1}";
-                String logMessage = MessageFormat.format(logFormat,
-                        this.currentOutputUri + this.currentSuffix,
-                        this.currentOutputUri);
+                String logMessage = MessageFormat.format(logFormat, this.currentOutputUri
+                        + this.currentSuffix, this.currentOutputUri);
                 logger.warn(logMessage, ex);
             }
         }
@@ -251,28 +246,26 @@ public class HdfsOutputSwitcher
     public void updateWriter()
     {
         HdfsStreamWriter result = new HdfsStreamWriter();
-        String suffix = this.config.tmpFileSuffix;
+        String suffix = this.config.getTmpFileSuffix();
         int suffixIndex = 0;
-        boolean isFileSyncEachTime = this.config.isFileSyncEachTime;
+        boolean isFileSyncEachTime = this.config.isFileSyncEachTime();
         boolean isSucceed = false;
 
         while (suffixIndex < TMP_MAX)
         {
             try
             {
-                result.open(this.currentOutputUri + suffix, this.fileSystem,
-                        isFileSyncEachTime);
+                result.open(this.currentOutputUri + suffix, this.fileSystem, isFileSyncEachTime);
                 isSucceed = true;
                 break;
             }
             catch (IOException ex)
             {
                 String logFormat = "Failed to HDFS file open. Skip and retry next file. : TargetUri={0}";
-                String logMessage = MessageFormat.format(logFormat,
-                        this.currentOutputUri + suffix);
+                String logMessage = MessageFormat.format(logFormat, this.currentOutputUri + suffix);
                 logger.warn(logMessage, ex);
                 suffixIndex++;
-                suffix = this.config.tmpFileSuffix + suffixIndex;
+                suffix = this.config.getTmpFileSuffix() + suffixIndex;
             }
         }
 
@@ -284,8 +277,7 @@ public class HdfsOutputSwitcher
         else
         {
             String logFormat = "HDFS file open failure is retry overed. Skip HDFS file open. : TargetUri={0}";
-            String logMessage = MessageFormat.format(logFormat,
-                    this.currentOutputUri + suffix);
+            String logMessage = MessageFormat.format(logFormat, this.currentOutputUri + suffix);
             logger.warn(logMessage);
         }
     }
@@ -310,14 +302,12 @@ public class HdfsOutputSwitcher
      */
     public void initializeIntervalConf(int interval, TimeUnit unit)
     {
-        boolean isIntervalValid = TimeIntervalFormatUtil.checkValidInterval(
-                interval, unit);
+        boolean isIntervalValid = TimeIntervalFormatUtil.checkValidInterval(interval, unit);
 
         if (isIntervalValid == false)
         {
             String logFormat = "File switch interval is invalid. Apply default interval 10 minutes. : Interval={0} , TimeUnit={1}";
-            String logMessage = MessageFormat.format(logFormat, interval,
-                    unit.toString());
+            String logMessage = MessageFormat.format(logFormat, interval, unit.toString());
             logger.warn(logMessage);
         }
         else
@@ -341,14 +331,12 @@ public class HdfsOutputSwitcher
      * @param targetDate 算出時刻
      * @return ベースファイル名称
      */
-    private String generateOutputFileBase(String baseDir,
-            String fileNameHeader, String fileNameBody, DateFormat dateFormat,
-            long targetDate)
+    private String generateOutputFileBase(String baseDir, String fileNameHeader,
+            String fileNameBody, DateFormat dateFormat, long targetDate)
     {
         StringBuilder baseFileNameBuilder = new StringBuilder();
 
-        baseFileNameBuilder.append(baseDir).append(fileNameHeader).append(
-                fileNameBody);
+        baseFileNameBuilder.append(baseDir).append(fileNameHeader).append(fileNameBody);
         baseFileNameBuilder.append(dateFormat.format(new Date(targetDate)));
         String result = baseFileNameBuilder.toString();
 
