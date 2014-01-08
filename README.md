@@ -12,9 +12,3 @@ https://github.com/acromusashi/acromusashi-stream/wiki/Download
 ## License
 This software is released under the MIT License, see LICENSE.txt.
 
-## Third-Party Licenses
-
-For a list of third-party licenses associated with AcroMUSASHI Stream,  
-see <a href="https://github.com/acromusashi/acromusashi-stream/wiki/Library-License">Third-Party Licenses.<a/>
-
-
