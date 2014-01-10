@@ -33,13 +33,13 @@ import backtype.storm.utils.DRPCClient;
 public class DrpcRequestClient
 {
     /** デフォルトポート */
-    private static final int DEFAULT_PORT    = 3772;
+    private static final int    DEFAULT_PORT    = 3772;
 
     /** デフォルトタイムアウト */
-    private static final int DEFAULT_TIMEOUT = 30000;
+    private static final int    DEFAULT_TIMEOUT = 30000;
 
     /** logger */
-    private static Logger    logger          = LoggerFactory.getLogger(DrpcRequestClient.class);
+    private static final Logger logger          = LoggerFactory.getLogger(DrpcRequestClient.class);
 
     /**
      * パラメータを指定せずにインスタンスを生成する。

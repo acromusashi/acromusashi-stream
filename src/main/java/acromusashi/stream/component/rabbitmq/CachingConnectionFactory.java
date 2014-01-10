@@ -137,6 +137,7 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
         super(rabbitConnectionFactory);
     }
 
+    @Override
     public void setAddresses(String addresses)
     {
         super.setAddresses(addresses);
@@ -156,12 +157,12 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
 
     public boolean isPublisherConfirms()
     {
-        return publisherConfirms;
+        return this.publisherConfirms;
     }
 
     public boolean isPublisherReturns()
     {
-        return publisherReturns;
+        return this.publisherReturns;
     }
 
     public void setPublisherReturns(boolean publisherReturns)
@@ -181,7 +182,7 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
         // If the connection is already alive we assume that the new listeners want to be notified
         if (this.connection != null)
         {
-            this.getConnectionListener().onCreate(this.connection);
+            getConnectionListener().onCreate(this.connection);
         }
     }
 
@@ -220,9 +221,9 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
         }
         if (channel != null)
         {
-            if (logger.isTraceEnabled())
+            if (this.logger.isTraceEnabled())
             {
-                logger.trace("Found cached Rabbit Channel");
+                this.logger.trace("Found cached Rabbit Channel");
             }
         }
         else
@@ -237,9 +238,9 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
     {
         Channel targetChannel = createBareChannel(transactional);
 
-        if (logger.isDebugEnabled())
+        if (this.logger.isDebugEnabled())
         {
-            logger.debug("Creating cached Rabbit Channel from " + targetChannel);
+            this.logger.debug("Creating cached Rabbit Channel from " + targetChannel);
         }
         getChannelListener().onCreate(targetChannel, transactional);
         Class<?>[] interfaces;
@@ -264,9 +265,9 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
         boolean shouldFailback = shouldFailback();
         if (hasCachedConnection && shouldFailback)
         {
-            if (logger.isDebugEnabled())
+            if (this.logger.isDebugEnabled())
             {
-                logger.debug("Closing cached Rabbit Connection to failback");
+                this.logger.debug("Closing cached Rabbit Connection to failback");
             }
             this.connection.destroy();
         }
@@ -285,7 +286,8 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
             }
             catch (IOException e)
             {
-                logger.error("Could not configure the channel to receive publisher confirms", e);
+                this.logger.error("Could not configure the channel to receive publisher confirms",
+                        e);
             }
         }
         if (this.publisherConfirms || this.publisherReturns)
@@ -298,6 +300,7 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
         return channel;
     }
 
+    @Override
     public final Connection createConnection() throws AmqpException
     {
         synchronized (this.connectionMonitor)
@@ -326,7 +329,7 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
     {
         synchronized (this.connectionMonitor)
         {
-            if (connection != null)
+            if (this.connection != null)
             {
                 this.connection.destroy();
                 this.connection = null;
@@ -343,7 +346,7 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
         this.active = false;
         synchronized (this.cachedChannelsNonTransactional)
         {
-            for (ChannelProxy channel : cachedChannelsNonTransactional)
+            for (ChannelProxy channel : this.cachedChannelsNonTransactional)
             {
                 try
                 {
@@ -351,14 +354,14 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
                 }
                 catch (Throwable ex)
                 {
-                    logger.trace("Could not close cached Rabbit Channel", ex);
+                    this.logger.trace("Could not close cached Rabbit Channel", ex);
                 }
             }
             this.cachedChannelsNonTransactional.clear();
         }
         synchronized (this.cachedChannelsTransactional)
         {
-            for (ChannelProxy channel : cachedChannelsTransactional)
+            for (ChannelProxy channel : this.cachedChannelsTransactional)
             {
                 try
                 {
@@ -366,7 +369,7 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
                 }
                 catch (Throwable ex)
                 {
-                    logger.trace("Could not close cached Rabbit Channel", ex);
+                    this.logger.trace("Could not close cached Rabbit Channel", ex);
                 }
             }
             this.cachedChannelsTransactional.clear();
@@ -377,8 +380,8 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
     @Override
     public String toString()
     {
-        return "CachingConnectionFactory [channelCacheSize=" + channelCacheSize + ", host="
-                + this.getHost() + ", port=" + this.getPort() + ", active=" + active + "]";
+        return "CachingConnectionFactory [channelCacheSize=" + this.channelCacheSize + ", host="
+                + getHost() + ", port=" + getPort() + ", active=" + this.active + "]";
     }
 
     private class CachedChannelInvocationHandler implements InvocationHandler
@@ -400,6 +403,7 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
             this.transactional = transactional;
         }
 
+        @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
             String methodName = method.getName();
@@ -425,7 +429,7 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
             else if (methodName.equals("close"))
             {
                 // Handle close method: don't pass the call on.
-                if (active)
+                if (CachingConnectionFactory.this.active)
                 {
                     synchronized (this.channelList)
                     {
@@ -459,12 +463,12 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
                 {
                     this.target = null;
                 }
-                synchronized (targetMonitor)
+                synchronized (this.targetMonitor)
                 {
                     boolean shouldFailback = shouldFailback();
                     if (this.target == null || shouldFailback)
                     {
-                        this.target = createBareChannel(transactional);
+                        this.target = createBareChannel(this.transactional);
                     }
                     return method.invoke(this.target, args);
                 }
@@ -475,13 +479,13 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
                 {
                     // Basic re-connection logic...
                     this.target = null;
-                    logger.debug("Detected closed channel on exception.  Re-initializing: "
-                            + target);
-                    synchronized (targetMonitor)
+                    CachingConnectionFactory.this.logger.debug("Detected closed channel on exception.  Re-initializing: "
+                            + this.target);
+                    synchronized (this.targetMonitor)
                     {
                         if (this.target == null)
                         {
-                            this.target = createBareChannel(transactional);
+                            this.target = createBareChannel(this.transactional);
                         }
                     }
                 }
@@ -498,7 +502,7 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
         {
             if (this.target != null && !this.target.isOpen())
             {
-                synchronized (targetMonitor)
+                synchronized (this.targetMonitor)
                 {
                     if (this.target != null && !this.target.isOpen())
                     {
@@ -510,9 +514,10 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
             // Allow for multiple close calls...
             if (!this.channelList.contains(proxy))
             {
-                if (logger.isTraceEnabled())
+                if (CachingConnectionFactory.this.logger.isTraceEnabled())
                 {
-                    logger.trace("Returning cached Channel: " + this.target);
+                    CachingConnectionFactory.this.logger.trace("Returning cached Channel: "
+                            + this.target);
                 }
                 this.channelList.addLast(proxy);
             }
@@ -520,9 +525,9 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
 
         private void physicalClose() throws Exception
         {
-            if (logger.isDebugEnabled())
+            if (CachingConnectionFactory.this.logger.isDebugEnabled())
             {
-                logger.debug("Closing cached Channel: " + this.target);
+                CachingConnectionFactory.this.logger.debug("Closing cached Channel: " + this.target);
             }
             if (this.target == null)
             {
@@ -530,7 +535,7 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
             }
             if (this.target.isOpen())
             {
-                synchronized (targetMonitor)
+                synchronized (this.targetMonitor)
                 {
                     if (this.target.isOpen())
                     {
@@ -555,15 +560,17 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
 
         private Channel createBareChannel(boolean transactional)
         {
-            return target.createChannel(transactional);
+            return this.target.createChannel(transactional);
         }
 
+        @Override
         public Channel createChannel(boolean transactional)
         {
             Channel channel = getChannel(transactional);
             return channel;
         }
 
+        @Override
         public void close()
         {}
 
@@ -572,26 +579,28 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
             reset();
             if (this.target != null)
             {
-                getConnectionListener().onClose(target);
+                getConnectionListener().onClose(this.target);
                 RabbitUtils.closeConnection(this.target);
             }
             this.target = null;
         }
 
+        @Override
         public boolean isOpen()
         {
-            return target != null && target.isOpen();
+            return this.target != null && this.target.isOpen();
         }
 
+        @Override
         public Connection getTargetConnection()
         {
-            return target;
+            return this.target;
         }
 
         @Override
         public int hashCode()
         {
-            return 31 + ((target == null) ? 0 : target.hashCode());
+            return 31 + ((this.target == null) ? 0 : this.target.hashCode());
         }
 
         @Override
@@ -610,14 +619,14 @@ public class CachingConnectionFactory extends AbstractConnectionFactory
                 return false;
             }
             ChannelCachingConnectionProxy other = (ChannelCachingConnectionProxy) obj;
-            if (target == null)
+            if (this.target == null)
             {
                 if (other.target != null)
                 {
                     return false;
                 }
             }
-            else if (!target.equals(other.target))
+            else if (!this.target.equals(other.target))
             {
                 return false;
             }

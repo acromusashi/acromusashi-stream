@@ -119,11 +119,11 @@ public class KestrelSpout extends BaseRichSpout
         {
             throw new IllegalArgumentException("Must configure at least one host");
         }
-        hostInfos = new ArrayList<HostInfo>();
+        this.hostInfos = new ArrayList<HostInfo>();
         for (String host : hostStrs)
         {
             String[] array = host.split(":");
-            hostInfos.add(new HostInfo(array[0], Integer.valueOf(array[1])));
+            this.hostInfos.add(new HostInfo(array[0], Integer.valueOf(array[1])));
         }
         this.queueName = queueName;
         this.messageScheme = multiScheme;
@@ -137,17 +137,16 @@ public class KestrelSpout extends BaseRichSpout
      * @param queueName キュー名称
      * @param multiScheme メッセージ変換用スキーム
      */
-    public KestrelSpout(List<String> hostnames, int port, String queueName,
-            MultiScheme multiScheme)
+    public KestrelSpout(List<String> hostnames, int port, String queueName, MultiScheme multiScheme)
     {
         if (hostnames.isEmpty())
         {
             throw new IllegalArgumentException("Must configure at least one host");
         }
-        hostInfos = Lists.newArrayList();
+        this.hostInfos = Lists.newArrayList();
         for (String hostname : hostnames)
         {
-            hostInfos.add(new HostInfo(hostname, port));
+            this.hostInfos.add(new HostInfo(hostname, port));
         }
         this.queueName = queueName;
         this.messageScheme = multiScheme;
@@ -225,22 +224,22 @@ public class KestrelSpout extends BaseRichSpout
         Number timeout = (Number) conf.get(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS);
         this.messageTimeoutMs = (int) TimeUnit.SECONDS.toMillis(timeout.longValue());
         this.collector = collector;
-        emitIndex = 0;
-        clientInfoList = Lists.newArrayList();
+        this.emitIndex = 0;
+        this.clientInfoList = Lists.newArrayList();
         int numTasks = context.getComponentTasks(context.getThisComponentId()).size();
         int myIndex = context.getThisTaskIndex();
-        int numHosts = hostInfos.size();
+        int numHosts = this.hostInfos.size();
         if (numTasks < numHosts)
         {
-            for (HostInfo host : hostInfos)
+            for (HostInfo host : this.hostInfos)
             {
-                clientInfoList.add(new KestrelClientInfo(host.getHost(), host.getPort()));
+                this.clientInfoList.add(new KestrelClientInfo(host.getHost(), host.getPort()));
             }
         }
         else
         {
-            HostInfo host = hostInfos.get(myIndex % numHosts);
-            clientInfoList.add(new KestrelClientInfo(host.getHost(), host.getPort()));
+            HostInfo host = this.hostInfos.get(myIndex % numHosts);
+            this.clientInfoList.add(new KestrelClientInfo(host.getHost(), host.getPort()));
         }
 
         this.emitBuffer = new LinkedList<EmitItem>();

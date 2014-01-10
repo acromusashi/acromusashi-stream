@@ -24,7 +24,6 @@ import java.util.List;
  */
 public class HostBasedContextBuilder extends AbstractContextBuilder
 {
-
     /** ホスト名 */
     private String hostName;
 

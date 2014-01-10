@@ -65,8 +65,7 @@ public class StormConfigGenerator
 
         for (Entry<String, Object> targetConfigEntry : yamlConf.entrySet())
         {
-            stormConf.put(targetConfigEntry.getKey(),
-                    targetConfigEntry.getValue());
+            stormConf.put(targetConfigEntry.getKey(), targetConfigEntry.getValue());
         }
 
         return stormConf;
@@ -79,10 +78,8 @@ public class StormConfigGenerator
      * @return 設定ファイルを読みこんだ設定値オブジェクト
      * @throws IOException 入出力例外発生時
      */
-    @SuppressWarnings(
-    { "unchecked" })
-    public static Map<String, Object> readYaml(String filePath)
-            throws IOException
+    @SuppressWarnings({"unchecked"})
+    public static Map<String, Object> readYaml(String filePath) throws IOException
     {
         Map<String, Object> configObject = null;
         Yaml yaml = new Yaml();

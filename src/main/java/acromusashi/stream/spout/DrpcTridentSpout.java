@@ -29,19 +29,19 @@ import backtype.storm.tuple.Fields;
 public class DrpcTridentSpout<E extends DrpcTridentEmitter> implements ITridentSpout<Object>
 {
     /** serialVersionUID */
-    private static final long serialVersionUID = 741250318522431506L;
+    private static final long   serialVersionUID = 741250318522431506L;
 
     /** ロガー */
-    private static Logger     logger           = LoggerFactory.getLogger(DrpcTridentSpout.class);
+    private static final Logger logger           = LoggerFactory.getLogger(DrpcTridentSpout.class);
 
     /** DRPCリクエストを受信する際の指定機能名 */
-    protected String          function;
+    protected String            function;
 
     /** Tupleを送付する際のフィールド定義 */
-    protected Fields          outputFields;
+    protected Fields            outputFields;
 
     /** Emitterのクラス型 */
-    protected Class<E>        emitterClassType;
+    protected Class<E>          emitterClassType;
 
     /**
      * DRPCリクエスト受信機能名を指定してインスタンスを生成する。

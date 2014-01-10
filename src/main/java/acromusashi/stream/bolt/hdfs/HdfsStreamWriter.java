@@ -46,8 +46,7 @@ public class HdfsStreamWriter
      * @param isFileSyncEachTime 書き込むたびに同期するかのフラグ
      * @throws IOException Open失敗時
      */
-    public void open(String filePath, FileSystem fs, boolean isFileSyncEachTime)
-            throws IOException
+    public void open(String filePath, FileSystem fs, boolean isFileSyncEachTime) throws IOException
     {
         Path dstPath = new Path(filePath);
 

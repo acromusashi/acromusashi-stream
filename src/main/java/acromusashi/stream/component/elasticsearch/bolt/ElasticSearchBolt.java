@@ -87,7 +87,7 @@ public class ElasticSearchBolt extends BaseConfigurationBolt
         Settings settings = ImmutableSettings.settingsBuilder().put("cluster.name",
                 this.clusterName).build();
         TransportClient transportClient = new TransportClient(settings);
-        for (String server : servers.split(";"))
+        for (String server : this.servers.split(";"))
         {
             String[] components = server.trim().split(":");
             String host = components[0];

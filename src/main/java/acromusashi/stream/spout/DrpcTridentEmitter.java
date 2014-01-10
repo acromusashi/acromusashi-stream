@@ -36,7 +36,7 @@ import backtype.storm.utils.RotatingMap;
 public abstract class DrpcTridentEmitter implements Emitter<Object>
 {
     /** ロガー */
-    private static Logger                                      logger      = LoggerFactory.getLogger(DrpcTridentEmitter.class);
+    private static final Logger                                logger      = LoggerFactory.getLogger(DrpcTridentEmitter.class);
 
     /** ローテートマップのサイズ。タイムアウト秒経過毎に現状の内容がシフトされるため、サイズは3にして最後のマップにシフトしたらタイムアウトして扱う */
     private static final int                                   ROTATE_SIZE = 3;
@@ -127,8 +127,8 @@ public abstract class DrpcTridentEmitter implements Emitter<Object>
         {
             prepare(this.stormConf, this.context);
             this.fetchHelper = createFetchHelper();
-            this.fetchHelper.initialize(stormConf, this.function);
-            prepared = true;
+            this.fetchHelper.initialize(this.stormConf, this.function);
+            this.prepared = true;
         }
 
         // DRPCリクエストを取得する。リクエストが存在しない場合、何も処理は行わない。
@@ -151,7 +151,7 @@ public abstract class DrpcTridentEmitter implements Emitter<Object>
             }
 
             emitTuples(requestInfo.getFuncArgs(), collector);
-            idsMap.put(tx, requestInfo);
+            this.idsMap.put(tx, requestInfo);
         }
     }
 

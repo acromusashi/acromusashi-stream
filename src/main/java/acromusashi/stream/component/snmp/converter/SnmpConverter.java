@@ -61,8 +61,7 @@ public class SnmpConverter extends AbstractMessageConverter
         header.setTimestamp(jsonHeader.getLong("timestamp"));
         header.setSource(jsonHeader.getString("sender"));
         header.setType(getType());
-        header.addAdditionalHeader("SNMPVersion",
-                jsonHeader.getString("version"));
+        header.addAdditionalHeader("SNMPVersion", jsonHeader.getString("version"));
 
         return header;
     }
@@ -116,15 +115,13 @@ public class SnmpConverter extends AbstractMessageConverter
      */
     @Override
     @SuppressWarnings("rawtypes")
-    public Map<String, Object> toMap(Message message)
-            throws ConvertFailException
+    public Map<String, Object> toMap(Message message) throws ConvertFailException
     {
         Map<String, Object> result = new LinkedHashMap<String, Object>();
 
         // Messageヘッダのうち、DBに格納する値を取得する
         result.put("messageId", message.getHeader().getMessageId());
-        result.put("timestamp", new Timestamp(
-                message.getHeader().getTimestamp()));
+        result.put("timestamp", new Timestamp(message.getHeader().getTimestamp()));
 
         result.put("source", message.getHeader().getSource());
 

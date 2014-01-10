@@ -40,8 +40,7 @@ public abstract class BaseConfigurationBolt extends BaseRichBolt
 
     @SuppressWarnings("rawtypes")
     @Override
-    public void prepare(Map stormConf, TopologyContext context,
-            OutputCollector collector)
+    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector)
     {
         this.stormConf = stormConf;
         this.context = context;

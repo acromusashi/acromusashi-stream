@@ -46,8 +46,7 @@ public abstract class BaseConfigurationSpout extends BaseRichSpout
 
     @Override
     @SuppressWarnings("rawtypes")
-    public void open(Map stormConf, TopologyContext context,
-            SpoutOutputCollector collector)
+    public void open(Map stormConf, TopologyContext context, SpoutOutputCollector collector)
     {
         this.stormConf = stormConf;
         this.context = context;

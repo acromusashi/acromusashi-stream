@@ -82,8 +82,7 @@ public abstract class AbstractMessageConverter implements Serializable
      * @return 変換したKey-ValueのMap
      * @throws ConvertFailException 変換失敗時
      */
-    public Map<String, Object> toMap(Message message)
-            throws ConvertFailException
+    public Map<String, Object> toMap(Message message) throws ConvertFailException
     {
         if (this.propUtilBean == null)
         {
@@ -102,8 +101,7 @@ public abstract class AbstractMessageConverter implements Serializable
                 String name = descriptors[i].getName();
                 if (descriptors[i].getReadMethod() != null)
                 {
-                    result.put(name,
-                            this.propUtilBean.getProperty(message, name));
+                    result.put(name, this.propUtilBean.getProperty(message, name));
                 }
             }
         }

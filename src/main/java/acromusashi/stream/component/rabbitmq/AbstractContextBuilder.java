@@ -21,7 +21,6 @@ import java.util.Map;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 
-
 /**
  * RabbitMQコンポーネント<br>
  * <br>

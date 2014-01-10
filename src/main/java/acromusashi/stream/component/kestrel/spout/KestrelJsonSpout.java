@@ -83,7 +83,7 @@ public class KestrelJsonSpout extends KestrelSpout
     /** serialVersionUID */
     private static final long           serialVersionUID      = -3331796053960250415L;
 
-    /** ロガー */
+    /** logger */
     private static final Logger         logger                = LoggerFactory.getLogger(KestrelJsonSpout.class);
 
     /** 規制状態確認クラス */

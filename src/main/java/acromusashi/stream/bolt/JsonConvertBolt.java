@@ -18,8 +18,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import acromusashi.stream.constants.FieldName;
 import acromusashi.stream.entity.Message;
 import backtype.storm.task.OutputCollector;
@@ -28,6 +26,8 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * メッセージ変換を行うBolt<br/>

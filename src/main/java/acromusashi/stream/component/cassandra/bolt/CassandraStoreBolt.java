@@ -44,16 +44,16 @@ import com.netflix.astyanax.connectionpool.impl.ConnectionPoolConfigurationImpl;
 public class CassandraStoreBolt<K, C, V> extends CassandraBolt<K, C, V> implements IRichBolt
 {
     /** serialVersionUID */
-    private static final long         serialVersionUID = -1151860639847216951L;
+    private static final long           serialVersionUID = -1151860639847216951L;
 
     /** logger */
-    private static final Logger       logger           = LoggerFactory.getLogger(CassandraStoreBolt.class);
+    private static final Logger         logger           = LoggerFactory.getLogger(CassandraStoreBolt.class);
 
     /** OutputCollector */
     protected transient OutputCollector collector;
 
     /** 設定値を保持するキー値 */
-    protected String                  clientConfigKey;
+    protected String                    clientConfigKey;
 
     /**
      * 設定値キーとCassandraへのマッピング定義を指定してインスタンスを生成する。

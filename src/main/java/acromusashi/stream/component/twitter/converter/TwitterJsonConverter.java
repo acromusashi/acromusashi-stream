@@ -53,8 +53,7 @@ public class TwitterJsonConverter extends AbstractMessageConverter
         JSONObject twitterJson = JSONObject.fromObject(input);
 
         String dateStr = twitterJson.getString("created_at");
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT,
-                Locale.ENGLISH);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH);
         Date created = null;
 
         try

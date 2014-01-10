@@ -27,7 +27,7 @@ import storm.trident.spout.ITridentSpout.BatchCoordinator;
 public class DrpcTridentCoodinator implements BatchCoordinator<Object>
 {
     /** ロガー */
-    private static Logger logger = LoggerFactory.getLogger(DrpcTridentCoodinator.class);
+    private static final Logger logger = LoggerFactory.getLogger(DrpcTridentCoodinator.class);
 
     /**
      * パラメータを指定せずにインスタンスを生成する。

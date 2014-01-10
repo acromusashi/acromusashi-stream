@@ -99,8 +99,7 @@ public abstract class BaseTopology
         {
             // ローカル環境で実行
             LocalCluster cluster = new LocalCluster();
-            cluster.submitTopology(getTopologyName(), getConfig(),
-                    getBuilder().createTopology());
+            cluster.submitTopology(getTopologyName(), getConfig(), getBuilder().createTopology());
         }
         else
         {
@@ -113,15 +112,13 @@ public abstract class BaseTopology
             catch (AlreadyAliveException ex)
             {
                 String logFormat = "Occur exception at Topology Submit. Skip Topology Submit. : TopologyName={0}";
-                String logMessage = MessageFormat.format(logFormat,
-                        getTopologyName());
+                String logMessage = MessageFormat.format(logFormat, getTopologyName());
                 logger.error(logMessage, ex);
             }
             catch (InvalidTopologyException ex)
             {
                 String logFormat = "Occur exception at Topology Submit. Skip Topology Submit. : TopologyName={0}";
-                String logMessage = MessageFormat.format(logFormat,
-                        getTopologyName());
+                String logMessage = MessageFormat.format(logFormat, getTopologyName());
                 logger.error(logMessage, ex);
             }
         }
