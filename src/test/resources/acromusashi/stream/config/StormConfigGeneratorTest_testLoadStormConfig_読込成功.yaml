@@ -1,0 +1,7 @@
+## WordCountTopology Sample Config
+## NimbusHost
+## Set StormCluster's Nimbus Host
+nimbus.host        : 192.168.100.100
+## NimbusPort
+nimbus.thrift.port : 6627
+topology.debug     : false

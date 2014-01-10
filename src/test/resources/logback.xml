@@ -1,0 +1,42 @@
+<configuration scan="true" scanPeriod="30 seconds">
+    <jmxConfigurator />
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/var/log/storm/storm-${logfile.name}</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/var/log/storm/storm-${logfile.name}.%d{yyyy-MM-dd}
+            </fileNamePattern>
+            <maxHistory>14</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%p] [%t] [%logger{35}:%line] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- INFOでイベント内容を出力するため通常時はWARNに設定 -->
+    <logger name="backtype.storm.daemon.task" level="WARN" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <!-- INFOでイベント内容を出力するため通常時はWARNに設定 -->
+    <logger name="backtype.storm.daemon.executor" level="WARN" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <!-- DEBUGレベルにするとZooKeeperとの通信バイナリが出力されログが溢れるためINFO固定 -->
+    <logger name="org.apache.zookeeper.ClientCnxn" level="INFO" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <!-- DEBUGレベルにするとHeartBeatが出力されログが溢れるためINFO固定 -->
+    <logger name="backtype.storm.daemon.worker" level="INFO" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>
+
