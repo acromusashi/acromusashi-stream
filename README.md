@@ -63,6 +63,47 @@ getBuilder().setSpout("RabbitMqSpout", rabbitMqSpout, mqSpoutPara);
   
 // ～～以後、BoltをTopologyに設定～～  
 ```
+#### 設定ファイル記述例([rabbitmqClusterContext.xml](https://github.com/acromusashi/acromusashi-stream/blob/master/conf/rabbitmqClusterContext.xml) をベースに下記の個所の修正を行う)
+```
+<!-- RabbitMQCluster0が保持するキュー一覧 -->  
+<util:list id="queueList0">  
+    <value>Message01</value>  
+    <value>Message02</value>  
+</util:list>  
+～～～～  
+<!-- RabbitMQプロセス一覧 -->  
+<property name="mqProcessList">  
+    <util:list list-class="java.util.LinkedList">  
+        <value>rabbitmq01:5672</value>  
+        <value>rabbitmq02:5672</value>  
+    </util:list>  
+</property>  
+～～～～  
+<!-- 呼出元別、接続先RabbitMQプロセス定義 -->  
+<property name="connectionProcessMap">  
+    <util:map>  
+        <entry key="rabbitmq01_Message01">  
+            <value>rabbitmq01:5672</value>  
+        </entry>  
+        <entry key="rabbitmq01_Message02">  
+            <value>rabbitmq02:5672</value>  
+        </entry>  
+        <entry key="rabbitmq02_Message01">  
+            <value>rabbitmq01:5672</value>  
+        </entry>  
+        <entry key="rabbitmq02_Message02">  
+            <value>rabbitmq02:5672</value>  
+        </entry>  
+    </util:map>  
+</property>  
+～～～～  
+<!-- 使用するConnectionFactory （ユーザ名、パスワードを変更） -->  
+<bean id="connectionFactory0" class="acromusashi.stream.component.rabbitmq.CachingConnectionFactory">  
+    <property name="username" value="guest" />  
+    <property name="password" value="guest" />  
+    <property name="channelCacheSize" value="10" />  
+</bean>  
+```
 
 ### SNMPTrap 受信
 
