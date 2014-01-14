@@ -47,7 +47,7 @@ public class JsonValueExtractorTest
     {
         // 準備
         String jsonStr = FileUtils.readFileToString(new File(DATA_DIR
-                + "JsonValueExtractorTest_testExtractValue_抽出確認.txt"));
+                + "JsonValueExtractorTest_testExtractValue_ExtractConfirm.txt"));
 
         // 実施
         String actual = JsonValueExtractor.extractValue(jsonStr, "header", "messageId");

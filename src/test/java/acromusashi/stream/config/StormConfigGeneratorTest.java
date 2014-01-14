@@ -47,7 +47,7 @@ public class StormConfigGeneratorTest
     {
         // 実施
         Config actual = StormConfigGenerator.loadStormConfig(DATA_DIR
-                + "StormConfigGeneratorTest_testLoadStormConfig_読込成功.yaml");
+                + "StormConfigGeneratorTest_testLoadStormConfig_ReadSuccess.yaml");
 
         // 検証
         assertEquals("192.168.100.100", actual.get("nimbus.host"));

@@ -50,7 +50,7 @@ public class StormConfigUtilTest
     {
         // 準備
         Config conf = StormConfigGenerator.loadStormConfig(DATA_DIR
-                + "StormConfigUtilTest_ファイル読み込み確認用.yaml");
+                + "StormConfigUtilTest_FileReadConfirm.yaml");
 
         // 実施
         String actual = StormConfigUtil.getStringValue(conf, "CassandraSpout.field", "");
@@ -72,7 +72,7 @@ public class StormConfigUtilTest
     {
         // 準備
         Config conf = StormConfigGenerator.loadStormConfig(DATA_DIR
-                + "StormConfigUtilTest_ファイル読み込み確認用.yaml");
+                + "StormConfigUtilTest_FileReadConfirm.yaml");
 
         // 実施
         String actual = StormConfigUtil.getStringValue(conf, "CassandraSpout.NotFound", "default");
@@ -94,7 +94,7 @@ public class StormConfigUtilTest
     {
         // 準備
         Config conf = StormConfigGenerator.loadStormConfig(DATA_DIR
-                + "StormConfigUtilTest_ファイル読み込み確認用.yaml");
+                + "StormConfigUtilTest_FileReadConfirm.yaml");
 
         // 実施
         int actual = StormConfigUtil.getIntValue(conf, "topology.workers", 10);
@@ -116,7 +116,7 @@ public class StormConfigUtilTest
     {
         // 準備
         Config conf = StormConfigGenerator.loadStormConfig(DATA_DIR
-                + "StormConfigUtilTest_ファイル読み込み確認用.yaml");
+                + "StormConfigUtilTest_FileReadConfirm.yaml");
 
         // 実施
         int actual = StormConfigUtil.getIntValue(conf, "topology.workers.NotFound", 10);
@@ -138,7 +138,7 @@ public class StormConfigUtilTest
     {
         // 準備
         Config conf = StormConfigGenerator.loadStormConfig(DATA_DIR
-                + "StormConfigUtilTest_ファイル読み込み確認用.yaml");
+                + "StormConfigUtilTest_FileReadConfirm.yaml");
 
         // 実施
         List<String> actual = StormConfigUtil.getStringListValue(conf, "casa.word");
@@ -163,7 +163,7 @@ public class StormConfigUtilTest
     {
         // 準備
         Config conf = StormConfigGenerator.loadStormConfig(DATA_DIR
-                + "StormConfigUtilTest_ファイル読み込み確認用.yaml");
+                + "StormConfigUtilTest_FileReadConfirm.yaml");
 
         // 実施
         List<String> actual = StormConfigUtil.getStringListValue(conf, "casa.word.NotFound");
@@ -186,7 +186,7 @@ public class StormConfigUtilTest
     {
         // 準備
         Config conf = StormConfigGenerator.loadStormConfig(DATA_DIR
-                + "StormConfigUtilTest_ファイル読み込み確認用.yaml");
+                + "StormConfigUtilTest_FileReadConfirm.yaml");
 
         // 実施
         Map actual = StormConfigUtil.getMapValue(conf, "casa");
@@ -212,7 +212,7 @@ public class StormConfigUtilTest
     {
         // 準備
         Config conf = StormConfigGenerator.loadStormConfig(DATA_DIR
-                + "StormConfigUtilTest_ファイル読み込み確認用.yaml");
+                + "StormConfigUtilTest_FileReadConfirm.yaml");
 
         // 実施
         Map actual = StormConfigUtil.getMapValue(conf, "casa.NotFound");
