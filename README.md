@@ -3,12 +3,27 @@ AcroMUSASHI Streamは分散ストリームプラットフォームです。
 AcroMUSASHI Streamは多種多様なデバイス／サービスからのイベントデータをリアルタイムに分散処理します。  
 Stormを採用し、ビッグデータに欠かせないHDFS／HBase／Cassandraなどのデータストアとの連携機能を提供します。
 ![Abstract Image](http://acromusashi.github.com/acromusashi-stream/images/AcroMUSASHIStreamAbstract.jpg)
-各API/構成については[JavaDoc](http://acromusashi.github.io/acromusashi-stream/javadoc-0.5.0/)を、  
 AcroMUSASHI Streamを用いた実装例については<a href="https://github.com/acromusashi/acromusashi-stream-example">AcroMUSASHI Stream Example</a>を参照してください。
 
 
 ## 機能一覧
-### 
+### HDFS連携
+
+### HBase連携
+
+### Cassandra連携
+
+### ElasticSearch連携
+
+### Kestrel連携
+
+### RabbitMQ連携
+
+### SNMPTrap 受信
+
+### DRPC-TridentTopology連携
+
+### Storm設定読込ユーティリティ
 
 ## ビルド手順
 ### ビルド環境
