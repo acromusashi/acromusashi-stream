@@ -17,7 +17,7 @@ AcroMUSASHI Streamを用いた実装例については<a href="https://github.co
 
 ### Kestrel連携
 KestrelJsonSpoutを用いてKestrelからJSON形式のメッセージを取得し、グルーピング情報を抽出して次Boltに送信する。  
-本Spoutを用いた場合、Boltにおいて処理に失敗する／タイムアウトしたメッセージのを行うことが可能。  
+本Spoutを用いた場合、Boltにおいて処理に失敗する／タイムアウトしたメッセージの再処理を行うことが可能。  
 #### Topologyの実装例(BaseTopology継承クラスにおける実装例)
 ```
 // Kestrelの接続先情報リスト  
