@@ -19,7 +19,7 @@ AcroMUSASHI Streamを用いた実装例については<a href="https://github.co
 KestrelJsonSpoutを用いてKestrelからJSON形式のメッセージを取得し、グルーピング情報を抽出して次Boltに送信する。  
 本Spoutを用いた場合、Boltにおいて処理に失敗する／タイムアウトしたメッセージの再処理を行うことが可能。  
 #### 実装例(BaseTopology継承クラスにおける実装例)
-```
+```java
 // Kestrelの接続先情報リスト  
 List<String> kestrelHosts = Lists.newArrayList("KestrelServer1:2229", "KestrelServer2:2229", "KestrelServer3:2229");  
 // Kestrelのメッセージキューベース名称  
@@ -39,7 +39,7 @@ getBuilder().setSpout("KestrelJsonSpout", kestrelSpout, kestrelSpoutPara);
 RabbitMqSpoutを用いてRabbitMQから文字列形式のメッセージを取得し、グルーピング情報を抽出して次Boltに送信する。  
 グルーピング情報の抽出方式はRabbitMqSpoutに設定するMessageKeyExtractor継承クラスによって指定が可能。
 #### 実装例(BaseTopology継承クラスにおける実装例)
-```
+```java
 // RabbitMQクラスタ設定ファイルパスの指定  
 String contextPath = "/rabbitmqClusterContext.xml";  
 // RabbitMQのメッセージキューベース名称  
@@ -64,7 +64,7 @@ getBuilder().setSpout("RabbitMqSpout", rabbitMqSpout, mqSpoutPara);
 // ～～以後、BoltをTopologyに設定～～  
 ```
 #### 設定ファイル記述例([rabbitmqClusterContext.xml](https://github.com/acromusashi/acromusashi-stream/blob/master/conf/rabbitmqClusterContext.xml) をベースに下記の個所の修正を行う)
-```
+```xml
 <!-- RabbitMQCluster0が保持するキュー一覧 -->  
 <util:list id="queueList0">  
     <value>Message01</value>  
