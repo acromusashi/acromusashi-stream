@@ -23,7 +23,6 @@ AcroMUSASHI Streamを用いた実装例については<a href="https://github.co
 ## 機能一覧
 ### データ取得
 #### Kestrel
-
 Kestrelからデータを取得するためには、KestrelJsonSpoutを利用します。  
 KestrelからJSON形式のメッセージを取得し、Boltに送信するまでの処理を、シームレスに行えるようになります。  
 また、KestrelJsonSpoutを用いた場合、Boltにおいて処理に失敗／タイムアウトしたメッセージの再処理が可能です。  
@@ -112,17 +111,28 @@ getBuilder().setSpout("RabbitMqSpout", rabbitMqSpout, mqSpoutPara);
     <property name="channelCacheSize" value="10" />  
 </bean>  
 ```
-### HBase連携
+### データストア連携
+#### Hadoop
+Hadoopに対してデータを投入するためにはHdfsStoreBoltを使用します。  
+HDFSに対して一定時間ごとにファイルを切り替えながらデータを投入できるようになります。  
+実装例は[HdfsStoreTopology](https://github.com/acromusashi/acromusashi-stream-example/blob/master/src/main/java/acromusashi/stream/example/topology/HdfsStoreTopology.java)を確認してください。
+#### HBase
+HBaseに対してデータを投入するためにはCamelHbaseStoreBoltを使用します。  
+HBaseに対してBoltが受信したデータを投入できるようになります。  
+実装例は[HbaseStoreTopology](https://github.com/acromusashi/acromusashi-stream-example/blob/master/src/main/java/acromusashi/stream/example/topology/HbaseStoreTopology.java)を確認してください。
+#### Cassandra
 
-### Cassandra連携
+#### ElasticSearch
 
-### ElasticSearch連携
+### データ受信
+#### SNMP Trap
 
-### SNMPTrap 受信
+### ユーティリティ
+#### DRPC-TridentTopology連携
 
-### DRPC-TridentTopology連携
+#### Storm設定読込ユーティリティ
 
-### Storm設定読込ユーティリティ
+
 
 
 
