@@ -1,3 +1,4 @@
+## 概要
 AcroMUSASHI Streamは分散ストリームプラットフォームです。
 
 AcroMUSASHI Streamは多種多様なデバイス／サービスからのイベントデータをリアルタイムに分散処理します。  
