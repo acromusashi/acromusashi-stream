@@ -1,14 +1,48 @@
 ## 概要
-AcroMUSASHI Streamは分散ストリームプラットフォームです。
+AcroMUSASHI Stream は、Stormをベースとした、ビッグデータの分散ストリームデータ処理プラットフォームです。  
 
-AcroMUSASHI Streamは多種多様なデバイス／サービスからのイベントデータをリアルタイムに分散処理します。  
-Stormを採用し、ビッグデータに欠かせないHDFS／HBase／Cassandraなどのデータストアとの連携機能を提供します。
+「ストリームデータ」とは、連続的に発生し続ける時系列順のデータのことを言います。AcroMUSASHI Stream を利用することで、多種多様なデバイス／サービスで発生するストリームデータをリアルタイムに処理するシステムを簡単に構築できるようになります。  
+HTTP／SNMP／JMSといった数十種類のプロトコルに対応したインタフェースや、ビッグデータ処理に欠かせないHDFS／HBase／Cassandraなどのデータストアとの連携機能を提供しており、「M2M」「ログ収集・分析」「SNSアクセス解析」等、データの解析にリアルタイム性を要するシステムを、迅速に立ち上げることが可能です。  
+AcroMUSASHI Streamを用いた実装例については<a href="https://github.com/acromusashi/acromusashi-stream-example">AcroMUSASHI Stream Example</a>を参照してください。  
+## システム構成イメージ
 ![Abstract Image](http://acromusashi.github.com/acromusashi-stream/images/AcroMUSASHIStreamAbstract.jpg)
-AcroMUSASHI Streamを用いた実装例については<a href="https://github.com/acromusashi/acromusashi-stream-example">AcroMUSASHI Stream Example</a>を参照してください。
 
+## スタートガイド
+### ビルド環境
+* JDK 7以降  
+* Maven 2.2.1以降
+
+### ビルド手順
+* ソースをGitHubから取得後、取得先ディレクトリに移動し下記のコマンドを実行してください。  
+** コマンド実行の結果、 acromusashi-stream.zip が生成されます。  
+
+```
+# mvn clean package  
+```  
 
 ## 機能一覧
-### HDFS連携
+### データ取得
+#### Kestrel
+
+Kestrelからデータを取得するためには、KestrelJsonSpoutを利用します。  
+KestrelからJSON形式のメッセージを取得し、Boltに送信するまでの処理を、シームレスに行えるようになります。  
+また、KestrelJsonSpoutを用いた場合、Boltにおいて処理に失敗／タイムアウトしたメッセージの再処理が可能です。  
+##### 実装例(BaseTopology継承クラスにおける実装例)
+```java
+// Kestrelの接続先情報リスト  
+List<String> kestrelHosts = Lists.newArrayList("KestrelServer1:2229", "KestrelServer2:2229", "KestrelServer3:2229");  
+// Kestrelのメッセージキューベース名称  
+String kestrelQueueName = "MessageQueue";  
+// KestrelJsonSpoutの並列度  
+int kestrelPara = 3;  
+  
+// KestrelJsonSpoutコンポーネントの生成  
+KestrelJsonSpout kestrelSpout = new KestrelJsonSpout(kestrelHosts, kestrelQueueName, new StringScheme());  
+// KestrelJsonSpoutをTopologyに登録  
+getBuilder().setSpout("KestrelJsonSpout", kestrelSpout, kestrelSpoutPara);  
+  
+// ～～以後、BoltをTopologyに設定～～  
+```
 
 ### HBase連携
 
@@ -19,7 +53,7 @@ AcroMUSASHI Streamを用いた実装例については<a href="https://github.co
 ### Kestrel連携
 KestrelJsonSpoutを用いてKestrelからJSON形式のメッセージを取得し、グルーピング情報を抽出して次Boltに送信する。  
 本Spoutを用いた場合、Boltにおいて処理に失敗する／タイムアウトしたメッセージの再処理を行うことが可能。  
-#### 実装例(BaseTopology継承クラスにおける実装例)
+##### 実装例(BaseTopology継承クラスにおける実装例)
 ```java
 // Kestrelの接続先情報リスト  
 List<String> kestrelHosts = Lists.newArrayList("KestrelServer1:2229", "KestrelServer2:2229", "KestrelServer3:2229");  
@@ -112,18 +146,7 @@ getBuilder().setSpout("RabbitMqSpout", rabbitMqSpout, mqSpoutPara);
 
 ### Storm設定読込ユーティリティ
 
-## ビルド手順
-### ビルド環境
-* JDK 7以降  
-* Maven 2.2.1以降
 
-### ビルド手順
-* ソースをGitHubから取得後、取得先ディレクトリに移動し下記のコマンドを実行する。  
-** コマンド実行の結果、 acromusashi-stream.zip が生成される。  
-
-```
-# mvn clean package  
-```
 
 ## Javadoc
 [Javadoc](http://acromusashi.github.io/acromusashi-stream/javadoc-0.5.0/)
