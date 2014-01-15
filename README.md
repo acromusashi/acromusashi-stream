@@ -120,12 +120,45 @@ HDFSに対して一定時間ごとにファイルを切り替えながらデー�
 HBaseに対してデータを投入するためにはCamelHbaseStoreBoltを使用します。  
 HBaseに対してBoltが受信したデータを投入できるようになります。  
 実装例は[HbaseStoreTopology](https://github.com/acromusashi/acromusashi-stream-example/blob/master/src/main/java/acromusashi/stream/example/topology/HbaseStoreTopology.java)を確認してください。
-#### Cassandra
-
 #### Elasticsearch
 Elasticsearchに対してデータを投入するためにはElasticSearchBoltを使用します。  
 Elasticsearchに対してBoltが受信したデータを投入できるようになります。  
 実装例は[KafkaEsTopology](https://github.com/acromusashi/acromusashi-stream-example/blob/master/src/main/java/acromusashi/stream/example/topology/KafkaEsTopology.java)を確認してください。
+#### Cassandra
+Cassandraに対してデータを投入するためにはCassandraStoreBoltを使用します。  
+Cassandraに対してBoltが受信したデータを投入できるようになります。  
+TupleMapperオブジェクトを切り替えることで投入対象のKeyspace、ColumunFamily、投入内容を切り替えることが可能です。  
+##### 実装例(BaseTopology継承クラスにおける実装例)
+```java
+// ～～SpoutをTopologyに設定～～  
+
+// Cassandra投入設定Mapを保持するキー名称  
+String configKey = "cassandrastore.setting";  
+// Cassandra投入先Keyspace  
+String keyspace = "keyspace";  
+// Cassandra投入先ColumunFamily  
+String columnFamily = "columnFamily";  
+// CassandraStoreBoltの並列度  
+int cassandraPara = 3;  
+
+// TupleMapperの生成(投入用のデータを生成するMapperオブジェクト)  
+TupleMapper<String, String, String> storeMapper = new StoreMapper(keyspace, columnFamily);
+
+// CassandraStoreBoltコンポーネントの生成
+CassandraStoreBolt<String, String, String> cassandraStoreBolt = new CassandraStoreBolt<String, String, String>(configKey, storeMapper);
+// CassandraStoreBoltをTopologyに登録  
+getBuilder().setBolt("CassandraStoreBolt", cassandraStoreBolt, cassandraPara).fieldsGrouping("JsonConvertBolt", new Fields(FieldName.MESSAGE_KEY));  
+```
+##### 設定ファイル記述例(Topology起動時に読みこませるyamlファイル)
+```yaml
+## CassandraStoreBolt Setting  
+cassandrastore.setting  :  ## Cassandra設定グループを示すキー項目  
+  cassandra.host        : "cassandrahost1:9160,cassandrahost2:9160,cassandrahost3:9160"  ## CassandraHost Setting
+  cassandra.clusterName : 'Test Cluster'                                                 ## Cassandra投入先クラスタ名  
+  cassandra.connection.timeout : 5000                                                    ## Cassandra接続タイムアウト  
+  cassandra.keyspace    :                                                                ## CassandraKeyspace  
+    - keyspace  
+```
 ### データ受信
 #### SNMP Trap
 
