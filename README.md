@@ -161,16 +161,14 @@ cassandrastore.setting  :  ## Cassandra設定グループを示すキー項目
 ```
 ### データ受信
 #### SNMP Trap
-
+SNMPTrapを受信するにはCamelJson2KestrelMainプロセスを使用します。  
+SNMPTrapを受信し、KestrelにJSON形式で保存することができます。  
+使用方法は[Camelの利用方法](https://github.com/acromusashi/acromusashi-stream-example/wiki/Camel-Usage)を確認してください。
 ### ユーティリティ
-#### DRPC-TridentTopology連携
-
 #### Storm設定読込ユーティリティ
-
-
-
-
-
+Stormで使用しているyaml形式の設定ファイルを読み込むにはStormConfigGeneratorを使用します。  
+yaml形式の設定ファイルをStormのConfigオブジェクトとして読み込むことができます。  
+実装例は[KafkaEsTopology](https://github.com/acromusashi/acromusashi-stream-example/blob/master/src/main/java/acromusashi/stream/example/topology/KafkaEsTopology.java)を確認してください。
 ## Javadoc
 [Javadoc](http://acromusashi.github.io/acromusashi-stream/javadoc-0.5.0/)
 
