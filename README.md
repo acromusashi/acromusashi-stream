@@ -122,8 +122,10 @@ HBaseに対してBoltが受信したデータを投入できるようになり�
 実装例は[HbaseStoreTopology](https://github.com/acromusashi/acromusashi-stream-example/blob/master/src/main/java/acromusashi/stream/example/topology/HbaseStoreTopology.java)を確認してください。
 #### Cassandra
 
-#### ElasticSearch
-
+#### Elasticsearch
+Elasticsearchに対してデータを投入するためにはElasticSearchBoltを使用します。  
+Elasticsearchに対してBoltが受信したデータを投入できるようになります。  
+実装例は[KafkaEsTopology](https://github.com/acromusashi/acromusashi-stream-example/blob/master/src/main/java/acromusashi/stream/example/topology/KafkaEsTopology.java)を確認してください。
 ### データ受信
 #### SNMP Trap
 
