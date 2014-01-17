@@ -18,6 +18,24 @@ AcroMUSASHI Streamを用いた実装例については<a href="https://github.co
 ``` 
 
 ## 機能一覧
+### データ受信
+ストリームデータを処理するシステムを構築する際にはデータを受信／取得し、  
+ストリーム処理システムに取り込むことが必要になります。  
+そのため、ストリームデータ処理基盤にはデータを受信／取得する機能が求められます。  
+
+acromusashi-streamにおいては以下の方式に対応しています。  
+- SNMP Trap受信
+- ApacheLog収集
+
+#### SNMP Trap受信
+SNMPTrapを受信するにはCamelJson2KestrelMainプロセスを使用します。  
+SNMPTrapを受信し、KestrelにJSON形式で保存することができます。  
+使用方法は[Camelの利用方法](https://github.com/acromusashi/acromusashi-stream-example/wiki/Camel-Usage)を確認してください。
+
+#### ApacheLog収集
+ApacheLogを収集するには[kafka-log-producer](https://github.com/acromusashi/kafka-log-producer)を使用します。  
+詳細は[kafka-log-producer](https://github.com/acromusashi/kafka-log-producer)を確認してください。
+
 ### データ取得
 ストリームデータを処理するシステムを構築する際にはデータを一時メッセージキューに格納することで  
 瞬間的な負荷増大に対しても、欠損なく対応できるようになります。  
@@ -164,11 +182,6 @@ cassandrastore.setting  :  ## Cassandra設定グループを示すキー項目
   cassandra.keyspace    :                                                                ## CassandraKeyspace  
     - keyspace  
 ```
-### データ受信
-#### SNMP Trap
-SNMPTrapを受信するにはCamelJson2KestrelMainプロセスを使用します。  
-SNMPTrapを受信し、KestrelにJSON形式で保存することができます。  
-使用方法は[Camelの利用方法](https://github.com/acromusashi/acromusashi-stream-example/wiki/Camel-Usage)を確認してください。
 ### ユーティリティ
 #### Storm設定読込ユーティリティ
 Stormで使用しているyaml形式の設定ファイルを読み込むにはStormConfigGeneratorを使用します。  
