@@ -104,7 +104,7 @@ RabbitMQから文字列形式のメッセージを取得し、グルーピング
 
 RabbitMqSpoutには以下の設定項目を設定し、rabbitmqClusterContext.xmlにも設定を行ってください。
 ```
-- RabbitMQクラスタ設定ファイルパス：【Kestrelホスト:KestrelThriftポート】形式の文字列のリスト
+- RabbitMQクラスタ設定ファイルパス：クラスパス上に配置したRabbitMQクラスタ設定ファイルパス
 - RabbitMQのメッセージキューベース名称：キュー名称のベースを定義。【ベース名称】_【RabbitMqSpoutのスレッドID】のキューが取得対象
 - MessageKeyExtractorを継承したキー抽出クラス（個別に実装が必要です）
 ```
