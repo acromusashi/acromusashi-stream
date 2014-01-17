@@ -2,23 +2,20 @@
 AcroMUSASHI Stream は、[Storm](http://storm-project.net/)をベースとした、ビッグデータの分散ストリームデータ処理プラットフォームです。  
 
 「ストリームデータ」とは、連続的に発生し続ける時系列順のデータのことを言います。AcroMUSASHI Stream を利用することで、多種多様なデバイス／サービスで発生するストリームデータをリアルタイムに処理するシステムを簡単に構築できるようになります。  
-HTTP／SNMP／JMSといった数十種類のプロトコルに対応したインタフェースや、ビッグデータ処理に欠かせないHadoop／HBase／Cassandraなどのデータストアとの連携機能を提供しており、「M2M」「ログ収集・分析」「SNSアクセス解析」等、データの解析にリアルタイム性を要するシステムを、迅速に立ち上げることが可能です。  
+HTTP／SNMP／JMSといった数十種類のプロトコルに対応したインタフェースや、ビッグデータ処理に欠かせない[Hadoop](http://hadoop.apache.org/)／[HBase](http://hbase.apache.org/)／[Cassandra](http://cassandra.apache.org/)などのデータストアとの連携機能を提供しており、「M2M」「ログ収集・分析」「SNSアクセス解析」等、データの解析にリアルタイム性を要するシステムを、迅速に立ち上げることが可能です。  
 AcroMUSASHI Streamを用いた実装例については<a href="https://github.com/acromusashi/acromusashi-stream-example">AcroMUSASHI Stream Example</a>を参照してください。  
 ## システム構成イメージ
 ![Abstract Image](http://acromusashi.github.com/acromusashi-stream/images/AcroMUSASHIStreamAbstract.jpg)
 
 ## スタートガイド
-### ビルド環境
-* JDK 7以降  
-* Maven 2.2.1以降
-
-### ビルド手順
-* ソースをGitHubから取得後、取得先ディレクトリに移動し下記のコマンドを実行してください。  
-** コマンド実行の結果、 acromusashi-stream.zip が生成されます。  
-
-```
-# mvn clean package  
-```  
+### Integration
+```xml
+<dependency>  
+  <groupId>jp.co.acroquest.acromusashi</groupId>  
+  <artifactId>acromusashi-stream</artifactId>  
+  <version>0.5.0</version>  
+</dependency> 
+``` 
 
 ## 機能一覧
 ### データ取得
