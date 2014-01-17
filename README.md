@@ -74,6 +74,13 @@ Kestrelからデータを取得するためには、KestrelJsonSpoutを利用し
 KestrelからJSON形式のメッセージを取得し、Boltに送信するまでの処理を、シームレスに行えるようになります。  
 また、KestrelJsonSpoutを用いた場合、Boltにおいて処理に失敗／タイムアウトしたメッセージの再処理が可能です。  
 あらかじめKestrelをインストールしておく必要がありますので、[Kestrelの利用方法](https://github.com/acromusashi/acromusashi-stream-example/wiki/Kestrel-Usage)を確認してインストールして使用してください。
+
+KestrelJsonSpoutには以下の設定項目を設定してください。  
+```
+- Kestrelの接続先情報リスト：【Kestrelホスト:KestrelThriftポート】形式の文字列のリスト
+- Kestrelのメッセージキューベース名称：キュー名称のベースを定義。【ベース名称】_【KestrelJsonSpoutのスレッドID】のキューが取得対象
+```
+
 ##### 実装例
 ```java
 // Kestrelの接続先情報リスト  
