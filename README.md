@@ -217,7 +217,7 @@ StormのConfigオブジェクトとして読みこんだオブジェクトから
 ## Javadoc
 [Javadoc](http://acromusashi.github.io/acromusashi-stream/javadoc-0.5.0/)
 
-## Download
+## ダウンロード
 https://github.com/acromusashi/acromusashi-stream/wiki/Download
 
 ## License
