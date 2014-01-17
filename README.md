@@ -101,6 +101,13 @@ getBuilder().setSpout("KestrelJsonSpout", kestrelSpout, kestrelSpoutPara);
 RabbitMQからデータを取得するためにはRabbitMqSpoutを利用します。  
 RabbitMQから文字列形式のメッセージを取得し、グルーピング情報を抽出してBoltに送信するまでの処理を、シームレスに行えるようになります。  
 あらかじめRabbitMQをインストールしておく必要がありますので、[RabbitMQの利用方法]を確認してインストールして使用してください。
+
+RabbitMqSpoutには以下の設定項目を設定し、rabbitmqClusterContext.xmlにも設定を行ってください。
+```
+- RabbitMQクラスタ設定ファイルパス：【Kestrelホスト:KestrelThriftポート】形式の文字列のリスト
+- RabbitMQのメッセージキューベース名称：キュー名称のベースを定義。【ベース名称】_【RabbitMqSpoutのスレッドID】のキューが取得対象
+- MessageKeyExtractorを継承したキー抽出クラス（個別に実装が必要です）
+```
 ##### 実装例
 ```java
 // RabbitMQクラスタ設定ファイルパスの指定  
