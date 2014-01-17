@@ -53,17 +53,13 @@ acromusashi-stream-exampleの各機能を参照してください。
 そのため、ストリームデータ処理基盤にはデータを受信／取得する機能が求められます。  
 
 acromusashi-streamにおいては以下の方式に対応しています。  
-- SNMP Trap受信
-- Apacheのログ収集
+- SNMP Trap受信  
+
 #### SNMP Trap受信
 
-SNMP Trapを受信するにはSNMP Trap受信機能のプロセスを使用します。  
+SNMP Trapを受信するにはSNMP Trap受信機能のプロセスを利用します。  
 SNMP Trapを受信し、KestrelにJSON形式で保存することができます。  
-使用方法は[Camelの利用方法](https://github.com/acromusashi/acromusashi-stream-example/wiki/Camel-Usage)を確認してください。
-
-#### Apacheのログ収集
-Apacheのログを収集するには[kafka-log-producer](https://github.com/acromusashi/kafka-log-producer)を使用します。  
-詳細は[kafka-log-producer](https://github.com/acromusashi/kafka-log-producer)を確認してください。
+利用方法は[SNMP Trap受信機能のプロセス利用方法]を確認してください。
 
 ### データ取得
 ストリームデータを処理するシステムを構築する際にはデータを一時メッセージキューに格納することで瞬間的な負荷増大に対しても、欠損なく対応できるようになります。  
@@ -77,6 +73,7 @@ acromusashi-streamにおいては以下のメッセージキューに対応し�
 Kestrelからデータを取得するためには、KestrelJsonSpoutを利用します。  
 KestrelからJSON形式のメッセージを取得し、Boltに送信するまでの処理を、シームレスに行えるようになります。  
 また、KestrelJsonSpoutを用いた場合、Boltにおいて処理に失敗／タイムアウトしたメッセージの再処理が可能です。  
+あらかじめKestrelをインストールしておく必要がありますので、[Kestrelの利用方法](https://github.com/acromusashi/acromusashi-stream-example/wiki/Kestrel-Usage)を確認してインストールして使用してください。
 ##### 実装例
 ```java
 // Kestrelの接続先情報リスト  
