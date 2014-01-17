@@ -26,15 +26,15 @@ acromusashi-streamのコンポーネントが利用可能になります。
 
 acromusashi-streamにおいては以下の方式に対応しています。  
 - SNMP Trap受信
-- ApacheLog収集
-
+- Apacheのログ収集
 #### SNMP Trap受信
-SNMPTrapを受信するにはCamelJson2KestrelMainプロセスを使用します。  
-SNMPTrapを受信し、KestrelにJSON形式で保存することができます。  
+
+SNMP Trapを受信するにはSNMP Trap受信機能のプロセスを使用します。  
+SNMP Trapを受信し、KestrelにJSON形式で保存することができます。  
 使用方法は[Camelの利用方法](https://github.com/acromusashi/acromusashi-stream-example/wiki/Camel-Usage)を確認してください。
 
-#### ApacheLog収集
-ApacheLogを収集するには[kafka-log-producer](https://github.com/acromusashi/kafka-log-producer)を使用します。  
+#### Apacheのログ収集
+Apacheのログを収集するには[kafka-log-producer](https://github.com/acromusashi/kafka-log-producer)を使用します。  
 詳細は[kafka-log-producer](https://github.com/acromusashi/kafka-log-producer)を確認してください。
 
 ### データ取得
