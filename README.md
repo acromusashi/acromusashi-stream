@@ -22,7 +22,7 @@ acromusashi-streamのコンポーネントが利用可能になります。
 acromusashi-streamを使用するためには以下の手順が必要です。
 - 1. Stormのインストール  
 - 2. acromusashi-streamのインストール  
-- 3. 対向ミドルウェアのインストール  
+- 3. 使用ミドルウェアのインストール  
 - 4. Topologyのインストール
 - 5. Topologyの起動  
 
@@ -44,7 +44,7 @@ acromusashi-streamを使用するためには以下の手順が必要です。
 ```
 # service storm-supervisor restart  
 ```  
-#### 3. 対向ミドルウェアのインストール／4. Topologyのインストール／5. Topologyの起動  
+#### 3. 使用ミドルウェアのインストール／4. Topologyのインストール／5. Topologyの起動  
 acromusashi-streamの使用したい機能によって異なります。  
 acromusashi-stream-exampleの各機能を参照してください。  
 ## 機能一覧
@@ -251,8 +251,15 @@ ElasticSearchBoltには以下の設定項目を設定してください。
 #### Storm設定読込ユーティリティ
 Stormで使用しているyaml形式の設定ファイルを読み込むにはStormConfigGeneratorを使用します。  
 YAML形式の設定ファイルをStormのConfigオブジェクトとして読み込むことができます。  
-StormのConfigオブジェクトとして読みこんだオブジェクトからはStormConfigUtilを用いることで値の取得が可能です。  
-実装例は[KafkaEsTopology](https://github.com/acromusashi/acromusashi-stream-example/blob/master/src/main/java/acromusashi/stream/example/topology/KafkaEsTopology.java)を確認してください。
+StormのConfigオブジェクトとして読みこんだオブジェクトからはStormConfigUtilを用いることで値の取得が可能です。    
+##### 実装例
+```java
+// 指定したパスから設定情報をStormの設定オブジェクト形式で読み込む。
+Config conf = StormConfigGenerator.loadStormConfig("/opt/storm/config/TargetTopology.yaml");
+
+// Stormの設定オブジェクトからキー"target.config"を持つ文字列形式の設定項目をデフォルト値""で取得する
+String configValue = StormConfigUtil.getStringValue(conf, "target.config", "");
+```
 ## Javadoc
 [Javadoc](http://acromusashi.github.io/acromusashi-stream/javadoc-0.5.0/)
 
