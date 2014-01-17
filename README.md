@@ -18,7 +18,35 @@ acromusashi-streamのコンポーネントが利用可能になります。
   <version>0.5.0</version>  
 </dependency> 
 ``` 
+### インストール
+acromusashi-streamを使用するためには以下の手順が必要です。
+- 1. Stormのインストール  
+- 2. acromusashi-streamのインストール  
+- 3. 対向ミドルウェアのインストール  
+- 4. Topologyのインストール
+- 5. Topologyの起動  
 
+#### 1.Stormのインストール
+[storm-installer](https://github.com/acromusashi/storm-installer)を使用します。  
+[storm-installer](https://github.com/acromusashi/storm-installer)を参照して下さい。  
+
+#### 2.acromusashi-streamのインストール
+- ※Supervisorが動作しているホスト全てにインストールが必要です。  
+
+1.「ダウンロード」からacromusashi-streamの媒体をダウンロードします。  
+2.Supervisorが動作しているホストにacromusashi-streamの媒体を配置します。    
+3.Supervisorが動作しているホストのStormのライブラリディレクトリにファイルをインストールします。  
+```
+# unzip acromusashi-stream.zip  
+# cp -p acromusashi-stream-X.X.X/lib/*.jar /opt/storm/lib/  
+``` 
+4.Supervisorを再起動します。  
+```
+# service storm-supervisor restart  
+```  
+#### 3. 対向ミドルウェアのインストール／4. Topologyのインストール／5. Topologyの起動  
+acromusashi-streamの使用したい機能によって異なります。  
+acromusashi-stream-exampleの各機能を参照してください。  
 ## 機能一覧
 ### データ受信
 ストリームデータを処理するシステムを構築する際にはデータを受信／取得し、ストリーム処理システムに取り込むことが必要になります。  
