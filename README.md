@@ -172,7 +172,7 @@ CassandraStoreBolt<String, String, String> cassandraStoreBolt = new CassandraSto
 // CassandraStoreBoltをTopologyに登録  
 getBuilder().setBolt("CassandraStoreBolt", cassandraStoreBolt, cassandraPara).fieldsGrouping("JsonConvertBolt", new Fields(FieldName.MESSAGE_KEY));  
 ```
-##### 設定ファイル記述例(Topology起動時に読みこませるyamlファイル)
+##### 設定ファイル記述例(Topology起動時に読みこませるYAMLファイル)
 ```yaml
 ## CassandraStoreBolt Setting  
 cassandrastore.setting  :  ## Cassandra設定グループを示すキー項目  
@@ -185,7 +185,7 @@ cassandrastore.setting  :  ## Cassandra設定グループを示すキー項目
 ### ユーティリティ
 #### Storm設定読込ユーティリティ
 Stormで使用しているyaml形式の設定ファイルを読み込むにはStormConfigGeneratorを使用します。  
-yaml形式の設定ファイルをStormのConfigオブジェクトとして読み込むことができます。  
+YAML形式の設定ファイルをStormのConfigオブジェクトとして読み込むことができます。  
 実装例は[KafkaEsTopology](https://github.com/acromusashi/acromusashi-stream-example/blob/master/src/main/java/acromusashi/stream/example/topology/KafkaEsTopology.java)を確認してください。
 ## Javadoc
 [Javadoc](http://acromusashi.github.io/acromusashi-stream/javadoc-0.5.0/)
