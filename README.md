@@ -144,25 +144,18 @@ getBuilder().setSpout("RabbitMqSpout", rabbitMqSpout, mqSpoutPara);
 <!-- RabbitMQプロセス一覧 -->  
 <property name="mqProcessList">  
     <util:list list-class="java.util.LinkedList">  
-        <value>rabbitmq01:5672</value>  <!-- ★RabbitMQの待ち受けホスト／ポートを設定★ -->  
-        <value>rabbitmq02:5672</value>  <!-- ★RabbitMQの待ち受けホスト／ポートを設定★ -->  
+        <value>rabbitmqserver:5672</value>  <!-- ★RabbitMQの待ち受けホスト／ポートを設定★ -->  
     </util:list>  
 </property>  
 ～～～～  
 <!-- 呼出元別、接続先RabbitMQプロセス定義 -->  
 <property name="connectionProcessMap">  
     <util:map>  
-        <entry key="rabbitmq01_Message01">  <!-- ★RabbitMQへのアクセス元ホスト_キュー名称 を設定★ -->  
-            <value>rabbitmq01:5672</value>  <!-- ★RabbitMQの待ち受けホスト／ポートを設定★ -->  
+        <entry key="rabbitmqserver_Message01">  <!-- ★RabbitMQへのアクセス元ホスト_キュー名称 を設定★ -->  
+            <value>rabbitmqserver:5672</value>  <!-- ★RabbitMQの待ち受けホスト／ポートを設定★ -->  
         </entry>  
-        <entry key="rabbitmq01_Message02">  <!-- ★RabbitMQへのアクセス元ホスト_キュー名称 を設定★ -->  
-            <value>rabbitmq02:5672</value>  <!-- ★RabbitMQの待ち受けホスト／ポートを設定★ -->  
-        </entry>  
-        <entry key="rabbitmq02_Message01">  <!-- ★RabbitMQへのアクセス元ホスト_キュー名称 を設定★ -->  
-            <value>rabbitmq01:5672</value>  <!-- ★RabbitMQの待ち受けホスト／ポートを設定★ -->  
-        </entry>  
-        <entry key="rabbitmq02_Message02">  <!-- ★RabbitMQへのアクセス元ホスト_キュー名称 を設定★ -->  
-            <value>rabbitmq02:5672</value>  <!-- ★RabbitMQの待ち受けホスト／ポートを設定★ -->  
+        <entry key="rabbitmqserver_Message02">  <!-- ★RabbitMQへのアクセス元ホスト_キュー名称 を設定★ -->  
+            <value>rabbitmqserver:5672</value>  <!-- ★RabbitMQの待ち受けホスト／ポートを設定★ -->  
         </entry>  
     </util:map>  
 </property>  
