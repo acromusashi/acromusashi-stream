@@ -100,7 +100,7 @@ getBuilder().setSpout("KestrelJsonSpout", kestrelSpout, kestrelSpoutPara);
 #### [RabbitMQ](http://www.rabbitmq.com/)
 RabbitMQからデータを取得するためにはRabbitMqSpoutを利用します。  
 RabbitMQから文字列形式のメッセージを取得し、グルーピング情報を抽出してBoltに送信するまでの処理を、シームレスに行えるようになります。  
-あらかじめRabbitMQをインストールしておく必要がありますので、[RabbitMQの利用方法]を確認してインストールして使用してください。
+あらかじめRabbitMQをインストールしておく必要がありますので、[RabbitMQの利用方法](https://github.com/acromusashi/acromusashi-stream-example/wiki/RabbitMQ-Usage)を確認してインストールして使用してください。
 
 RabbitMqSpoutには以下の設定項目を設定し、rabbitmqClusterContext.xmlにも設定を行ってください。
 ```
