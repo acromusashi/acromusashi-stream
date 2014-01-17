@@ -46,7 +46,7 @@ acromusashi-streamを使用するためには以下の手順が必要です。
 ```  
 #### 3. 使用ミドルウェアのインストール／4. Topologyのインストール／5. Topologyの起動  
 acromusashi-streamの使用したい機能によって異なります。  
-acromusashi-stream-exampleの各機能を参照してください。  
+[acromusashi-stream-exampleの各機能]を参照してください。  
 ## 機能一覧
 ### データ受信
 ストリームデータを処理するシステムを構築する際にはデータを受信／取得し、ストリーム処理システムに取り込むことが必要になります。  
