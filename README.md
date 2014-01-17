@@ -8,7 +8,9 @@ AcroMUSASHI Streamを用いた実装例については<a href="https://github.co
 ![Abstract Image](http://acromusashi.github.com/acromusashi-stream/images/AcroMUSASHIStreamAbstract.jpg)
 
 ## スタートガイド
-### Integration
+### Maven設定ファイル(pom.xml)の記述内容
+acromusashi-streamを用いて開発を行う場合、下記の内容をpom.xmlに追記してください。  
+acromusashi-streamのコンポーネントが利用可能になります。  
 ```xml
 <dependency>  
   <groupId>jp.co.acroquest.acromusashi</groupId>  
@@ -19,8 +21,7 @@ AcroMUSASHI Streamを用いた実装例については<a href="https://github.co
 
 ## 機能一覧
 ### データ受信
-ストリームデータを処理するシステムを構築する際にはデータを受信／取得し、  
-ストリーム処理システムに取り込むことが必要になります。  
+ストリームデータを処理するシステムを構築する際にはデータを受信／取得し、ストリーム処理システムに取り込むことが必要になります。  
 そのため、ストリームデータ処理基盤にはデータを受信／取得する機能が求められます。  
 
 acromusashi-streamにおいては以下の方式に対応しています。  
@@ -37,8 +38,7 @@ ApacheLogを収集するには[kafka-log-producer](https://github.com/acromusash
 詳細は[kafka-log-producer](https://github.com/acromusashi/kafka-log-producer)を確認してください。
 
 ### データ取得
-ストリームデータを処理するシステムを構築する際にはデータを一時メッセージキューに格納することで  
-瞬間的な負荷増大に対しても、欠損なく対応できるようになります。  
+ストリームデータを処理するシステムを構築する際にはデータを一時メッセージキューに格納することで瞬間的な負荷増大に対しても、欠損なく対応できるようになります。  
 そのため、ストリームデータ処理基盤にはメッセージキューからデータを取得するための機能が求められます。
 
 acromusashi-streamにおいては以下のメッセージキューに対応しています。  
