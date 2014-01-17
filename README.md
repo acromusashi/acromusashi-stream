@@ -33,7 +33,7 @@ acromusashi-streamを使用するためには以下の手順が必要です。
 #### 2.acromusashi-streamのインストール
 - ※Supervisorが動作しているホスト全てにインストールが必要です。  
 
-1.「ダウンロード」からacromusashi-streamの媒体をダウンロードします。  
+1.[ダウンロード](https://github.com/acromusashi/acromusashi-stream/blob/master/README.md#%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89)からacromusashi-streamの媒体をダウンロードします。  
 2.Supervisorが動作しているホストにacromusashi-streamの媒体を配置します。    
 3.Supervisorが動作しているホストのStormのライブラリディレクトリにファイルをインストールします。  
 ```
