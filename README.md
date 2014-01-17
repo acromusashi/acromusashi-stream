@@ -181,7 +181,6 @@ HDFSに対して一定時間ごとにファイルを切り替えながらデー�
 実装例は[Hadoop連携]を確認してください。
 
 HdfsStoreBoltを使用するTopologyでは読み込むYAMLファイルに以下の設定項目を設定してください。
-
 ```yaml
 ## 投入先のHDFSパス  
 hdfsstorebolt.outputuri      : 'hdfs://__NAMENODE_HOST__/HDFS/'  
@@ -193,11 +192,13 @@ hdfsstorebolt.interval       : 10
 #### HBase
 HBaseに対してデータを投入するためにはCamelHbaseStoreBoltを使用します。  
 HBaseに対してBoltが受信したデータを投入できるようになります。  
-実装例は[HbaseStoreTopology](https://github.com/acromusashi/acromusashi-stream-example/blob/master/src/main/java/acromusashi/stream/example/topology/HbaseStoreTopology.java)を確認してください。
-#### Elasticsearch
-Elasticsearchに対してデータを投入するためにはElasticSearchBoltを使用します。  
-Elasticsearchに対してBoltが受信したデータを投入できるようになります。  
-実装例は[KafkaEsTopology](https://github.com/acromusashi/acromusashi-stream-example/blob/master/src/main/java/acromusashi/stream/example/topology/KafkaEsTopology.java)を確認してください。
+実装例は[HBase連携]を確認してください。
+
+CamelHbaseStoreBoltには以下の設定項目を設定してください。
+```
+- コンテキスト設定ファイルパス：クラスパス上に配置したコンテキスト設定ファイルパス  
+- HBaseセル定義：CellDefineクラス(ColumnFamilyとColumnQuantifierを保持するクラス）のリスト
+```
 #### Cassandra
 Cassandraに対してデータを投入するためにはCassandraStoreBoltを使用します。  
 Cassandraに対してBoltが受信したデータを投入できるようになります。  
@@ -233,6 +234,11 @@ cassandrastore.setting  :  ## Cassandra設定グループを示すキー項目
   cassandra.keyspace    :                                                                ## CassandraKeyspace  
     - keyspace  
 ```
+#### Elasticsearch
+Elasticsearchに対してデータを投入するためにはElasticSearchBoltを使用します。  
+Elasticsearchに対してBoltが受信したデータを投入できるようになります。  
+実装例は[KafkaEsTopology](https://github.com/acromusashi/acromusashi-stream-example/blob/master/src/main/java/acromusashi/stream/example/topology/KafkaEsTopology.java)を確認してください。
+
 ### ユーティリティ
 #### Storm設定読込ユーティリティ
 Stormで使用しているyaml形式の設定ファイルを読み込むにはStormConfigGeneratorを使用します。  
