@@ -19,11 +19,19 @@ AcroMUSASHI Streamを用いた実装例については<a href="https://github.co
 
 ## 機能一覧
 ### データ取得
-#### Kestrel
+ストリームデータを処理するシステムを構築する際にはデータを一時メッセージキューに格納することで  
+瞬間的な負荷増大に対しても、欠損なく対応できるようになります。  
+そのため、ストリームデータ処理基盤にはメッセージキューからデータを取得するための機能が求められます。
+
+acromusashi-streamにおいては以下のメッセージキューに対応しています。  
+- [Kestrel](http://robey.github.io/kestrel/)
+- [RabbitMQ](http://www.rabbitmq.com/)
+
+#### [Kestrel](http://robey.github.io/kestrel/)
 Kestrelからデータを取得するためには、KestrelJsonSpoutを利用します。  
 KestrelからJSON形式のメッセージを取得し、Boltに送信するまでの処理を、シームレスに行えるようになります。  
 また、KestrelJsonSpoutを用いた場合、Boltにおいて処理に失敗／タイムアウトしたメッセージの再処理が可能です。  
-##### 実装例(BaseTopology継承クラスにおける実装例)
+##### 実装例
 ```java
 // Kestrelの接続先情報リスト  
 List<String> kestrelHosts = Lists.newArrayList("KestrelServer1:2229", "KestrelServer2:2229", "KestrelServer3:2229");  
@@ -39,10 +47,10 @@ getBuilder().setSpout("KestrelJsonSpout", kestrelSpout, kestrelSpoutPara);
   
 // ～～以後、BoltをTopologyに設定～～  
 ```
-#### RabbitMQ
+#### [RabbitMQ](http://www.rabbitmq.com/)
 RabbitMQからデータを取得するためにはRabbitMqSpoutを利用します。
 RabbitMQから文字列形式のメッセージを取得し、グルーピング情報を抽出してBoltに送信するまでの処理を、シームレスに行えるようになります。 
-##### 実装例(BaseTopology継承クラスにおける実装例)
+##### 実装例
 ```java
 // RabbitMQクラスタ設定ファイルパスの指定  
 String contextPath = "/rabbitmqClusterContext.xml";  
