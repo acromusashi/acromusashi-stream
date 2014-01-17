@@ -123,40 +123,40 @@ getBuilder().setSpout("RabbitMqSpout", rabbitMqSpout, mqSpoutPara);
 ```xml
 <!-- RabbitMQCluster0が保持するキュー一覧 -->  
 <util:list id="queueList0">  
-    <value>Message01</value>  
-    <value>Message02</value>  
+    <value>Message01</value>  <!-- ★RabbitMQが保持するキューを設定★ -->  
+    <value>Message02</value>  <!-- ★RabbitMQが保持するキューを設定★ -->  
 </util:list>  
 ～～～～  
 <!-- RabbitMQプロセス一覧 -->  
 <property name="mqProcessList">  
     <util:list list-class="java.util.LinkedList">  
-        <value>rabbitmq01:5672</value>  
-        <value>rabbitmq02:5672</value>  
+        <value>rabbitmq01:5672</value>  <!-- ★RabbitMQの待ち受けホスト／ポートを設定★ -->  
+        <value>rabbitmq02:5672</value>  <!-- ★RabbitMQの待ち受けホスト／ポートを設定★ -->  
     </util:list>  
 </property>  
 ～～～～  
 <!-- 呼出元別、接続先RabbitMQプロセス定義 -->  
 <property name="connectionProcessMap">  
     <util:map>  
-        <entry key="rabbitmq01_Message01">  
-            <value>rabbitmq01:5672</value>  
+        <entry key="rabbitmq01_Message01">  <!-- ★RabbitMQへのアクセス元ホスト_キュー名称 を設定★ -->  
+            <value>rabbitmq01:5672</value>  <!-- ★RabbitMQの待ち受けホスト／ポートを設定★ -->  
         </entry>  
-        <entry key="rabbitmq01_Message02">  
-            <value>rabbitmq02:5672</value>  
+        <entry key="rabbitmq01_Message02">  <!-- ★RabbitMQへのアクセス元ホスト_キュー名称 を設定★ -->  
+            <value>rabbitmq02:5672</value>  <!-- ★RabbitMQの待ち受けホスト／ポートを設定★ -->  
         </entry>  
-        <entry key="rabbitmq02_Message01">  
-            <value>rabbitmq01:5672</value>  
+        <entry key="rabbitmq02_Message01">  <!-- ★RabbitMQへのアクセス元ホスト_キュー名称 を設定★ -->  
+            <value>rabbitmq01:5672</value>  <!-- ★RabbitMQの待ち受けホスト／ポートを設定★ -->  
         </entry>  
-        <entry key="rabbitmq02_Message02">  
-            <value>rabbitmq02:5672</value>  
+        <entry key="rabbitmq02_Message02">  <!-- ★RabbitMQへのアクセス元ホスト_キュー名称 を設定★ -->  
+            <value>rabbitmq02:5672</value>  <!-- ★RabbitMQの待ち受けホスト／ポートを設定★ -->  
         </entry>  
     </util:map>  
 </property>  
 ～～～～  
 <!-- 使用するConnectionFactory （ユーザ名、パスワードを変更） -->  
 <bean id="connectionFactory0" class="acromusashi.stream.component.rabbitmq.CachingConnectionFactory">  
-    <property name="username" value="guest" />  
-    <property name="password" value="guest" />  
+    <property name="username" value="guest" />  <!-- ★RabbitMQのユーザ名を設定★ -->  
+    <property name="password" value="guest" />  <!-- ★RabbitMQのパスワードを設定★ -->  
     <property name="channelCacheSize" value="10" />  
 </bean>  
 ```
