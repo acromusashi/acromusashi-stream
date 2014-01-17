@@ -178,7 +178,18 @@ getBuilder().setSpout("RabbitMqSpout", rabbitMqSpout, mqSpoutPara);
 #### Hadoop
 Hadoopに対してデータを投入するためにはHdfsStoreBoltを使用します。  
 HDFSに対して一定時間ごとにファイルを切り替えながらデータを投入できるようになります。  
-実装例は[HdfsStoreTopology](https://github.com/acromusashi/acromusashi-stream-example/blob/master/src/main/java/acromusashi/stream/example/topology/HdfsStoreTopology.java)を確認してください。
+実装例は[Hadoop連携]を確認してください。
+
+HdfsStoreBoltを使用するTopologyでは読み込むYAMLファイルに以下の設定項目を設定してください。
+
+```yaml
+## 投入先のHDFSパス  
+hdfsstorebolt.outputuri      : 'hdfs://__NAMENODE_HOST__/HDFS/'  
+## 投入されるファイル名のヘッダ  
+hdfsstorebolt.filenameheader : HDFSStoreBolt  
+## ファイルを切り替えるインターバル  
+hdfsstorebolt.interval       : 10  
+```
 #### HBase
 HBaseに対してデータを投入するためにはCamelHbaseStoreBoltを使用します。  
 HBaseに対してBoltが受信したデータを投入できるようになります。  
