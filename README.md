@@ -105,7 +105,7 @@ RabbitMQから文字列形式のメッセージを取得し、グルーピング
 RabbitMqSpoutには以下の設定項目を設定し、rabbitmqClusterContext.xmlにも設定を行ってください。
 ```
 - RabbitMQクラスタ設定ファイルパス：クラスパス上に配置したRabbitMQクラスタ設定ファイルパス
-- RabbitMQのメッセージキューベース名称：キュー名称のベースを定義。【ベース名称】_【RabbitMqSpoutのスレッドID】のキューが取得対象
+- RabbitMQのメッセージキューベース名称：キュー名称のベースを定義。【ベース名称】【RabbitMqSpoutのスレッドID】のキューが取得対象
 - MessageKeyExtractorを継承したキー抽出クラス（個別に実装が必要です）
 ```
 ##### 実装例
@@ -137,8 +137,8 @@ getBuilder().setSpout("RabbitMqSpout", rabbitMqSpout, mqSpoutPara);
 ```xml
 <!-- RabbitMQCluster0が保持するキュー一覧 -->  
 <util:list id="queueList0">  
-    <value>Message01</value>  <!-- ★RabbitMQが保持するキューを設定★ -->  
-    <value>Message02</value>  <!-- ★RabbitMQが保持するキューを設定★ -->  
+    <value>Message0</value>  <!-- ★RabbitMQが保持するキューを設定★ -->  
+    <value>Message1</value>  <!-- ★RabbitMQが保持するキューを設定★ -->  
 </util:list>  
 ～～～～  
 <!-- RabbitMQプロセス一覧 -->  
@@ -151,10 +151,10 @@ getBuilder().setSpout("RabbitMqSpout", rabbitMqSpout, mqSpoutPara);
 <!-- 呼出元別、接続先RabbitMQプロセス定義 -->  
 <property name="connectionProcessMap">  
     <util:map>  
-        <entry key="rabbitmqserver_Message01">  <!-- ★RabbitMQへのアクセス元ホスト_キュー名称 を設定★ -->  
+        <entry key="rabbitmqserver_Message0">  <!-- ★RabbitMQへのアクセス元ホスト_キュー名称 を設定★ -->  
             <value>rabbitmqserver:5672</value>  <!-- ★RabbitMQの待ち受けホスト／ポートを設定★ -->  
         </entry>  
-        <entry key="rabbitmqserver_Message02">  <!-- ★RabbitMQへのアクセス元ホスト_キュー名称 を設定★ -->  
+        <entry key="rabbitmqserver_Message1">  <!-- ★RabbitMQへのアクセス元ホスト_キュー名称 を設定★ -->  
             <value>rabbitmqserver:5672</value>  <!-- ★RabbitMQの待ち受けホスト／ポートを設定★ -->  
         </entry>  
     </util:map>  
