@@ -57,9 +57,9 @@ acromusashi-streamにおいては以下の方式に対応しています。
 
 #### SNMP Trap受信
 
-SNMP Trapを受信するにはSNMP Trap受信機能のプロセスを利用します。  
-SNMP Trapを受信し、KestrelにJSON形式で保存することができます。  
-利用方法は[SNMP Trap受信機能のプロセス利用方法]を確認してください。
+SNMP Trapを受信するにはSNMP Trap受信機能を利用します。  
+SNMP Trapを受信し、Kestrelに保存することができます。  
+利用方法は[SNMP Trap受信機能の利用方法]を確認してください。  
 
 ### データ取得
 ストリームデータを処理するシステムを構築する際にはデータを一時メッセージキューに格納することで瞬間的な負荷増大に対しても、欠損なく対応できるようになります。  
@@ -91,8 +91,9 @@ getBuilder().setSpout("KestrelJsonSpout", kestrelSpout, kestrelSpoutPara);
 // ～～以後、BoltをTopologyに設定～～  
 ```
 #### [RabbitMQ](http://www.rabbitmq.com/)
-RabbitMQからデータを取得するためにはRabbitMqSpoutを利用します。
-RabbitMQから文字列形式のメッセージを取得し、グルーピング情報を抽出してBoltに送信するまでの処理を、シームレスに行えるようになります。 
+RabbitMQからデータを取得するためにはRabbitMqSpoutを利用します。  
+RabbitMQから文字列形式のメッセージを取得し、グルーピング情報を抽出してBoltに送信するまでの処理を、シームレスに行えるようになります。  
+あらかじめRabbitMQをインストールしておく必要がありますので、[RabbitMQの利用方法]を確認してインストールして使用してください。
 ##### 実装例
 ```java
 // RabbitMQクラスタ設定ファイルパスの指定  
