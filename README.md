@@ -203,7 +203,7 @@ CamelHbaseStoreBoltには以下の設定項目を設定してください。
 Cassandraに対してデータを投入するためにはCassandraStoreBoltを使用します。  
 Cassandraに対してBoltが受信したデータを投入できるようになります。  
 TupleMapperオブジェクトを切り替えることで投入対象のKeyspace、ColumunFamily、投入内容を切り替えることが可能です。  
-##### 実装例(BaseTopology継承クラスにおける実装例)
+##### 実装例
 ```java
 // ～～SpoutをTopologyに設定～～  
 
@@ -237,8 +237,16 @@ cassandrastore.setting  :  ## Cassandra設定グループを示すキー項目
 #### Elasticsearch
 Elasticsearchに対してデータを投入するためにはElasticSearchBoltを使用します。  
 Elasticsearchに対してBoltが受信したデータを投入できるようになります。  
-実装例は[KafkaEsTopology](https://github.com/acromusashi/acromusashi-stream-example/blob/master/src/main/java/acromusashi/stream/example/topology/KafkaEsTopology.java)を確認してください。
+実装例は[Elasticsearch連携]を確認してください。
 
+ElasticSearchBoltには以下の設定項目を設定してください。
+```
+- Elasticsearchクラスタ名：投入先のElasticsearchクラスタ名
+- Elasticsearch接続文字列：投入先のElasticsearchクラスタアドレス。「host1:port1;host2:port2;host3:port3...」という形式で定義(ホスト毎の区切り文字はセミコロン)
+- Elasticsearch投入先インデックス名称：投入先のElasticsearchインデックス名
+- Elasticsearch投入先型名称：投入先のElasticsearch型名
+- Elasticsearchに投入するTuple内のフィールド名称：Elasticsearchに投入するTuple中のフィールド名称
+```
 ### ユーティリティ
 #### Storm設定読込ユーティリティ
 Stormで使用しているyaml形式の設定ファイルを読み込むにはStormConfigGeneratorを使用します。  
