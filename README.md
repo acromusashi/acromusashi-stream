@@ -186,6 +186,7 @@ cassandrastore.setting  :  ## Cassandra設定グループを示すキー項目
 #### Storm設定読込ユーティリティ
 Stormで使用しているyaml形式の設定ファイルを読み込むにはStormConfigGeneratorを使用します。  
 YAML形式の設定ファイルをStormのConfigオブジェクトとして読み込むことができます。  
+StormのConfigオブジェクトとして読みこんだオブジェクトからはStormConfigUtilを用いることで値の取得が可能です。  
 実装例は[KafkaEsTopology](https://github.com/acromusashi/acromusashi-stream-example/blob/master/src/main/java/acromusashi/stream/example/topology/KafkaEsTopology.java)を確認してください。
 ## Javadoc
 [Javadoc](http://acromusashi.github.io/acromusashi-stream/javadoc-0.5.0/)
@@ -193,8 +194,6 @@ YAML形式の設定ファイルをStormのConfigオブジェクトとして読�
 ## Download
 https://github.com/acromusashi/acromusashi-stream/wiki/Download
 
-## Integration
-
 ## License
-This software is released under the MIT License, see LICENSE.txt.
+This software is released under the [MIT License](http://choosealicense.com/licenses/mit/), see LICENSE.txt.
 
