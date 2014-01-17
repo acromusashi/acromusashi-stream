@@ -1,8 +1,8 @@
 ## 概要
-AcroMUSASHI Stream は、Stormをベースとした、ビッグデータの分散ストリームデータ処理プラットフォームです。  
+AcroMUSASHI Stream は、[Storm](http://storm-project.net/)をベースとした、ビッグデータの分散ストリームデータ処理プラットフォームです。  
 
 「ストリームデータ」とは、連続的に発生し続ける時系列順のデータのことを言います。AcroMUSASHI Stream を利用することで、多種多様なデバイス／サービスで発生するストリームデータをリアルタイムに処理するシステムを簡単に構築できるようになります。  
-HTTP／SNMP／JMSといった数十種類のプロトコルに対応したインタフェースや、ビッグデータ処理に欠かせないHDFS／HBase／Cassandraなどのデータストアとの連携機能を提供しており、「M2M」「ログ収集・分析」「SNSアクセス解析」等、データの解析にリアルタイム性を要するシステムを、迅速に立ち上げることが可能です。  
+HTTP／SNMP／JMSといった数十種類のプロトコルに対応したインタフェースや、ビッグデータ処理に欠かせないHadoop／HBase／Cassandraなどのデータストアとの連携機能を提供しており、「M2M」「ログ収集・分析」「SNSアクセス解析」等、データの解析にリアルタイム性を要するシステムを、迅速に立ち上げることが可能です。  
 AcroMUSASHI Streamを用いた実装例については<a href="https://github.com/acromusashi/acromusashi-stream-example">AcroMUSASHI Stream Example</a>を参照してください。  
 ## システム構成イメージ
 ![Abstract Image](http://acromusashi.github.com/acromusashi-stream/images/AcroMUSASHIStreamAbstract.jpg)
