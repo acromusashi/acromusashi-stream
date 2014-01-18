@@ -1,76 +1,76 @@
 ## 概要
-AcroMUSASHI Stream は、[Storm](http://storm-project.net/)をベースとした、ビッグデータの分散ストリームデータ処理プラットフォームです。  
-
-「ストリームデータ」とは、連続的に発生し続ける時系列順のデータのことを言います。AcroMUSASHI Stream を利用することで、多種多様なデバイス／サービスで発生するストリームデータをリアルタイムに処理するシステムを簡単に構築できるようになります。  
+AcroMUSASHI Stream は、[Storm](http://storm-project.net/) をベースとした、ストリームデータの分散処理プラットフォームです。  
+  
+「ストリームデータ」とは、ビッグデータにおけるひとつのかたちであり、連続的に発生し続ける時系列順のデータのことを言います。AcroMUSASHI Stream を利用することで、多種多様なデバイス／センサー／サービスなどで発生するストリームデータをリアルタイムに処理するシステムを簡単に構築できるようになります。  
 HTTP／SNMP／JMSといった数十種類のプロトコルに対応したインタフェースや、ビッグデータ処理に欠かせない[Hadoop](http://hadoop.apache.org/)／[HBase](http://hbase.apache.org/)／[Cassandra](http://cassandra.apache.org/)などのデータストアとの連携機能を提供しており、「M2M」「ログ収集・分析」「SNSアクセス解析」等、データの解析にリアルタイム性を要するシステムを、迅速に立ち上げることが可能です。  
-AcroMUSASHI Streamを用いた実装例については<a href="https://github.com/acromusashi/acromusashi-stream-example">AcroMUSASHI Stream Example</a>を参照してください。  
+
+AcroMUSASHI Stream を用いた実装の仕方については <a href="https://github.com/acromusashi/acromusashi-stream-example"> Examples</a> を参照してください。  
+
 ## システム構成イメージ
 ![Abstract Image](http://acromusashi.github.com/acromusashi-stream/images/AcroMUSASHIStreamAbstract.jpg)
 
 ## スタートガイド
-### Maven設定ファイル(pom.xml)の記述内容
-acromusashi-streamを用いて開発を行う場合、下記の内容をpom.xmlに追記してください。  
-acromusashi-streamのコンポーネントが利用可能になります。  
+### 開発
+acromusashi-stream を用いて開発を行うためには、Mavenのビルド定義ファイルであるpom.xmlに以下の内容を記述してください。
 ```xml
 <dependency>  
   <groupId>jp.co.acroquest.acromusashi</groupId>  
   <artifactId>acromusashi-stream</artifactId>  
   <version>0.5.0</version>  
 </dependency> 
-``` 
-### インストール
-acromusashi-streamを使用するためには以下の手順が必要です。
-- 1. Stormのインストール  
-- 2. acromusashi-streamのインストール  
-- 3. 使用ミドルウェアのインストール  
-- 4. Topologyのインストール
-- 5. Topologyの起動  
-
-#### 1.Stormのインストール
-[storm-installer](https://github.com/acromusashi/storm-installer)を使用します。  
-[storm-installer](https://github.com/acromusashi/storm-installer)を参照して下さい。  
-
-#### 2.acromusashi-streamのインストール
-- ※Supervisorが動作しているホスト全てにインストールが必要です。  
-
-1.[ダウンロード](https://github.com/acromusashi/acromusashi-stream/blob/master/README.md#%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89)からacromusashi-streamの媒体をダウンロードします。  
-2.Supervisorが動作しているホストにacromusashi-streamの媒体を配置します。    
-3.Supervisorが動作しているホストのStormのライブラリディレクトリにファイルをインストールします。  
 ```
-# unzip acromusashi-stream.zip  
-# cp -p acromusashi-stream-X.X.X/lib/*.jar /opt/storm/lib/  
-``` 
-4.Supervisorを再起動します。  
+acromusashi-stream を利用して、StormのTopologyを開発してください。
+
+### デプロイ
+acromusashi-stream を利用したシステムを実行するためには、以下の手順が必要です。
+- Step1: Storm／必要となるミドルウェアのインストール
+- Step2: acromusashi-stream を利用して開発したTopologyのデプロイ
+- Step3: Topologyの起動
+
+#### Step1: Stormのインストール
+[storm-installer](https://github.com/acromusashi/storm-installer)を使用することで、簡単にStormに必要な環境を構築できます。  
+また、必要に応じて、メッセージキューやNoSQLなどのミドルウェアをインストールしてください。
+
+#### Step2: acromusashi-stream を利用して開発したTopologyのデプロイ
+acromusashi-stream を用いて開発したTopologyのクラスをjarファイルにまとめ、関連するjarファイルと共に、Supervisorにデプロイしてください（Supervisorが動作しているホスト全てにデプロイが必要です）。  
+
+#### Step3: Topologyの起動
+予め、StormのNumbus／Supervisorを起動しておいてください。
 ```
-# service storm-supervisor restart  
-```  
-#### 3. 使用ミドルウェアのインストール／4. Topologyのインストール／5. Topologyの起動  
-acromusashi-streamの使用したい機能によって異なります。  
-[acromusashi-stream-exampleの各機能]を参照してください。  
+# service storm-nimbus start
+# service storm-supervisor start
+```
+
+Storm本体の起動が確認できたら、開発したTopologyを起動します。
+```
+# cd /opt/storm/bin
+# storm jar storm-xxx-x.x.x-jar acromusashi.stream.example.MyTopology MyTopologyName
+```
+
 ## 機能一覧
-### データ受信
-ストリームデータを処理するシステムを構築する際にはデータを受信／取得し、ストリーム処理システムに取り込むことが必要になります。  
-そのため、ストリームデータ処理基盤にはデータを受信／取得する機能が求められます。  
 
-acromusashi-streamにおいては以下の方式に対応しています。  
-- SNMP Trap受信  
+### データ受信／収集
+ストリームデータを処理するシステムを構築する際にはデータを受信／取得し、ストリーム処理システムに取り込むこと必要があります。
+acromusashi-stream では、以下のようなデータに対応しています（ここでは、代表的な一部だけを示しています）。  
+- HTTP（JSON）
+- TCP/IP
+- SNMP Trap
+- Syslog
 
-#### SNMP Trap受信
-
-SNMP Trapを受信するにはSNMP Trap受信機能を利用します。  
-SNMP Trapを受信し、Kestrelに保存することができます。  
-利用方法は[SNMP Trap受信機能の利用方法]を確認してください。  
+#### SNMP Trap
+SNMP Trap を受信し、Kestrelなどのキューに格納する処理を、設定だけで実現可能です。  
+利用方法については、[SNMP Trap 受信機能の利用方法]を確認してください。  
 
 ### データ取得
 ストリームデータを処理するシステムを構築する際にはデータを一時メッセージキューに格納することで瞬間的な負荷増大に対しても、欠損なく対応できるようになります。  
-そのため、ストリームデータ処理基盤にはメッセージキューからデータを取得するための機能が求められます。
+そのため、ストリームデータ処理プラットフォームではメッセージキューからデータを取得するための機能が求められます。
 
-acromusashi-streamにおいては以下のメッセージキューに対応しています。  
+acromusashi-stream では、以下のメッセージキューに対応しています。  
 - [Kestrel](http://robey.github.io/kestrel/)
 - [RabbitMQ](http://www.rabbitmq.com/)
 
 #### [Kestrel](http://robey.github.io/kestrel/)
-Kestrelからデータを取得するためには、KestrelJsonSpoutを利用します。  
+Kestrelからデータを取得するためには、[KestrelJsonSpout](./src/main/java/acromusashi/stream/component/kestrel/spout/KestrelJsonSpout.java)を利用します。  
 KestrelからJSON形式のメッセージを取得し、Boltに送信するまでの処理を、シームレスに行えるようになります。  
 また、KestrelJsonSpoutを用いた場合、Boltにおいて処理に失敗／タイムアウトしたメッセージの再処理が可能です。  
 あらかじめKestrelをインストールしておく必要がありますので、[Kestrelの利用方法](https://github.com/acromusashi/acromusashi-stream-example/wiki/Kestrel-Usage)を確認してインストールして使用してください。
@@ -97,8 +97,9 @@ getBuilder().setSpout("KestrelJsonSpout", kestrelSpout, kestrelSpoutPara);
   
 // ～～以後、BoltをTopologyに設定～～  
 ```
+
 #### [RabbitMQ](http://www.rabbitmq.com/)
-RabbitMQからデータを取得するためにはRabbitMqSpoutを利用します。  
+RabbitMQからデータを取得するためには、[RabbitMqSpout](./src/main/java/acromusashi/stream/component/rabbitmq/spout/RabbitMqSpout.java)を利用します。  
 RabbitMQから文字列形式のメッセージを取得し、グルーピング情報を抽出してBoltに送信するまでの処理を、シームレスに行えるようになります。  
 あらかじめRabbitMQをインストールしておく必要がありますので、[RabbitMQの利用方法](https://github.com/acromusashi/acromusashi-stream-example/wiki/RabbitMQ-Usage)を確認してインストールして使用してください。
 
@@ -108,6 +109,7 @@ RabbitMqSpoutには以下の設定項目を設定し、rabbitmqClusterContext.xm
 - RabbitMQのメッセージキューベース名称：キュー名称のベースを定義。【ベース名称】【RabbitMqSpoutのスレッドID】のキューが取得対象
 - MessageKeyExtractorを継承したキー抽出クラス（個別に実装が必要です）
 ```
+
 ##### 実装例
 ```java
 // RabbitMQクラスタ設定ファイルパスの指定  
@@ -133,6 +135,7 @@ getBuilder().setSpout("RabbitMqSpout", rabbitMqSpout, mqSpoutPara);
   
 // ～～以後、BoltをTopologyに設定～～  
 ```
+
 ##### 設定ファイル記述例([rabbitmqClusterContext.xml](https://github.com/acromusashi/acromusashi-stream/blob/master/conf/rabbitmqClusterContext.xml) をベースに下記の個所の修正を行う)
 ```xml
 <!-- RabbitMQCluster0が保持するキュー一覧 -->  
@@ -167,9 +170,11 @@ getBuilder().setSpout("RabbitMqSpout", rabbitMqSpout, mqSpoutPara);
     <property name="channelCacheSize" value="10" />  
 </bean>  
 ```
+
 ### データストア連携
+
 #### Hadoop
-Hadoopに対してデータを投入するためにはHdfsStoreBoltを使用します。  
+Hadoopに対してデータを投入するためには[HdfsStoreBolt](./src/main/java/acromusashi/stream/bolt/hdfs/HdfsStoreBolt.java)を使用します。  
 HDFSに対して一定時間ごとにファイルを切り替えながらデータを投入できるようになります。  
 実装例は[Hadoop連携]を確認してください。
 
@@ -182,8 +187,9 @@ hdfsstorebolt.filenameheader : HDFSStoreBolt
 ## ファイルを切り替えるインターバル  
 hdfsstorebolt.interval       : 10  
 ```
+
 #### HBase
-HBaseに対してデータを投入するためにはCamelHbaseStoreBoltを使用します。  
+HBaseに対してデータを投入するためには[CamelHbaseStoreBolt](./src/main/java/acromusashi/stream/bolt/hbase/CamelHbaseStoreBolt.java)を使用します。  
 HBaseに対してBoltが受信したデータを投入できるようになります。  
 実装例は[HBase連携]を確認してください。
 
@@ -192,8 +198,9 @@ CamelHbaseStoreBoltには以下の設定項目を設定してください。
 - コンテキスト設定ファイルパス：クラスパス上に配置したコンテキスト設定ファイルパス  
 - HBaseセル定義：CellDefineクラス(ColumnFamilyとColumnQuantifierを保持するクラス）のリスト
 ```
+
 #### Cassandra
-Cassandraに対してデータを投入するためにはCassandraStoreBoltを使用します。  
+Cassandraに対してデータを投入するためには[CassandraStoreBolt](./src/main/java/acromusashi/stream/component/cassandra/bolt/CassandraStoreBolt.java)を使用します。  
 Cassandraに対してBoltが受信したデータを投入できるようになります。  
 TupleMapperオブジェクトを切り替えることで投入対象のKeyspace、ColumunFamily、投入内容を切り替えることが可能です。  
 ##### 実装例
@@ -227,8 +234,9 @@ cassandrastore.setting  :  ## Cassandra設定グループを示すキー項目
   cassandra.keyspace    :                                                                ## CassandraKeyspace  
     - keyspace  
 ```
+
 #### Elasticsearch
-Elasticsearchに対してデータを投入するためにはElasticSearchBoltを使用します。  
+Elasticsearchに対してデータを投入するためには[ElasticSearchBolt](./src/main/java/acromusashi/stream/component/elasticsearch/bolt/ElasticSearchBolt.java)を使用します。  
 Elasticsearchに対してBoltが受信したデータを投入できるようになります。  
 実装例は[Elasticsearch連携]を確認してください。
 
@@ -240,11 +248,14 @@ ElasticSearchBoltには以下の設定項目を設定してください。
 - Elasticsearch投入先型名称：投入先のElasticsearch型名
 - Elasticsearchに投入するTuple内のフィールド名称：Elasticsearchに投入するTuple中のフィールド名称
 ```
+
 ### ユーティリティ
+
 #### Storm設定読込ユーティリティ
-Stormで使用しているyaml形式の設定ファイルを読み込むにはStormConfigGeneratorを使用します。  
+Stormで使用しているYAML形式の設定ファイルを読み込むには[StormConfigGenerator](./src/main/java/acromusashi/stream/config/StormConfigGenerator.java)を使用します。  
 YAML形式の設定ファイルをStormのConfigオブジェクトとして読み込むことができます。  
-StormのConfigオブジェクトとして読みこんだオブジェクトからはStormConfigUtilを用いることで値の取得が可能です。    
+StormのConfigオブジェクトとして読みこんだオブジェクトからは[StormConfigUtil](./src/main/java/acromusashi/stream/config/StormConfigUtil.java)を用いることで値の取得が可能です。
+
 ##### 実装例
 ```java
 // 指定したパスから設定情報をStormの設定オブジェクト形式で読み込む。
@@ -253,12 +264,12 @@ Config conf = StormConfigGenerator.loadStormConfig("/opt/storm/config/TargetTopo
 // Stormの設定オブジェクトからキー"target.config"を持つ文字列形式の設定項目をデフォルト値""で取得する
 String configValue = StormConfigUtil.getStringValue(conf, "target.config", "");
 ```
+
 ## Javadoc
 [Javadoc](http://acromusashi.github.io/acromusashi-stream/javadoc-0.5.0/)
 
 ## ダウンロード
 https://github.com/acromusashi/acromusashi-stream/wiki/Download
 
-## License
+## ライセンス
 This software is released under the [MIT License](http://choosealicense.com/licenses/mit/), see LICENSE.txt.
-
