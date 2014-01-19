@@ -17,8 +17,8 @@
   </licenses>
   <scm>
     <url>https://github.com/acromusashi/acromusashi-stream</url>
-    <connection>https://github.com/acromusashi/acromusashi-stream.git</connection>
-    <developerConnection>https://github.com/acromusashi/acromusashi-stream.git</developerConnection>
+    <connection>scm:git:https://github.com/acromusashi/acromusashi-stream.git</connection>
+    <developerConnection>scm:git:https://github.com/acromusashi/acromusashi-stream.git</developerConnection>
   </scm>
   <developers>
     <developer>
