@@ -32,7 +32,7 @@ acromusashi-stream を利用したシステムを実行するためには、以�
 また、必要に応じて、メッセージキューやNoSQLなどのミドルウェアをインストールしてください。
 
 #### Step2: acromusashi-stream を利用して開発したTopologyのデプロイ
-acromusashi-stream を用いて開発したTopologyのクラスをjarファイルにまとめ、関連するjarファイルと共に、Supervisorにデプロイしてください（Supervisorが動作しているホスト全てにデプロイが必要です）。  
+acromusashi-stream を用いて開発したTopologyのクラスをjarファイルにまとめ、関連するjarファイルと共に、Supervisorにデプロイしてください（関連するjarファイルはSupervisorが動作しているホスト全てにデプロイが必要です）。  
 その際、下記のディレクトリに配置してください。
 ```
 関連するjarファイル　 ＞　/opt/storm/lib 配下
