@@ -118,7 +118,7 @@ RabbitMQからデータを取得するためには、[RabbitMqSpout](./src/main/
 RabbitMQから文字列形式のメッセージを取得し、グルーピング情報を抽出してBoltに送信するまでの処理を、シームレスに行えるようになります。  
 あらかじめRabbitMQをインストールしておく必要がありますので、[RabbitMQの利用方法](https://github.com/acromusashi/acromusashi-stream-example/wiki/RabbitMQ-Usage)を確認してインストールして使用してください。
 
-RabbitMqSpoutにはTopology生成時に以下の設定項目を設定してください。  
+RabbitMqSpoutにはTopology生成時に以下のフィールドを設定してください。  
 その上で、[rabbitmqClusterContext.xml](./conf/rabbitmqClusterContext.xml)を取得して設定を行い、Supervisorが動作しているホスト全ての /opt/storm/conf 配下に配置してください。  
 MessageKeyExtractorは[JsonExtractor](https://github.com/acromusashi/acromusashi-stream-example/blob/master/src/main/java/acromusashi/stream/example/spout/JsonExtractor.java)を参考に作成してください。
 ```
