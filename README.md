@@ -218,16 +218,33 @@ HBaseに対してデータを投入するためには[CamelHbaseStoreBolt](./src
 HBaseに対してBoltが受信したデータを投入できるようになります。  
 実装例は[HBase連携]を確認してください。
 
-CamelHbaseStoreBoltには以下の設定項目を設定してください。
-```
-- コンテキスト設定ファイルパス：クラスパス上に配置したコンテキスト設定ファイルパス  
-- HBaseセル定義：CellDefineクラス(ColumnFamilyとColumnQuantifierを保持するクラス）のリスト
-```
-
 #### Cassandra
 Cassandraに対してデータを投入するためには[CassandraStoreBolt](./src/main/java/acromusashi/stream/component/cassandra/bolt/CassandraStoreBolt.java)を使用します。  
 Cassandraに対してBoltが受信したデータを投入できるようになります。  
-TupleMapperオブジェクトを切り替えることで投入対象のKeyspace、ColumunFamily、投入内容を切り替えることが可能です。  
+あらかじめCassandraをインストールしておく必要がありますので、[Cassandraの利用方法]を確認してインストールして使用してください。  
+
+CassandraStoreBoltを使用する際にはコンストラクタの引数に以下の設定項目を設定してください。  
+TupleMapperは[DefaultTupleMapper](https://github.com/hmsonline/storm-cassandra/blob/master/src/main/java/com/hmsonline/storm/cassandra/bolt/mapper/DefaultTupleMapper.java)を参考に作成してください。
+```
+- 第1引数(Cassandra投入設定Mapを保持するキー名称)   
+  以下の例のようにYAMLファイル中に指定したCassandra投入設定Mapのキー値を設定
+  (例)cassandrastore.setting  
+- 第2引数(Cassandraへの投入内容を生成するTupleMapperオブジェクト)   
+  Cassandraへの投入内容を生成するオブジェクトをTupleMapperインタフェースを継承して作成し、設定してください。
+```
+
+CassandraStoreBoltを使用するTopologyでは読み込むYAMLファイルに以下の設定項目を設定してください。
+##### 設定ファイル記述例(Topology起動時に読みこませるYAMLファイル)
+```yaml
+## CassandraStoreBolt Setting  
+cassandrastore.setting  :  ## Cassandra設定グループを示すキー項目、CassandraStoreBoltコンストラクタの第1引数に指定した値とあわせる  
+  cassandra.host        : "cassandrahost1:9160,cassandrahost2:9160,cassandrahost3:9160"  ## CassandraHost Setting
+  cassandra.clusterName : 'Test Cluster'                                                 ## Cassandra投入先クラスタ名  
+  cassandra.connection.timeout : 5000                                                    ## Cassandra接続タイムアウト  
+  cassandra.keyspace    :                                                                ## CassandraKeyspace  
+    - keyspace  
+```
+
 ##### 実装例
 ```java
 // ～～SpoutをTopologyに設定～～  
@@ -249,16 +266,7 @@ CassandraStoreBolt<String, String, String> cassandraStoreBolt = new CassandraSto
 // CassandraStoreBoltをTopologyに登録  
 getBuilder().setBolt("CassandraStoreBolt", cassandraStoreBolt, cassandraPara).fieldsGrouping("JsonConvertBolt", new Fields(FieldName.MESSAGE_KEY));  
 ```
-##### 設定ファイル記述例(Topology起動時に読みこませるYAMLファイル)
-```yaml
-## CassandraStoreBolt Setting  
-cassandrastore.setting  :  ## Cassandra設定グループを示すキー項目  
-  cassandra.host        : "cassandrahost1:9160,cassandrahost2:9160,cassandrahost3:9160"  ## CassandraHost Setting
-  cassandra.clusterName : 'Test Cluster'                                                 ## Cassandra投入先クラスタ名  
-  cassandra.connection.timeout : 5000                                                    ## Cassandra接続タイムアウト  
-  cassandra.keyspace    :                                                                ## CassandraKeyspace  
-    - keyspace  
-```
+
 
 #### Elasticsearch
 Elasticsearchに対してデータを投入するためには[ElasticSearchBolt](./src/main/java/acromusashi/stream/component/elasticsearch/bolt/ElasticSearchBolt.java)を使用します。  
