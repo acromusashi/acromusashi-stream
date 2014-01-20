@@ -161,7 +161,7 @@ getBuilder().setSpout("RabbitMqSpout", rabbitMqSpout, mqSpoutPara);
 // ～～以後、BoltをTopologyに設定～～  
 ```
 
-##### 設定ファイル記述例([rabbitmqClusterContext.xml](https://github.com/acromusashi/acromusashi-stream/blob/master/conf/rabbitmqClusterContext.xml) をベースに下記の個所の修正を行う)
+##### 設定ファイル記述例([rabbitmqClusterContext.xml](./conf/rabbitmqClusterContext.xml) をベースに下記の個所の修正を行う)
 ```xml
 <!-- RabbitMQCluster0が保持するキュー一覧 -->  
 <util:list id="queueList0">  
