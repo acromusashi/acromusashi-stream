@@ -33,7 +33,11 @@ acromusashi-stream を利用したシステムを実行するためには、以�
 
 #### Step2: acromusashi-stream を利用して開発したTopologyのデプロイ
 acromusashi-stream を用いて開発したTopologyのクラスをjarファイルにまとめ、関連するjarファイルと共に、Supervisorにデプロイしてください（Supervisorが動作しているホスト全てにデプロイが必要です）。  
-
+その際、下記のディレクトリに配置してください。
+```
+関連するjarファイル　 ＞　/opt/storm/lib 配下
+開発したTopologyのjar ＞　/opt/storm 配下
+```
 #### Step3: Topologyの起動
 予め、StormのNumbus／Supervisorを起動しておいてください。
 ```
@@ -43,8 +47,8 @@ acromusashi-stream を用いて開発したTopologyのクラスをjarファイ�
 
 Storm本体の起動が確認できたら、開発したTopologyを起動します。
 ```
-# cd /opt/storm/bin
-# storm jar storm-xxx-x.x.x-jar acromusashi.stream.example.MyTopology MyTopologyName
+# cd /opt/storm
+# bin/storm jar mytopology-x.x.x-jar acromusashi.stream.example.MyTopology MyTopologyName
 ```
 
 ## 機能一覧
