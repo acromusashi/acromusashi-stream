@@ -79,10 +79,21 @@ KestrelからJSON形式のメッセージを取得し、Boltに送信するま�
 また、KestrelJsonSpoutを用いた場合、Boltにおいて処理に失敗／タイムアウトしたメッセージの再処理が可能です。  
 あらかじめKestrelをインストールしておく必要がありますので、[Kestrelの利用方法](https://github.com/acromusashi/acromusashi-stream-example/wiki/Kestrel-Usage)を確認してインストールして使用してください。
 
-KestrelJsonSpoutには以下の設定項目を設定してください。  
+KestrelJsonSpoutを使用する際にはコンストラクタの引数に以下の設定項目を設定してください。  
 ```
-- Kestrelの接続先情報リスト：【Kestrelホスト:KestrelThriftポート】形式の文字列のリスト
-- Kestrelのメッセージキューベース名称：キュー名称のベースを定義。【ベース名称】_【KestrelJsonSpoutのスレッドID】のキューが取得対象
+- 第1引数(Kestrelの接続先情報リスト)   
+  以下の例のように【Kestrelホスト:KestrelThriftポート】形式のStringのListを指定
+  (例)
+  - 192.168.0.2:2229  
+  - 192.168.0.2:2229  
+  - 192.168.0.3:2229  
+- 第2引数(Kestrelのメッセージキューベース名称)   
+  以下の例のように取得対象となるKestrel上のキュー名のベースの名称を指定してください。
+  (例)MessageQueue
+  尚、ベース名称をMessageQueueとした場合、実際に取得対象となるキュー名は
+  MessageQueue_0、MessageQueue_1、MessageQueue_2・・・となります。
+- 第3引数(Kestrelから取得したデータのデシリアライズ方式)   
+  文字列として取得する場合、「new StringScheme())」を設定してください。  
 ```
 
 ##### 実装例
