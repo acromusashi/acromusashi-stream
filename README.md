@@ -88,10 +88,10 @@ KestrelJsonSpoutを使用する際にはコンストラクタの引数に以下�
   - 192.168.0.2:2229  
   - 192.168.0.3:2229  
 - 第2引数(Kestrelのメッセージキューベース名称)   
-  以下の例のように取得対象となるKestrel上のキュー名のベースの名称を指定してください。
-  (例)MessageQueue
-  尚、ベース名称をMessageQueueとした場合、実際に取得対象となるキュー名は
-  MessageQueue_0、MessageQueue_1、MessageQueue_2・・・となります。
+  以下の例のように取得対象となるKestrel上のキュー名のベースの名称を指定してください。  
+  (例)MessageQueue  
+  尚、ベース名称をMessageQueueとした場合、実際に取得対象となるキュー名は  
+  MessageQueue_0、MessageQueue_1、MessageQueue_2・・・となります。  
 - 第3引数(Kestrelから取得したデータのデシリアライズ方式)   
   文字列として取得する場合、「new StringScheme())」を設定してください。  
 ```
@@ -118,11 +118,21 @@ RabbitMQからデータを取得するためには、[RabbitMqSpout](./src/main/
 RabbitMQから文字列形式のメッセージを取得し、グルーピング情報を抽出してBoltに送信するまでの処理を、シームレスに行えるようになります。  
 あらかじめRabbitMQをインストールしておく必要がありますので、[RabbitMQの利用方法](https://github.com/acromusashi/acromusashi-stream-example/wiki/RabbitMQ-Usage)を確認してインストールして使用してください。
 
-RabbitMqSpoutには以下の設定項目を設定し、rabbitmqClusterContext.xmlにも設定を行ってください。
+RabbitMqSpoutにはTopology生成時に以下の設定項目を設定してください。  
+その上で、[rabbitmqClusterContext.xml](./conf/rabbitmqClusterContext.xml)を取得して設定を行い、Supervisorが動作しているホスト全ての /opt/storm/conf 配下に配置してください。  
+MessageKeyExtractorは[JsonExtractor](https://github.com/acromusashi/acromusashi-stream-example/blob/master/src/main/java/acromusashi/stream/example/spout/JsonExtractor.java)を参考に作成してください。
 ```
-- RabbitMQクラスタ設定ファイルパス：クラスパス上に配置したRabbitMQクラスタ設定ファイルパス
-- RabbitMQのメッセージキューベース名称：キュー名称のベースを定義。【ベース名称】【RabbitMqSpoutのスレッドID】のキューが取得対象
-- MessageKeyExtractorを継承したキー抽出クラス（個別に実装が必要です）
+- コンテキスト読込オブジェクト(ContextHelper)  
+  RabbitMQのクラスタ設定を記述したコンテキストファイルを読み込む読込オブジェクト。  
+  SpringContextHelperに以下の例のようにクラスパス上のコンテキストファイルのパスを設定してください。  
+  (例)/rabbitmqClusterContext.xml  
+- RabbitMQのベースキュー名称(QueueName)  
+  以下の例のように取得対象となるRabbitMQ上のキュー名のベースの名称を指定してください。  
+  (例)MessageQueue  
+  尚、ベース名称をMessageQueueとした場合、実際に取得対象となるキュー名は  
+  MessageQueue0、MessageQueue1、MessageQueue2・・・となります。  
+- RabbitMQから取得したメッセージからキーを抽出するオブジェクト(MessageKeyExtractor)
+  RabbitMQから取得したメッセージからキー項目を抽出するオブジェクトをMessageKeyExtractorインタフェースを継承して作成し、設定してください。
 ```
 
 ##### 実装例
