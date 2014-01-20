@@ -63,7 +63,7 @@ acromusashi-stream では、以下のようなデータに対応しています�
 
 #### SNMP Trap
 SNMP Trap を受信し、Kestrelなどのキューに格納する処理を、設定だけで実現可能です。  
-利用方法については、[SNMP Trap 受信機能の利用方法]を確認してください。  
+利用方法については、[SNMP Trap 受信機能の利用方法](https://github.com/acromusashi/acromusashi-stream-example/wiki/SNMPTrapReceive)を確認してください。  
 
 ### データ取得
 ストリームデータを処理するシステムを構築する際にはデータを一時メッセージキューに格納することで瞬間的な負荷増大に対しても、欠損なく対応できるようになります。  
