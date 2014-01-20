@@ -84,7 +84,7 @@ KestrelJsonSpoutを使用する際にはコンストラクタの引数に以下�
 - 第1引数(Kestrelの接続先情報リスト)   
   以下の例のように【Kestrelホスト:KestrelThriftポート】形式のStringのListを指定
   (例)
-  - 192.168.0.2:2229  
+  - 192.168.0.1:2229  
   - 192.168.0.2:2229  
   - 192.168.0.3:2229  
 - 第2引数(Kestrelのメッセージキューベース名称)   
@@ -273,13 +273,22 @@ Elasticsearchに対してデータを投入するためには[ElasticSearchBolt]
 Elasticsearchに対してBoltが受信したデータを投入できるようになります。  
 実装例は[Elasticsearch連携]を確認してください。
 
-ElasticSearchBoltには以下の設定項目を設定してください。
+ElasticSearchBoltを使用する際にはコンストラクタの引数に以下の設定項目を設定してください。  
+EsTupleConverterは[JsonConverter](./src/main/java/acromusashi/stream/component/elasticsearch/bolt/JsonConverter.java)を参考に作成してください。
 ```
-- Elasticsearchクラスタ名：投入先のElasticsearchクラスタ名
-- Elasticsearch接続文字列：投入先のElasticsearchクラスタアドレス。「host1:port1;host2:port2;host3:port3...」という形式で定義(ホスト毎の区切り文字はセミコロン)
-- Elasticsearch投入先インデックス名称：投入先のElasticsearchインデックス名
-- Elasticsearch投入先型名称：投入先のElasticsearch型名
-- Elasticsearchに投入するTuple内のフィールド名称：Elasticsearchに投入するTuple中のフィールド名称
+- 第1引数(TupleをIndex Requestに変換するコンバータオブジェクト)   
+  Elasticsearchへの投入内容を生成するオブジェクトをEsTupleConverterインタフェースを継承して作成し、設定してください。  
+```
+
+ElasticSearchBoltにはTopology生成時に以下のフィールドを設定してください。  
+```
+- クラスタ名称(clusterName)  
+  Elasticsearchのクラスタ名称を設定してください。  
+  (例)TestCluster  
+- ElasticSearchの投入先(servers)  
+  ElasticSearchの投入先を設定してください。  
+  「host1:port1;host2:port2;host3:port3...」という形式で定義してください。  
+  (例)192.168.0.1:9300;192.168.0.2:9300;192.168.0.3:9300  
 ```
 
 ### ユーティリティ
