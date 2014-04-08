@@ -46,17 +46,11 @@ public class ElasticSearchBolt extends BaseConfigurationBolt
     /** デフォルトポート値 */
     private static final int    DEFAULT_PORT      = 9300;
 
-    /** デフォルトの絞り込みクエリ値 */
-    private static final String DEFAULT_PERCOLATE = "*";
-
     /** クラスタ名称 */
     protected String            clusterName;
 
     /** ElasticSearchの投入先。「host1:port1;host2:port2;host3:port3...」という形式で定義 */
     protected String            servers;
-
-    /** 絞り込みクエリ値 */
-    protected String            percolate         = DEFAULT_PERCOLATE;
 
     /** TupleをIndex Requestに変換するコンバータ */
     protected EsTupleConverter  converter;
@@ -123,7 +117,7 @@ public class ElasticSearchBolt extends BaseConfigurationBolt
             document = this.converter.convertToDocument(input);
 
             IndexResponse response = this.client.prepareIndex(indexName, typeName, documentId).setSource(
-                    document).setPercolate(this.percolate).execute().actionGet();
+                    document).execute().actionGet();
 
             if (logger.isDebugEnabled() == true)
             {
@@ -164,13 +158,5 @@ public class ElasticSearchBolt extends BaseConfigurationBolt
     public void setServers(String servers)
     {
         this.servers = servers;
-    }
-
-    /**
-     * @param percolate the percolate to set
-     */
-    public void setPercolate(String percolate)
-    {
-        this.percolate = percolate;
     }
 }

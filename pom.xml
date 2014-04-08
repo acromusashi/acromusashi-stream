@@ -77,9 +77,9 @@
     <site.encoding>UTF-8</site.encoding>
     <slf4j.version>1.6.6</slf4j.version>
     <logback.version>1.0.6</logback.version>
-    <storm.version>0.9.0-rc2</storm.version>
-    <camel.version>2.12.1</camel.version>
-    <elasticsearch.version>0.90.7</elasticsearch.version>
+    <storm.version>0.9.1-incubating</storm.version>
+    <camel.version>2.13.0</camel.version>
+    <elasticsearch.version>1.1.0</elasticsearch.version>
     <jacoco.include.package>acromusashi.stream.*</jacoco.include.package>
   </properties>
 
@@ -187,8 +187,8 @@
 
     <!-- Storm -->
     <dependency>
-      <groupId>storm</groupId>
-      <artifactId>storm</artifactId>
+      <groupId>org.apache.storm</groupId>
+      <artifactId>storm-core</artifactId>
       <version>${storm.version}</version>
       <!-- Storm本体は実行環境で提供 -->
       <scope>provided</scope>
@@ -206,7 +206,7 @@
     <dependency>
       <groupId>com.hmsonline</groupId>
       <artifactId>storm-cassandra</artifactId>
-      <version>0.4.0-rc3</version>
+      <version>0.4.0-rc4</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
