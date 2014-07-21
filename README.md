@@ -13,11 +13,11 @@ AcroMUSASHI Stream を用いた実装の仕方については <a href="https://g
 ### 開発
 acromusashi-stream を用いて開発を行うためには、Mavenのビルド定義ファイルであるpom.xmlに以下の内容を記述してください。
 ```xml
-<dependency>  
-  <groupId>jp.co.acroquest.acromusashi</groupId>  
-  <artifactId>acromusashi-stream</artifactId>  
-  <version>0.5.0</version>  
-</dependency> 
+<dependency>
+  <groupId>jp.co.acroquest.acromusashi</groupId>
+  <artifactId>acromusashi-stream</artifactId>
+  <version>0.5.2</version>
+</dependency>
 ```
 acromusashi-stream を利用して、StormのTopologyを開発してください。
 
