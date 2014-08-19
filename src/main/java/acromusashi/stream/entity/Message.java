@@ -16,7 +16,7 @@ import java.io.Serializable;
 
 /**
  * AcroMUSASHI Stream内で流通する汎用メッセージ。
- * 
+ *
  * @author tsukano
  */
 public class Message implements Serializable
@@ -31,10 +31,26 @@ public class Message implements Serializable
     private Object            body;
 
     /**
-     * インスタンス化を防止するためのコンストラクタ
+     * パラメータを指定せずにインスタンスを生成する。
      */
     public Message()
     {}
+
+    /**
+     * パラメータを指定せずにインスタンスを生成する。
+     */
+
+    /**
+     * ヘッダとボディを指定してインスタンスを生成する。
+     *
+     * @param header Message Header
+     * @param body Message Body
+     */
+    public Message(Header header, Object body)
+    {
+        this.header = header;
+        this.body = body;
+    }
 
     /**
      * @return the header

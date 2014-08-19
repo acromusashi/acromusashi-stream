@@ -21,7 +21,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
 
 /**
  * AcroMUSASHI Stream内で流通する汎用メッセージのヘッダ。
- * 
+ *
  * @author tsukano
  */
 public class Header implements Serializable
@@ -32,13 +32,13 @@ public class Header implements Serializable
     /** 共通メッセージに設定されるデフォルトのバージョン値　*/
     public static final String  DEFAULT_VERSION  = "1.0";
 
-    /** Message Key　*/
+    /** Message Key */
     private String              messageKey       = "";
 
-    /** Message Identifier　*/
+    /** Message Identifier */
     private String              messageId        = "";
 
-    /** TimeStamp　*/
+    /** TimeStamp */
     private long                timestamp        = 0;
 
     /** Message Source Identifier　*/
@@ -173,7 +173,7 @@ public class Header implements Serializable
 
     /**
      * 拡張ヘッダ領域に値を追加する。
-     * 
+     *
      * @param key 追加キー
      * @param value 追加値
      */
