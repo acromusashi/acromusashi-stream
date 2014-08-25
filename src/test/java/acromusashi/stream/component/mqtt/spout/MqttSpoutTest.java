@@ -77,6 +77,7 @@ public class MqttSpoutTest
      *    condition::  メッセージの取得に失敗
      *    result:: メッセージの送信が行われないこと
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testNextTuple_Message取得失敗() throws Exception
     {
@@ -99,6 +100,7 @@ public class MqttSpoutTest
      *    condition::  メッセージの取得結果がnull
      *    result:: メッセージの送信が行われないこと
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testNextTuple_Message取得結果null() throws Exception
     {
@@ -121,6 +123,7 @@ public class MqttSpoutTest
      *    condition::  即Ackを返す設定でメッセージを受信
      *    result:: Anchor無しでemitされること
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     public void testNextTuple_Message取得成功即Ack() throws Exception
     {
@@ -153,6 +156,7 @@ public class MqttSpoutTest
      *    condition::  QoS0設定でメッセージを受信
      *    result:: Anchor無しでemitされること
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
     public void testNextTuple_Message取得成功QoS0() throws Exception
     {
@@ -185,6 +189,7 @@ public class MqttSpoutTest
      *    condition::  QoS1設定でメッセージを受信
      *    result:: Anchorつきでemitされること
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
     public void testNextTuple_Message取得成功QoS1() throws Exception
     {
