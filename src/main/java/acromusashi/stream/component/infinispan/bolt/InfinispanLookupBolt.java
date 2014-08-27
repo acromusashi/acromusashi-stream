@@ -21,27 +21,30 @@ import org.slf4j.LoggerFactory;
 import acromusashi.stream.bolt.BaseConfigurationBolt;
 import acromusashi.stream.component.infinispan.CacheHelper;
 import acromusashi.stream.component.infinispan.TupleCacheMapper;
+import acromusashi.stream.constants.FieldName;
 import acromusashi.stream.exception.ConvertFailException;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 
 /**
- * InfinispanにTupleの内容を保存するBolt
+ * InfinispanからTupleに指定したKeyに対応したValueを取得し、取得結果を基に処理を実施するBolt
  *
  * @author kimura
  *
  * @param <K> InfinispanCacheKeyの型
  * @param <V> InfinispanCacheValueの型
  */
-public class InfinispanStoreBolt<K, V> extends BaseConfigurationBolt
+public class InfinispanLookupBolt<K, V> extends BaseConfigurationBolt
 {
     /** serialVersionUID */
-    private static final long             serialVersionUID = -1793029528020234403L;
+    private static final long             serialVersionUID = 9028505967740858573L;
 
     /** logger */
-    private static final Logger           logger           = LoggerFactory.getLogger(InfinispanStoreBolt.class);
+    private static final Logger           logger           = LoggerFactory.getLogger(InfinispanLookupBolt.class);
 
     /** キャッシュサーバURL */
     protected String                      cacheServerUrl;
@@ -62,7 +65,7 @@ public class InfinispanStoreBolt<K, V> extends BaseConfigurationBolt
      * @param cacheName キャッシュ名称
      * @param mapper TupleMapper
      */
-    public InfinispanStoreBolt(String cacheServerUrl, String cacheName,
+    public InfinispanLookupBolt(String cacheServerUrl, String cacheName,
             TupleCacheMapper<K, V> mapper)
     {
         this.cacheServerUrl = cacheServerUrl;
@@ -88,53 +91,65 @@ public class InfinispanStoreBolt<K, V> extends BaseConfigurationBolt
     @Override
     public void execute(Tuple input)
     {
-        // データ保存前実行処理を実行
-        onStoreBefore(input);
+        // データ取得前実行処理を実行
+        onLookupBefore(input);
 
-        K storeKey = null;
+        K lookupKey = null;
         try
         {
-            storeKey = this.mapper.convertToKey(input);
+            lookupKey = this.mapper.convertToKey(input);
         }
         catch (ConvertFailException ex)
         {
-            String messageFormat = "Tuple convert to key failed. Trash tuple. : InputTuple={0}";
+            String messageFormat = "Tuple convert to key failed. Skip lookup. : InputTuple={0}";
             String errorMessage = MessageFormat.format(messageFormat, input.toString());
             logger.warn(errorMessage, ex);
-            getCollector().ack(input);
-            return;
         }
 
-        V storeValue = null;
-        try
+        V lookupValue = null;
+        if (lookupKey != null)
         {
-            storeValue = this.mapper.convertToValue(input);
-        }
-        catch (ConvertFailException ex)
-        {
-            String messageFormat = "Tuple convert to value failed. Trash tuple. : InputTuple={0}";
-            String errorMessage = MessageFormat.format(messageFormat, input.toString());
-            logger.warn(errorMessage, ex);
-            getCollector().ack(input);
-            return;
-        }
-
-        try
-        {
-            this.cacheHelper.getCache().put(storeKey, storeValue);
-        }
-        catch (Exception ex)
-        {
-            String messageFormat = "Cache store failed. Trash tuple. : InputTuple={0}";
-            String errorMessage = MessageFormat.format(messageFormat, input.toString());
-            logger.warn(errorMessage, ex);
-            getCollector().ack(input);
-            return;
+            try
+            {
+                lookupValue = this.cacheHelper.getCache().get(lookupKey);
+            }
+            catch (Exception ex)
+            {
+                String messageFormat = "Cache lookup failed. Continue execute. : InputTuple={0}";
+                String errorMessage = MessageFormat.format(messageFormat, input.toString());
+                logger.warn(errorMessage, ex);
+            }
         }
 
-        // データ保存後実行処理を実行
-        onStoreAfter(input, storeKey, storeValue);
+        // データ取得後実行処理を実行
+        onLookupAfter(input, lookupKey, lookupValue);
         getCollector().ack(input);
+    }
+
+    /**
+     * Infinispanからのデータ取得前に実行される処理。<br>
+     *
+     * @param input Tuple
+     */
+    protected void onLookupBefore(Tuple input)
+    {
+        // デフォルトでは何も行わない。
+    }
+
+    /**
+     * Infinispanからのデータ取得後に実行される処理。
+     *
+     * @param input Tuple
+     * @param lookupKey 取得に使用したKey
+     * @param lookupValue 取得したValue(取得されなかった場合はnull)
+     */
+    protected void onLookupAfter(Tuple input, K lookupKey, V lookupValue)
+    {
+        // デフォルトでは取得した結果がnull以外の場合、下流にデータを流す。
+        if (lookupValue != null)
+        {
+            getCollector().emit(input, new Values(lookupKey, lookupValue));
+        }
     }
 
     /**
@@ -143,29 +158,7 @@ public class InfinispanStoreBolt<K, V> extends BaseConfigurationBolt
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer)
     {
-        // 下流に送信を行わないため、未設定
-    }
-
-    /**
-     * Infinispanへのデータ保存前に実行される処理。<br>
-     *
-     * @param input Tuple
-     */
-    protected void onStoreBefore(Tuple input)
-    {
-        // デフォルトでは何も行わない。
-    }
-
-    /**
-     * Infinispanへのデータ保存後に実行される処理。<br>
-     * 保存失敗した場合は実行されない。
-     *
-     * @param input Tuple
-     * @param storedKey 保存したKey
-     * @param storedValue 保存したValue
-     */
-    protected void onStoreAfter(Tuple input, K storedKey, V storedValue)
-    {
-        // デフォルトでは何も行わない。
+        // デフォルトでは
+        declarer.declare(new Fields(FieldName.MESSAGE_KEY, FieldName.MESSAGE_VALUE));
     }
 }

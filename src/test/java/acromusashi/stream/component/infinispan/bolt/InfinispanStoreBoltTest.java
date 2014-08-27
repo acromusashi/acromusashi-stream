@@ -53,7 +53,7 @@ public class InfinispanStoreBoltTest
     public void setUp()
     {
         TupleCacheMapper<String, String> mapper = new SimpleCacheMapper<>();
-        this.target = new InfinispanStoreBolt<>(mapper);
+        this.target = new InfinispanStoreBolt<>("", "", mapper);
 
         Whitebox.setInternalState(this.target, "collector", this.mockCollector);
         Whitebox.setInternalState(this.target, "cacheHelper", this.cacheHelper);
