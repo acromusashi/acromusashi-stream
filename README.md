@@ -16,7 +16,7 @@ acromusashi-stream を用いて開発を行うためには、Mavenのビルド�
 <dependency>
   <groupId>jp.co.acroquest.acromusashi</groupId>
   <artifactId>acromusashi-stream</artifactId>
-  <version>0.5.2</version>
+  <version>0.5.4</version>
 </dependency>
 ```
 acromusashi-stream を利用して、StormのTopologyを開発してください。
@@ -306,12 +306,6 @@ Config conf = StormConfigGenerator.loadStormConfig("/opt/storm/config/TargetTopo
 // Stormの設定オブジェクトからキー"target.config"を持つ文字列形式の設定項目をデフォルト値""で取得する
 String configValue = StormConfigUtil.getStringValue(conf, "target.config", "");
 ```
-
-## Javadoc
-[Javadoc](http://acromusashi.github.io/acromusashi-stream/javadoc-0.5.0/)
-
-## ダウンロード
-https://github.com/acromusashi/acromusashi-stream/wiki/Download
 
 ## ライセンス
 This software is released under the [MIT License](http://choosealicense.com/licenses/mit/), see LICENSE.txt.
