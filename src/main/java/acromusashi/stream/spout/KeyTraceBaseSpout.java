@@ -29,6 +29,8 @@ import backtype.storm.tuple.Fields;
  * <ol>
  * <li>メッセージ中のキー情報を履歴として保持</li>
  * </ol>
+ *
+ * @author kimura
  */
 public abstract class KeyTraceBaseSpout extends BaseConfigurationSpout
 {

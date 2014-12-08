@@ -21,6 +21,8 @@ import org.apache.commons.lang.SerializationUtils;
 
 /**
  * キー情報の履歴を保持するValueObjectクラス
+ *
+ * @author kimura
  */
 public class KeyHistory implements Serializable
 {

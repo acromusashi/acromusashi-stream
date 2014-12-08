@@ -16,7 +16,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -46,6 +45,8 @@ import backtype.storm.tuple.Tuple;
 /**
  * KeyTraceBaseBoltクラスのテストクラス<br>
  * モッククラスを用いて検証を行う。
+ *
+ * @author kimura
  */
 @RunWith(MockitoJUnitRunner.class)
 public class KeyTraceBaseBoltTest
@@ -58,6 +59,7 @@ public class KeyTraceBaseBoltTest
     private OutputCollector  mockCollector;
 
     /** テスト用のStormConfigMap */
+    @SuppressWarnings("rawtypes")
     @Mock
     private Map              mockConfMap;
 
@@ -106,6 +108,7 @@ public class KeyTraceBaseBoltTest
      *    condition:: KeyHistoryInfo未保持Tuple受信時
      *    result:: 空のKeyHistoryInfoを生成して動作を継続することを確認
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     public void testExecute_KeyHistoryInfo未保持Tuple処理確認()
     {
@@ -208,6 +211,7 @@ public class KeyTraceBaseBoltTest
      *    condition:: KeyTraceBaseBolt#emitメソッド実行
      *    result:: Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していること
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
     public void testEmit_AnchorKey指定なし()
     {
@@ -251,6 +255,7 @@ public class KeyTraceBaseBoltTest
      *    condition:: KeyTraceBaseBolt#emitメソッド実行
      *    result:: Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していること
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
     public void testEmit_MessageKey指定()
     {
@@ -294,6 +299,7 @@ public class KeyTraceBaseBoltTest
      *    condition:: KeyTraceBaseBolt#emitメソッド実行
      *    result:: Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していること
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
     public void testEmit_Anchor指定()
     {
@@ -341,6 +347,7 @@ public class KeyTraceBaseBoltTest
      *    condition:: KeyTraceBaseBolt#emitメソッド実行
      *    result:: Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していること
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
     public void testEmit_AnchorKey指定()
     {

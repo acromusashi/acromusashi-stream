@@ -42,6 +42,8 @@ import backtype.storm.tuple.Values;
 /**
  * KeyTraceBaseBolt向けのテストクラス<br>
  * 単一クラスではなく「Stormクラスタ」としての試験のため、KeyTraceBaseBoltTestクラスとは別クラスとして作成する。
+ *
+ * @author kimura
  */
 public class KeyTraceBaseBoltUnitTest
 {
@@ -130,6 +132,7 @@ public class KeyTraceBaseBoltUnitTest
         Param1KeyHasUnique1MsgTestJob()
         {}
 
+        @SuppressWarnings("rawtypes")
         @Override
         public void run(ILocalCluster cluster) throws Exception
         {
@@ -190,6 +193,7 @@ public class KeyTraceBaseBoltUnitTest
         Param1KeyHasUnique1MsgAckTestJob()
         {}
 
+        @SuppressWarnings("rawtypes")
         @Override
         public void run(ILocalCluster cluster) throws Exception
         {
@@ -249,6 +253,7 @@ public class KeyTraceBaseBoltUnitTest
         Param1KeyHasUnique3MsgTestJob()
         {}
 
+        @SuppressWarnings("rawtypes")
         @Override
         public void run(ILocalCluster cluster) throws Exception
         {
@@ -328,6 +333,7 @@ public class KeyTraceBaseBoltUnitTest
         Param1KeyHasDupKey1MsgTestJob()
         {}
 
+        @SuppressWarnings("rawtypes")
         @Override
         public void run(ILocalCluster cluster) throws Exception
         {
@@ -387,6 +393,7 @@ public class KeyTraceBaseBoltUnitTest
         Param1KeyHasDupKey3MsgTestJob()
         {}
 
+        @SuppressWarnings("rawtypes")
         @Override
         public void run(ILocalCluster cluster) throws Exception
         {
@@ -465,6 +472,7 @@ public class KeyTraceBaseBoltUnitTest
         Param1NoKeyTestJob()
         {}
 
+        @SuppressWarnings("rawtypes")
         @Override
         public void run(ILocalCluster cluster) throws Exception
         {
@@ -525,6 +533,7 @@ public class KeyTraceBaseBoltUnitTest
         Param3KeyHasUnique1MsgTestJob()
         {}
 
+        @SuppressWarnings("rawtypes")
         @Override
         public void run(ILocalCluster cluster) throws Exception
         {
@@ -589,6 +598,7 @@ public class KeyTraceBaseBoltUnitTest
         Param3KeyHasUnique3MsgTestJob()
         {}
 
+        @SuppressWarnings("rawtypes")
         @Override
         public void run(ILocalCluster cluster) throws Exception
         {
@@ -675,6 +685,7 @@ public class KeyTraceBaseBoltUnitTest
         Param3KeyHasDupKey1MsgTestJob()
         {}
 
+        @SuppressWarnings("rawtypes")
         @Override
         public void run(ILocalCluster cluster) throws Exception
         {
@@ -739,6 +750,7 @@ public class KeyTraceBaseBoltUnitTest
         Param3KeyHasDupKey3MsgTestJob()
         {}
 
+        @SuppressWarnings("rawtypes")
         @Override
         public void run(ILocalCluster cluster) throws Exception
         {
@@ -824,6 +836,7 @@ public class KeyTraceBaseBoltUnitTest
         Param3NoKeyTestJob()
         {}
 
+        @SuppressWarnings("rawtypes")
         @Override
         public void run(ILocalCluster cluster) throws Exception
         {
@@ -850,18 +863,6 @@ public class KeyTraceBaseBoltUnitTest
             KeyTraceBaseBoltUnitTest.this.isAssert = true;
         }
     }
-
-    /**
-     * 下記の構成を保持する検証用Topology定義を作成する。<br>
-    * <ol>
-    * <li>KeyTraceThroughSpout : 指定したフィールドを指定してグルーピングを定義するSpout</li>
-    * <li>KeyTraceThroughBoltWithKey : 指定したフィールドを指定し、キーを追加してメッセージを送信するBolt</li>
-    * <li>KeyTraceThroughBolt : 指定したフィールドを指定してメッセージを送信するBolt</li>
-    * </ol>
-     *
-     * @param contextPath コンテキストパス
-     * @return 検証用のTopology定義
-     */
 
     /**
      * 下記の構成を保持する検証用Topology定義を作成する。<br>

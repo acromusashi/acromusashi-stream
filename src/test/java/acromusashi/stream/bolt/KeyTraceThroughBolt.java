@@ -21,6 +21,8 @@ import backtype.storm.tuple.Tuple;
 
 /**
  * 受信したTupleに対して指定したフィールドを抽出して下流に流すStorm-UnitTest用Bolt<br>
+ *
+ * @author kimura
  */
 public class KeyTraceThroughBolt extends KeyTraceBaseBolt
 {
@@ -42,6 +44,7 @@ public class KeyTraceThroughBolt extends KeyTraceBaseBolt
     public KeyTraceThroughBolt()
     {}
 
+    @SuppressWarnings("rawtypes")
     @Override
     public void onPrepare(Map stormConf, TopologyContext context)
     {

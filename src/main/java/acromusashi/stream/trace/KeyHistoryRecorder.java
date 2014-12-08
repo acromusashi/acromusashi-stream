@@ -16,6 +16,8 @@ import java.util.List;
 
 /**
  * Stormのメッセージにキー情報履歴を保存するユーティリティクラス
+ *
+ * @author kimura
  */
 public class KeyHistoryRecorder
 {

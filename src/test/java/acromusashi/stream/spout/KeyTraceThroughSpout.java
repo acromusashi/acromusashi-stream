@@ -19,6 +19,8 @@ import backtype.storm.task.TopologyContext;
 
 /**
  * 指定したフィールド指定を保持するStorm-UnitTest用Spout
+ *
+ * @author kimura
  */
 public class KeyTraceThroughSpout extends KeyTraceBaseSpout
 {
@@ -28,6 +30,7 @@ public class KeyTraceThroughSpout extends KeyTraceBaseSpout
     /** 下流に転送するフィールドリスト */
     private List<String>      fields;
 
+    @SuppressWarnings("rawtypes")
     @Override
     public void onOpen(Map conf, TopologyContext context)
     {

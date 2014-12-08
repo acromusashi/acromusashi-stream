@@ -42,6 +42,8 @@ import backtype.storm.tuple.Values;
 /**
  * KeyTraceBaseSpout向けのテストクラス<br>
  * 単一クラスではなく「Stormクラスタ」としての試験のため、KeyTraceBaseSpoutTestクラスとは別クラスとして作成する。
+ *
+ * @author kimura
  */
 public class KeyTraceBaseSpoutUnitTest
 {
@@ -132,6 +134,7 @@ public class KeyTraceBaseSpoutUnitTest
         Param1KeyHasTestJob()
         {}
 
+        @SuppressWarnings("rawtypes")
         @Override
         public void run(ILocalCluster cluster) throws Exception
         {
@@ -192,6 +195,7 @@ public class KeyTraceBaseSpoutUnitTest
         Param1NoKeyTestJob()
         {}
 
+        @SuppressWarnings("rawtypes")
         @Override
         public void run(ILocalCluster cluster) throws Exception
         {
@@ -254,6 +258,7 @@ public class KeyTraceBaseSpoutUnitTest
         Param3KeyHasTestJob()
         {}
 
+        @SuppressWarnings("rawtypes")
         @Override
         public void run(ILocalCluster cluster) throws Exception
         {
@@ -317,6 +322,7 @@ public class KeyTraceBaseSpoutUnitTest
         Param3NoKeyTestJob()
         {}
 
+        @SuppressWarnings("rawtypes")
         @Override
         public void run(ILocalCluster cluster) throws Exception
         {

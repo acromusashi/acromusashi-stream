@@ -13,6 +13,8 @@ import backtype.storm.tuple.Tuple;
 
 /**
  * KeyTraceBaseBolt検証用のモッククラス
+ *
+ * @author kimura
  */
 public class MockKeyTraceBaseBolt extends KeyTraceBaseBolt
 {

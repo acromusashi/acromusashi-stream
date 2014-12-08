@@ -20,6 +20,8 @@ import backtype.storm.task.TopologyContext;
 
 /**
  * KeyTraceBaseSpout検証用のモッククラス
+ *
+ * @author kimura
  */
 public class MockKeyTraceBaseSpout extends KeyTraceBaseSpout
 {

@@ -39,6 +39,8 @@ import backtype.storm.tuple.Fields;
 /**
  * KeyTraceBaseSpoutクラスのテストクラス<br>
  * モッククラスを用いて検証を行う。
+ *
+ * @author kimura
  */
 @RunWith(MockitoJUnitRunner.class)
 public class KeyTraceBaseSpoutTest
@@ -51,6 +53,7 @@ public class KeyTraceBaseSpoutTest
     private SpoutOutputCollector mockCollector;
 
     /** テスト用のStormConfigMap */
+    @SuppressWarnings("rawtypes")
     @Mock
     private Map                  mockConfMap;
 
@@ -127,6 +130,7 @@ public class KeyTraceBaseSpoutTest
      *    condition:: MessageKey、MessageIdを指定せずにTupleのemitを行う。<br>
      *    result:: collectorにemitされるTupleの頭にはkeyHistoryが設定されていること
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
     public void testEmit_KeyId未指定()
     {
@@ -163,6 +167,7 @@ public class KeyTraceBaseSpoutTest
      *    condition:: MessageKeyを指定してTupleのemitを行う。<br>
      *    result:: collectorにemitされるTupleの頭にはKeyを保持するkeyHistoryが設定されていること
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
     public void testEmit_Key指定()
     {
@@ -199,6 +204,7 @@ public class KeyTraceBaseSpoutTest
      *    condition:: MessageKey、MessageIdを指定してTupleのemitを行う。<br>
      *    result:: collectorにemitされるTupleの頭にはKeyを保持するkeyHistoryが設定されていること
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
     public void testEmit_KeyId指定()
     {
@@ -235,6 +241,7 @@ public class KeyTraceBaseSpoutTest
      *    condition:: MessageKey、MessageIdを個別指定してTupleのemitを行う。<br>
      *    result:: collectorにemitされるTupleの頭にはKeyを保持するkeyHistoryが設定されていること
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
     public void testEmit_KeyId個別指定()
     {
