@@ -14,7 +14,7 @@ package acromusashi.stream.constants;
 
 /**
  * Tuple中のフィールド名に用いる定数
- * 
+ *
  * @author kimura
  */
 public interface FieldName
@@ -24,4 +24,7 @@ public interface FieldName
 
     /** メッセージ値を格納するフィールド名称 */
     String MESSAGE_VALUE = "messageValue";
+
+    /** メッセージのキー情報履歴を保持するField名称 */
+    String KEY_HISTORY = "keyHistory";
 }

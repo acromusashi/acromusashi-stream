@@ -56,7 +56,7 @@ public class JsonConvertBoltUnitTest
                                                            '.', '/') + '/';
 
     /** JUnit実行結果を保持する変数 */
-    private boolean               isAssert_;
+    private boolean               isAssert;
 
     /** テスト用クラスタパラメータ */
     private static MkClusterParam mkClusterParam;
@@ -94,7 +94,7 @@ public class JsonConvertBoltUnitTest
     public void setup()
     {
         // テスト実施結果の格納変数を初期化
-        this.isAssert_ = false;
+        this.isAssert = false;
         // モックデータソースを初期化
         this.mockedSources = new MockedSources();
         // Topology用設定値を初期化
@@ -108,7 +108,7 @@ public class JsonConvertBoltUnitTest
 
     /**
      * 共通メッセージの変換に成功した場合のメッセージの送信内容を確認する
-     * 
+     *
      * @target {@link JsonConvertBolt#execute(backtype.storm.tuple.Tuple)}
      * @test 変換Boltにて共通メッセージのエンティティが生成され、ストリームに送信されること
      *    condition:: 共通メッセージJSON形式のメッセージをSpoutにて取得
@@ -123,23 +123,11 @@ public class JsonConvertBoltUnitTest
                 + "JacksonMessageConvertBoltTest_Valid.txt"));
         this.mockedSources.addMockData("ThroughSpout", new Values(messageKey, messageStr));
 
-        try
-        {
-            // 実施
-            Testing.withSimulatedTimeLocalCluster(mkClusterParam, new SpreadAlarmConvertJob());
-        }
-        catch (Exception ex)
-        {
-            // Windows上でテストコードを実行するとLocalCluster終了時にZooKeeperの一時ファイル削除時に例外が発生するため、
-            // 特定のメッセージを保持する例外の場合正常として扱う。
-            if (ex.getMessage().startsWith("Unable to delete file") == false)
-            {
-                throw ex;
-            }
-        }
+        // 実施
+        Testing.withSimulatedTimeLocalCluster(mkClusterParam, new SpreadAlarmConvertJob());
 
-        // 検証結果確認
-        assertTrue(this.isAssert_);
+        // 検証
+        assertTrue(this.isAssert);
     }
 
     /**
@@ -177,7 +165,7 @@ public class JsonConvertBoltUnitTest
             assertThat(resultTuple.get(0).toString(), equalTo("192.168.100.31"));
             assertThat(resultTuple.get(1).toString(), equalTo(expected.toString()));
 
-            JsonConvertBoltUnitTest.this.isAssert_ = true;
+            JsonConvertBoltUnitTest.this.isAssert = true;
         }
     }
 
@@ -188,7 +176,7 @@ public class JsonConvertBoltUnitTest
      * <li>JsonConvertBolt : 共通メッセージクラスにメッセージを変換するBolt</li>
      * <li>ThroughBolt : 指定したフィールドを指定してメッセージを送信するBolt</li>
      * </ol>
-     * 
+     *
      * @return JacksonMessageConvertBolt検証用のTopology定義
      */
     private StormTopology createConvertTopology()
@@ -217,7 +205,7 @@ public class JsonConvertBoltUnitTest
 
     /**
      * 検証用の共通メッセージエンティティを作成する
-     * 
+     *
      * @return 共通メッセージエンティティ
      */
     private Message baseExpectedMessage()
@@ -237,7 +225,7 @@ public class JsonConvertBoltUnitTest
 
     /**
      * 検証用のユーザエンティティを作成する
-     * 
+     *
      * @return 検証用ユーザエンティティ
      */
     private TestUserEntity createUserEntity()
