@@ -302,7 +302,7 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      * @param message sending message
      * @param messageKey MessageKey(Use key history's value)
      */
-    protected void emitWithKey(List<Object> message, Object messageKey)
+    protected void emitWithKey(StreamMessage message, Object messageKey)
     {
         KeyHistory history = new KeyHistory();
         history.addKey(messageKey.toString());
@@ -323,7 +323,7 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      * @param messageKey MessageKey(Use key history's value)
      * @param groupingKey grouping key
      */
-    protected void emitWithKeyAndGrouping(List<Object> message, Object messageKey,
+    protected void emitWithKeyAndGrouping(StreamMessage message, Object messageKey,
             String groupingKey)
     {
         KeyHistory history = new KeyHistory();
@@ -345,7 +345,7 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      * @param messageKey MessageKey(Use key history's value)
      * @param streamId streamId
      */
-    protected void emitWithKeyAndStream(List<Object> message, Object messageKey, String streamId)
+    protected void emitWithKeyAndStream(StreamMessage message, Object messageKey, String streamId)
     {
         KeyHistory history = new KeyHistory();
         history.addKey(messageKey.toString());
@@ -367,7 +367,7 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      * @param groupingKey grouping key
      * @param streamId streamId
      */
-    protected void emitWithKeyAndGroupingStream(List<Object> message, Object messageKey,
+    protected void emitWithKeyAndGroupingStream(StreamMessage message, Object messageKey,
             String groupingKey, String streamId)
     {
         KeyHistory history = new KeyHistory();

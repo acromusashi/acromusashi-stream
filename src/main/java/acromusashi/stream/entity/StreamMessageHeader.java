@@ -13,23 +13,24 @@
 package acromusashi.stream.entity;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
+import com.google.common.collect.Maps;
+
 /**
- * AcroMUSASHI Stream内で流通する汎用メッセージのヘッダ。
+ * Common message header used in AcroMUSASHI Stream
  *
  * @author tsukano
  */
 public class StreamMessageHeader implements Serializable
 {
-    /** serialVersionUID　*/
+    /** serialVersionUID */
     private static final long   serialVersionUID = -3290857759292105445L;
 
-    /** 共通メッセージに設定されるデフォルトのバージョン値　*/
+    /** Default Version */
     public static final String  DEFAULT_VERSION  = "1.0";
 
     /** Message Key */
@@ -41,20 +42,20 @@ public class StreamMessageHeader implements Serializable
     /** TimeStamp */
     private long                timestamp        = 0;
 
-    /** Message Source Identifier　*/
+    /** Message Source Identifier */
     private String              source           = "";
 
-    /** Message Type　*/
+    /** Message Type */
     private String              type             = "";
 
-    /** Message Protocol Version　*/
+    /** Message Protocol Version */
     private String              version          = DEFAULT_VERSION;
 
-    /** 拡張ヘッダ領域 */
-    private Map<String, String> additionalHeader = new LinkedHashMap<String, String>();
+    /** Additional Header */
+    private Map<String, String> additionalHeader;
 
     /**
-     * Class constructor.
+     * Constructs instance.
      */
     public StreamMessageHeader()
     {}
@@ -172,13 +173,18 @@ public class StreamMessageHeader implements Serializable
     }
 
     /**
-     * 拡張ヘッダ領域に値を追加する。
+     * Add value to additional header.
      *
-     * @param key 追加キー
-     * @param value 追加値
+     * @param key key
+     * @param value value
      */
     public void addAdditionalHeader(String key, String value)
     {
+        if (this.additionalHeader == null)
+        {
+            this.additionalHeader = Maps.newLinkedHashMap();
+        }
+
         this.additionalHeader.put(key, value);
     }
 

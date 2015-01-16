@@ -23,7 +23,7 @@ import backtype.storm.task.TopologyContext;
  *
  * @author kimura
  */
-public class MockAmBaseSpout extends AmBaseSpout
+public class BlankAmBaseSpout extends AmBaseSpout
 {
     /** serialVersionUID */
     private static final long serialVersionUID = -1271953207061271186L;

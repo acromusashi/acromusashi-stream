@@ -45,12 +45,6 @@ public abstract class AmConfigurationSpout extends BaseRichSpout
     private SpoutOutputCollector collector;
 
     /**
-     * Class constructor.
-     */
-    public AmConfigurationSpout()
-    {}
-
-    /**
      * {@inheritDoc}
      */
     @Override
