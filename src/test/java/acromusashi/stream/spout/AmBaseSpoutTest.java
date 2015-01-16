@@ -43,7 +43,7 @@ import backtype.storm.tuple.Fields;
  * @author kimura
  */
 @RunWith(MockitoJUnitRunner.class)
-public class KeyTraceBaseSpoutTest
+public class AmBaseSpoutTest
 {
     /** テスト対象 */
     private AmBaseSpout          target;
@@ -67,7 +67,7 @@ public class KeyTraceBaseSpoutTest
     @Before
     public void setUp()
     {
-        this.target = new MockKeyTraceBaseSpout();
+        this.target = new MockAmBaseSpout();
     }
 
     /**

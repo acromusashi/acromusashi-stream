@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import acromusashi.stream.spout.KeyTraceThroughSpout;
+import acromusashi.stream.spout.AmBaseThroughSpout;
 import acromusashi.stream.trace.KeyHistory;
 import backtype.storm.Config;
 import backtype.storm.ILocalCluster;
@@ -882,7 +882,7 @@ public class KeyTraceBaseBoltUnitTest
 
         // Build Topology
         // Add Spout(KeyTraceThroughSpout)
-        KeyTraceThroughSpout throughSpout = new KeyTraceThroughSpout();
+        AmBaseThroughSpout throughSpout = new AmBaseThroughSpout();
         throughSpout.setFields(fields);
         builder.setSpout("KeyTraceThroughSpout", throughSpout);
 
@@ -921,7 +921,7 @@ public class KeyTraceBaseBoltUnitTest
 
         // Build Topology
         // Add Spout(KeyTraceThroughSpout)
-        KeyTraceThroughSpout throughSpout = new KeyTraceThroughSpout();
+        AmBaseThroughSpout throughSpout = new AmBaseThroughSpout();
         throughSpout.setFields(fields);
         builder.setSpout("KeyTraceThroughSpout", throughSpout);
 

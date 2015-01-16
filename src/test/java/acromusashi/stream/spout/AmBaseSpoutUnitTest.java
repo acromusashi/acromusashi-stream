@@ -45,7 +45,7 @@ import backtype.storm.tuple.Values;
  *
  * @author kimura
  */
-public class KeyTraceBaseSpoutUnitTest
+public class AmBaseSpoutUnitTest
 {
     /** JUnit実行結果を保持する変数 */
     private boolean               isAssert;
@@ -141,7 +141,7 @@ public class KeyTraceBaseSpoutUnitTest
             // 実施
             Map result = Testing.completeTopology(cluster,
                     createTopology(Arrays.asList("Message")),
-                    KeyTraceBaseSpoutUnitTest.this.completeTopologyParam);
+                    AmBaseSpoutUnitTest.this.completeTopologyParam);
 
             // 検証
             List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
@@ -156,7 +156,7 @@ public class KeyTraceBaseSpoutUnitTest
             assertThat(resultTuple.get(0).toString(), equalTo("KeyHistory=[MessageKey]"));
             assertThat(resultTuple.get(1).toString(), equalTo("MessageValue"));
 
-            KeyTraceBaseSpoutUnitTest.this.isAssert = true;
+            AmBaseSpoutUnitTest.this.isAssert = true;
         }
     }
 
@@ -202,7 +202,7 @@ public class KeyTraceBaseSpoutUnitTest
             // 実施
             Map result = Testing.completeTopology(cluster,
                     createTopology(Arrays.asList("Message")),
-                    KeyTraceBaseSpoutUnitTest.this.completeTopologyParam);
+                    AmBaseSpoutUnitTest.this.completeTopologyParam);
 
             // 検証
             List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
@@ -217,7 +217,7 @@ public class KeyTraceBaseSpoutUnitTest
             assertThat(resultTuple.get(0).toString(), equalTo("KeyHistory=[]"));
             assertThat(resultTuple.get(1).toString(), equalTo("MessageValue"));
 
-            KeyTraceBaseSpoutUnitTest.this.isAssert = true;
+            AmBaseSpoutUnitTest.this.isAssert = true;
         }
     }
 
@@ -265,7 +265,7 @@ public class KeyTraceBaseSpoutUnitTest
             // 実施
             Map result = Testing.completeTopology(cluster,
                     createTopology(Arrays.asList("Message1", "Message2", "Message3")),
-                    KeyTraceBaseSpoutUnitTest.this.completeTopologyParam);
+                    AmBaseSpoutUnitTest.this.completeTopologyParam);
 
             // 検証
             List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
@@ -282,7 +282,7 @@ public class KeyTraceBaseSpoutUnitTest
             assertThat(resultTuple.get(2).toString(), equalTo("MessageValue2"));
             assertThat(resultTuple.get(3).toString(), equalTo("MessageValue3"));
 
-            KeyTraceBaseSpoutUnitTest.this.isAssert = true;
+            AmBaseSpoutUnitTest.this.isAssert = true;
         }
     }
 
@@ -329,7 +329,7 @@ public class KeyTraceBaseSpoutUnitTest
             // 実施
             Map result = Testing.completeTopology(cluster,
                     createTopology(Arrays.asList("Message1", "Message2", "Message3")),
-                    KeyTraceBaseSpoutUnitTest.this.completeTopologyParam);
+                    AmBaseSpoutUnitTest.this.completeTopologyParam);
 
             // 検証
             List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
@@ -346,7 +346,7 @@ public class KeyTraceBaseSpoutUnitTest
             assertThat(resultTuple.get(2).toString(), equalTo("MessageValue2"));
             assertThat(resultTuple.get(3).toString(), equalTo("MessageValue3"));
 
-            KeyTraceBaseSpoutUnitTest.this.isAssert = true;
+            AmBaseSpoutUnitTest.this.isAssert = true;
         }
     }
 
@@ -366,7 +366,7 @@ public class KeyTraceBaseSpoutUnitTest
 
         // Build Topology
         // Add Spout(KeyTraceThroughSpout)
-        KeyTraceThroughSpout throughSpout = new KeyTraceThroughSpout();
+        AmBaseThroughSpout throughSpout = new AmBaseThroughSpout();
         throughSpout.setFields(fields);
         builder.setSpout("KeyTraceThroughSpout", throughSpout);
 
