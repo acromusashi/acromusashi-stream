@@ -16,11 +16,13 @@ import java.util.List;
 import java.util.Map;
 
 import acromusashi.stream.constants.FieldName;
-import acromusashi.stream.trace.KeyHistoryRecorder;
+import acromusashi.stream.entity.StreamMessage;
+import acromusashi.stream.trace.KeyHistory;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Values;
 
 import com.google.common.collect.Lists;
 
@@ -126,74 +128,346 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
     }
 
     /**
-     * Use same value used by MessageKey(Use key history's value), MessageId(Id identify by storm). And send message to downstream component.<br>
-     * User following situation.
+     * Use same value used by MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
+     * Send message to downstream component.<br>
+     * Use following situation.
      * <ol>
      * <li>Use this class's key history function.</li>
-     * <li>Use storm's fault tolerant  function.</li>
+     * <li>Use storm's fault tolerant function.</li>
+     * <li>MessageKey and MessageId are same value.</li>
      * </ol>
      *
      * @param message sending message
-     * @param messageKeyId MessageKey(Use key history's value), MessageId(Id identify by storm), and GroupingKey
+     * @param messageKeyId MessageKey(Use key history's value), MessageId(Id identify by storm)
      */
-    protected void emit(List<Object> message, Object messageKeyId)
+    protected void emit(StreamMessage message, Object messageKeyId)
     {
-        // メッセージにキー情報を記録する。
-        KeyHistoryRecorder.recordKeyHistory(message, messageKeyId);
-        this.getCollector().emit(message, messageKeyId);
+        KeyHistory history = new KeyHistory();
+        history.addKey(messageKeyId.toString());
+
+        this.getCollector().emit(new Values("", history, message), messageKeyId);
     }
 
     /**
-     * MessageKey(キー情報履歴として出力する値)、MessageId(Stormのメッセージ処理失敗検知機構に指定する値)を指定せずに下流コンポーネントへメッセージを送信する。<br>
-     * 下記の条件の時に用いること。
+     * Use same value used by MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
+     * Send message to downstream component with grouping key.<br>
+     * Use following situation.
      * <ol>
-     * <li>本クラスの提供するキー情報履歴を使用しない。</li>
-     * <li>Stormのメッセージ処理失敗検知機構を使用しない。</li>
+     * <li>Use this class's key history function.</li>
+     * <li>Use storm's fault tolerant function.</li>
+     * <li>MessageKey and MessageId are same value.</li>
      * </ol>
      *
-     * @param message 送信メッセージ
+     * @param message sending message
+     * @param messageKeyId MessageKey(Use key history's value), MessageId(Id identify by storm)
+     * @param groupingKey grouping key
      */
-    protected void emitWithNoKeyId(List<Object> message)
+    protected void emitWithGrouping(StreamMessage message, Object messageKeyId, String groupingKey)
     {
-        KeyHistoryRecorder.recordKeyHistory(message);
-        this.getCollector().emit(message);
+        KeyHistory history = new KeyHistory();
+        history.addKey(messageKeyId.toString());
+
+        this.getCollector().emit(new Values(groupingKey, history, message), messageKeyId);
     }
 
     /**
-     * MessageKey(キー情報履歴として出力する値)のみを指定して下流コンポーネントへメッセージを送信する。<br>
-     * 下記の条件の時に用いること。
+     * Use same value used by MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
+     * Send message to downstream component with streamId.<br>
+     * Use following situation.
      * <ol>
-     * <li>本クラスの提供するキー情報履歴を使用する。</li>
-     * <li>Stormのメッセージ処理失敗検知機構を使用しない。</li>
+     * <li>Use this class's key history function.</li>
+     * <li>Use storm's fault tolerant function.</li>
+     * <li>MessageKey and MessageId are same value.</li>
      * </ol>
      *
-     * @param message 送信メッセージ
-     * @param messageKey メッセージを一意に特定するためのキー情報
+     * @param message sending message
+     * @param messageKeyId MessageKey(Use key history's value), MessageId(Id identify by storm)
+     * @param streamId streamId
      */
-    protected void emitWithKeyOnly(List<Object> message, Object messageKey)
+    protected void emitWithStream(StreamMessage message, Object messageKeyId, String streamId)
     {
-        // メッセージにキー情報を記録する。
-        KeyHistoryRecorder.recordKeyHistory(message, messageKey);
-        this.getCollector().emit(message);
+        KeyHistory history = new KeyHistory();
+        history.addKey(messageKeyId.toString());
+
+        this.getCollector().emit(streamId, new Values("", history, message), messageKeyId);
     }
 
     /**
-     * MessageKey(キー情報履歴として出力する値)、MessageId(Stormのメッセージ処理失敗検知機構に指定する値)を個別に指定して下流コンポーネントへメッセージを送信する。<br>
-     * 下記の条件の時に用いること。
+     * Use same value used by MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
+     * Send message to downstream component with grouping key and streamId.<br>
+     * Use following situation.
      * <ol>
-     * <li>本クラスの提供するキー情報履歴を使用する。</li>
-     * <li>Stormのメッセージ処理失敗検知機構を使用する。</li>
+     * <li>Use this class's key history function.</li>
+     * <li>Use storm's fault tolerant function.</li>
+     * <li>MessageKey and MessageId are same value.</li>
      * </ol>
      *
-     * @param message 送信メッセージ
-     * @param messageKey メッセージを一意に特定するためのキー情報
-     * @param messageId Stormのメッセージ処理失敗検知機構を利用する際のID
-     *
+     * @param message sending message
+     * @param messageKeyId MessageKey(Use key history's value), MessageId(Id identify by storm)
+     * @param groupingKey grouping key
+     * @param streamId streamId
      */
-    protected void emitWithDifferentKeyId(List<Object> message, Object messageKey, Object messageId)
+    protected void emitWithGroupingStream(StreamMessage message, Object messageKeyId,
+            String groupingKey, String streamId)
     {
-        // メッセージにキー情報を記録する。
-        KeyHistoryRecorder.recordKeyHistory(message, messageKey);
-        this.getCollector().emit(message, messageId);
+        KeyHistory history = new KeyHistory();
+        history.addKey(messageKeyId.toString());
+
+        this.getCollector().emit(streamId, new Values(groupingKey, history, message), messageKeyId);
+    }
+
+    /**
+     * Not use this class's key history function, and not use MessageId(Id identify by storm).<br>
+     * Send message to downstream component.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Not use this class's key history function.</li>
+     * <li>Not use storm's fault tolerant function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     */
+    protected void emitWithNoKeyId(StreamMessage message)
+    {
+        KeyHistory history = new KeyHistory();
+
+        this.getCollector().emit(new Values("", history, message));
+    }
+
+    /**
+     * Not use this class's key history function, and not use MessageId(Id identify by storm).<br>
+     * Send message to downstream component with grouping key.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Not use this class's key history function.</li>
+     * <li>Not use storm's fault tolerant function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param groupingKey grouping key
+     */
+    protected void emitWithNoKeyIdAndGrouping(StreamMessage message, String groupingKey)
+    {
+        KeyHistory history = new KeyHistory();
+        this.getCollector().emit(new Values(groupingKey, history, message));
+    }
+
+    /**
+     * Not use this class's key history function, and not use MessageId(Id identify by storm).<br>
+     * Send message to downstream component with streamId.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Not use this class's key history function.</li>
+     * <li>Not use storm's fault tolerant function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param streamId streamId
+     */
+    protected void emitWithNoKeyIdAndStream(StreamMessage message, String streamId)
+    {
+        KeyHistory history = new KeyHistory();
+        this.getCollector().emit(streamId, new Values("", history, message));
+    }
+
+    /**
+     * Not use this class's key history function, and not use MessageId(Id identify by storm).<br>
+     * Send message to downstream component with grouping key and streamId.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Not use this class's key history function.</li>
+     * <li>Not use storm's fault tolerant function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param groupingKey grouping key
+     * @param streamId streamId
+     */
+    protected void emitWithNoKeyIdAndGroupingStream(StreamMessage message, String groupingKey,
+            String streamId)
+    {
+        KeyHistory history = new KeyHistory();
+        this.getCollector().emit(streamId, new Values(groupingKey, history, message));
+    }
+
+    /**
+     * Use only MessageKey(Use key history's value) and not use MessageId(Id identify by storm).<br>
+     * Send message to downstream component.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Use this class's key history function.</li>
+     * <li>Not use storm's fault tolerant function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param messageKey MessageKey(Use key history's value)
+     */
+    protected void emitWithKey(List<Object> message, Object messageKey)
+    {
+        KeyHistory history = new KeyHistory();
+        history.addKey(messageKey.toString());
+
+        this.getCollector().emit(new Values("", history, message));
+    }
+
+    /**
+     * Use only MessageKey(Use key history's value) and not use MessageId(Id identify by storm).<br>
+     * Send message to downstream component with grouping key.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Use this class's key history function.</li>
+     * <li>Not use storm's fault tolerant function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param messageKey MessageKey(Use key history's value)
+     * @param groupingKey grouping key
+     */
+    protected void emitWithKeyAndGrouping(List<Object> message, Object messageKey,
+            String groupingKey)
+    {
+        KeyHistory history = new KeyHistory();
+        history.addKey(messageKey.toString());
+
+        this.getCollector().emit(new Values(groupingKey, history, message));
+    }
+
+    /**
+     * Use only MessageKey(Use key history's value) and not use MessageId(Id identify by storm).<br>
+     * Send message to downstream component with streamId.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Use this class's key history function.</li>
+     * <li>Not use storm's fault tolerant function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param messageKey MessageKey(Use key history's value)
+     * @param streamId streamId
+     */
+    protected void emitWithKeyAndStream(List<Object> message, Object messageKey, String streamId)
+    {
+        KeyHistory history = new KeyHistory();
+        history.addKey(messageKey.toString());
+
+        this.getCollector().emit(streamId, new Values("", history, message));
+    }
+
+    /**
+     * Use only MessageKey(Use key history's value) and not use MessageId(Id identify by storm).<br>
+     * Send message to downstream component with grouping key and streamId.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Use this class's key history function.</li>
+     * <li>Not use storm's fault tolerant function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param messageKey MessageKey(Use key history's value)
+     * @param groupingKey grouping key
+     * @param streamId streamId
+     */
+    protected void emitWithKeyAndGroupingStream(List<Object> message, Object messageKey,
+            String groupingKey, String streamId)
+    {
+        KeyHistory history = new KeyHistory();
+        history.addKey(messageKey.toString());
+
+        this.getCollector().emit(streamId, new Values(groupingKey, history, message));
+    }
+
+    /**
+     * Use different value used by MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
+     * Send message to downstream component.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Use this class's key history function.</li>
+     * <li>Use storm's fault tolerant function.</li>
+     * <li>MessageKey and MessageId are different value.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param messageKey MessageKey(Use key history's value)
+     * @param messageId MessageId(Id identify by storm)
+     */
+    protected void emitWithKeyId(StreamMessage message, Object messageKey, Object messageId)
+    {
+        KeyHistory history = new KeyHistory();
+        history.addKey(messageKey.toString());
+
+        this.getCollector().emit(new Values("", history, message), messageId);
+    }
+
+    /**
+     * Use different value used by MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
+     * Send message to downstream component with grouping key.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Use this class's key history function.</li>
+     * <li>Use storm's fault tolerant function.</li>
+     * <li>MessageKey and MessageId are different value.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param messageKey MessageKey(Use key history's value)
+     * @param messageId MessageId(Id identify by storm)
+     * @param groupingKey grouping key
+     */
+    protected void emitWithKeyIdAndGrouping(StreamMessage message, Object messageKey,
+            Object messageId, String groupingKey)
+    {
+        KeyHistory history = new KeyHistory();
+        history.addKey(messageKey.toString());
+
+        this.getCollector().emit(new Values(groupingKey, history, message), messageId);
+    }
+
+    /**
+     * Use different value used by MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
+     * Send message to downstream component with streamId.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Use this class's key history function.</li>
+     * <li>Use storm's fault tolerant function.</li>
+     * <li>MessageKey and MessageId are different value.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param messageKey MessageKey(Use key history's value)
+     * @param messageId MessageId(Id identify by storm)
+     * @param streamId streamId
+     */
+    protected void emitWithKeyIdAndStream(StreamMessage message, Object messageKey,
+            Object messageId, String streamId)
+    {
+        KeyHistory history = new KeyHistory();
+        history.addKey(messageKey.toString());
+
+        this.getCollector().emit(streamId, new Values("", history, message), messageId);
+    }
+
+    /**
+     * Use different value used by MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
+     * Send message to downstream component with grouping key and streamId.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Use this class's key history function.</li>
+     * <li>Use storm's fault tolerant function.</li>
+     * <li>MessageKey and MessageId are different value.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param messageKey MessageKey(Use key history's value)
+     * @param messageId MessageId(Id identify by storm)
+     * @param groupingKey grouping key
+     * @param streamId streamId
+     */
+    protected void emitWithKeyIdAndGroupingStream(StreamMessage message, Object messageKey,
+            Object messageId, String groupingKey, String streamId)
+    {
+        KeyHistory history = new KeyHistory();
+        history.addKey(messageKey.toString());
+
+        this.getCollector().emit(streamId, new Values(groupingKey, history, message), messageId);
     }
 }

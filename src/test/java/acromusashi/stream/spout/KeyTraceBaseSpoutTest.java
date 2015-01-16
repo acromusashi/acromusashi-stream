@@ -46,7 +46,7 @@ import backtype.storm.tuple.Fields;
 public class KeyTraceBaseSpoutTest
 {
     /** テスト対象 */
-    private AmBaseSpout    target;
+    private AmBaseSpout          target;
 
     /** テスト用のOutputCollector */
     @Mock
@@ -144,7 +144,7 @@ public class KeyTraceBaseSpoutTest
         objectList.add(param2);
 
         // 実施
-        this.target.emitWithNoKeyId(objectList);
+        this.target.emitWithNoKeyId(null);
 
         // 検証
         ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
@@ -181,7 +181,7 @@ public class KeyTraceBaseSpoutTest
         objectList.add(param2);
 
         // 実施
-        this.target.emitWithKeyOnly(objectList, "MessageKey");
+        this.target.emitWithKey(objectList, "MessageKey");
 
         // 検証
         ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
@@ -218,7 +218,7 @@ public class KeyTraceBaseSpoutTest
         objectList.add(param2);
 
         // 実施
-        this.target.emit(objectList, "MessageKeyId");
+        this.target.emit(null, "MessageKeyId");
 
         // 検証
         ArgumentCaptor<List> tupleArgument = ArgumentCaptor.forClass(List.class);
@@ -255,7 +255,7 @@ public class KeyTraceBaseSpoutTest
         objectList.add(param2);
 
         // 実施
-        this.target.emitWithDifferentKeyId(objectList, "MessageKey", "MessageId");
+        this.target.emitWithKeyId(null, "MessageKey", "MessageId");
 
         // 検証
         ArgumentCaptor<List> tupleArgument = ArgumentCaptor.forClass(List.class);
