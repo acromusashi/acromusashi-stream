@@ -12,7 +12,6 @@
 */
 package acromusashi.stream.spout;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,54 +22,59 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 
+import com.google.common.collect.Lists;
+
 /**
- * メッセージ中のキー情報履歴を保持する機能を持つBaseSpoutクラス。<br>
- * 本クラスを継承したSpoutを使用することで下記の機能を利用可能。<br>
+ * AcroMUSASHI Stream's basis spout class<br>
+ * Spout that inherit this class has following function.<br>
  * <ol>
- * <li>メッセージ中のキー情報を履歴として保持</li>
+ * <li>Has message's key history.</li>
  * </ol>
  *
  * @author kimura
  */
-public abstract class KeyTraceBaseSpout extends BaseConfigurationSpout
+public abstract class AmBaseSpout extends AmConfigurationSpout
 {
     /** serialVersionUID */
     private static final long serialVersionUID = -3966364804089682434L;
 
-    /** タスクID */
+    /** Task id. */
     protected String          taskId;
 
     /**
-     * SpoutがWorkerプロセスに展開された後に実行される初期化メソッド。<br>
-     * Stormクラスタから受け取ったオブジェクト群の設定と、TaskIdの算出を行う。
+     * Initialize method called after extracted for worker processes.<br>
+     * <br>
+     * Initialize task id.
      *
-     * @param conf Storm設定オブジェクト
-     * @param context Topologyコンテキスト
-     * @param collector Collectorオブジェクト
+     * @param conf Storm configuration
+     * @param context Topology context
+     * @param collector SpoutOutputCollector
      */
     @SuppressWarnings("rawtypes")
     @Override
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector)
     {
         super.open(conf, context, collector);
-        // TaskIdを算出し、フィールドに保持
+
         this.taskId = context.getThisComponentId() + "_" + context.getThisTaskId();
         onOpen(conf, context);
     }
 
     /**
-     * Spoutの初期化処理を行う。<br>
-     * リソースの初期化など起動時に必要な処理を記述する。
+     * Initialize method for individual spout.<br>
+     * <br>
+     * Describe processing at startup, such as initialization of resources.
      *
-     * @param conf Storm設定オブジェクト
-     * @param context Topologyコンテキスト
+     * @param conf Storm configuration
+     * @param context Topology context
      */
     @SuppressWarnings("rawtypes")
     public abstract void onOpen(Map conf, TopologyContext context);
 
     /**
-     * Stormから継続して実行される次のメッセージを取得するメソッド。<br>
-     * Spoutが動作中は本メソッドが延々実行される。
+     * Continually called method by Storm that gets next message.<br>
+     * <br>
+     * When spout is running, this method is endlessly called.
      */
     @Override
     public void nextTuple()
@@ -79,41 +83,58 @@ public abstract class KeyTraceBaseSpout extends BaseConfigurationSpout
     }
 
     /**
-     * 次のメッセージをメッセージソースから取得する。
+     * Get next message from message source.
      */
     public abstract void onNextTuple();
 
     /**
-     * 継承クラス側で指定されたフィールドリストに追加してキーの履歴情報を示すキーを追加して返す。
+     * Declare output fields and streams.<br>
+     * Declare fields are following.<br>
+     * <ol>
+     * <li>messageKey   : Groupingkey if exists.</li>
+     * <li>keyHistory   : Key history.</li>
+     * <li>messageValue : Message value.</li>
+     * </ol>
+     * Streams are "default" and user setting streams.
      *
-     * @param declarer フィールド取得オブジェクト
+     * @param declarer declarer object
      */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer)
     {
-        List<String> baseList = new ArrayList<String>();
-        baseList.add(FieldName.KEY_HISTORY);
-        baseList.addAll(getDeclareOutputFields());
-        declarer.declare(new Fields(baseList));
+        List<String> fields = Lists.newArrayList(FieldName.MESSAGE_KEY, FieldName.KEY_HISTORY,
+                FieldName.MESSAGE_VALUE);
+
+        // Declare default stream
+        declarer.declare(new Fields(fields));
+
+        for (String stream : getOutputStreams())
+        {
+            declarer.declareStream(stream, new Fields(fields));
+        }
     }
 
     /**
-     * メッセージに設定するフィールドリストを取得する。
+     * Define downstream streams.<br>
+     * If it needs other than default stream, inherit this method and return extra streams.
      *
-     * @return メッセージに設定するフィールドリスト
+     * @return Extra streams
      */
-    public abstract List<String> getDeclareOutputFields();
+    protected List<String> getOutputStreams()
+    {
+        return Lists.newArrayList();
+    }
 
     /**
-     * MessageKey(キー情報履歴として出力する値)、MessageId(Stormのメッセージ処理失敗検知機構に指定する値)として同一の値を指定して下流コンポーネントへメッセージを送信する。<br>
-     * 下記の条件の時に用いること。
+     * Use same value used by MessageKey(Use key history's value), MessageId(Id identify by storm). And send message to downstream component.<br>
+     * User following situation.
      * <ol>
-     * <li>本クラスの提供するキー情報履歴を使用する。</li>
-     * <li>Stormのメッセージ処理失敗検知機構を使用する。</li>
+     * <li>Use this class's key history function.</li>
+     * <li>Use storm's fault tolerant  function.</li>
      * </ol>
      *
-     * @param message 送信メッセージ
-     * @param messageKeyId メッセージを一意に特定するためのキー情報、Stormのメッセージ処理失敗検知機構を利用する際のID
+     * @param message sending message
+     * @param messageKeyId MessageKey(Use key history's value), MessageId(Id identify by storm), and GroupingKey
      */
     protected void emit(List<Object> message, Object messageKeyId)
     {

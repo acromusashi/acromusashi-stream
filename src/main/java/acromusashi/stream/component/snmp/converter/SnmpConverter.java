@@ -22,8 +22,8 @@ import java.util.Map;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import acromusashi.stream.converter.AbstractMessageConverter;
-import acromusashi.stream.entity.Header;
-import acromusashi.stream.entity.Message;
+import acromusashi.stream.entity.StreamMessageHeader;
+import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.exception.ConvertFailException;
 
 /**
@@ -52,12 +52,12 @@ public class SnmpConverter extends AbstractMessageConverter
     }
 
     @Override
-    public Header createHeader(Object input)
+    public StreamMessageHeader createHeader(Object input)
     {
         JSONObject json = JSONObject.fromObject(input);
         JSONObject jsonHeader = json.getJSONObject("header");
 
-        Header header = new Header();
+        StreamMessageHeader header = new StreamMessageHeader();
         header.setTimestamp(jsonHeader.getLong("timestamp"));
         header.setSource(jsonHeader.getString("sender"));
         header.setType(getType());
@@ -115,7 +115,7 @@ public class SnmpConverter extends AbstractMessageConverter
      */
     @Override
     @SuppressWarnings("rawtypes")
-    public Map<String, Object> toMap(Message message) throws ConvertFailException
+    public Map<String, Object> toMap(StreamMessage message) throws ConvertFailException
     {
         Map<String, Object> result = new LinkedHashMap<String, Object>();
 

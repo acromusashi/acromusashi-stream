@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import acromusashi.stream.bolt.MessageBolt;
 import acromusashi.stream.camel.CamelInitializer;
-import acromusashi.stream.entity.Message;
+import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.exception.ConvertFailException;
 import acromusashi.stream.exception.InitFailException;
 import backtype.storm.task.OutputCollector;
@@ -91,7 +91,7 @@ public class CamelJdbcStoreBolt extends MessageBolt
      */
     @Override
     @SuppressWarnings("unchecked")
-    public void onMessage(Message message) throws ConvertFailException
+    public void onMessage(StreamMessage message) throws ConvertFailException
     {
         String endopointUri = getEndpointUri();
 

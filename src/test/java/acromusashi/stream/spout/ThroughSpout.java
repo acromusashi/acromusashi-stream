@@ -20,7 +20,7 @@ import backtype.storm.tuple.Fields;
 /**
  * 指定したフィールド指定を保持するStorm-UnitTest用Spout
  */
-public class ThroughSpout extends BaseConfigurationSpout
+public class ThroughSpout extends AmConfigurationSpout
 {
 
     /** serialVersionUID */

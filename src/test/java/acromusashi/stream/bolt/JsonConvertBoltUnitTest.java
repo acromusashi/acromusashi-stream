@@ -29,8 +29,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import acromusashi.stream.constants.FieldName;
-import acromusashi.stream.entity.Header;
-import acromusashi.stream.entity.Message;
+import acromusashi.stream.entity.StreamMessageHeader;
+import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.spout.ThroughSpout;
 import backtype.storm.Config;
 import backtype.storm.ILocalCluster;
@@ -146,7 +146,7 @@ public class JsonConvertBoltUnitTest
         public void run(ILocalCluster cluster) throws Exception
         {
             // 準備
-            Message expected = baseExpectedMessage();
+            StreamMessage expected = baseExpectedMessage();
 
             // 実施
             Map result = Testing.completeTopology(cluster, createConvertTopology(),
@@ -208,10 +208,10 @@ public class JsonConvertBoltUnitTest
      *
      * @return 共通メッセージエンティティ
      */
-    private Message baseExpectedMessage()
+    private StreamMessage baseExpectedMessage()
     {
-        Message message = new Message();
-        Header header = new Header();
+        StreamMessage message = new StreamMessage();
+        StreamMessageHeader header = new StreamMessageHeader();
         header.setMessageId("192.168.100.31_20130419182101127_0019182101");
         header.setMessageKey("192.168.100.31");
         header.setSource("192.168.100.31");

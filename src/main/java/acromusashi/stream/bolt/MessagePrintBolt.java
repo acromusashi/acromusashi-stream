@@ -18,8 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import acromusashi.stream.constants.FieldName;
-import acromusashi.stream.entity.Header;
-import acromusashi.stream.entity.Message;
+import acromusashi.stream.entity.StreamMessageHeader;
+import acromusashi.stream.entity.StreamMessage;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Tuple;
 
@@ -45,9 +45,9 @@ public class MessagePrintBolt extends BaseConfigurationBolt
     @Override
     public void execute(Tuple input)
     {
-        Message message = (Message) input.getValueByField(FieldName.MESSAGE_VALUE);
+        StreamMessage message = (StreamMessage) input.getValueByField(FieldName.MESSAGE_VALUE);
 
-        Header header = message.getHeader();
+        StreamMessageHeader header = message.getHeader();
         Object body = message.getBody();
 
         logger.info("ReceiveHeader=" + header.toString() + " ,ReceiveBody="

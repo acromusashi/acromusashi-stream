@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import acromusashi.stream.constants.FieldName;
 import acromusashi.stream.converter.AbstractMessageConverter;
-import acromusashi.stream.entity.Message;
+import acromusashi.stream.entity.StreamMessage;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
@@ -54,7 +54,7 @@ public abstract class MessageBolt extends BaseConfigurationBolt
 
         // Tupleのフィールド"message"にMessageが設定されていない場合はnullを返す
         Object obj = input.getValueByField(FieldName.MESSAGE_VALUE);
-        if (obj == null || !(obj instanceof Message))
+        if (obj == null || !(obj instanceof StreamMessage))
         {
             String logFormat = "Failed to get message object. Skip message prosessing. : InputTuple={0}";
             String logMessage = MessageFormat.format(logFormat, input);
@@ -63,7 +63,7 @@ public abstract class MessageBolt extends BaseConfigurationBolt
             return;
         }
 
-        Message message = (Message) obj;
+        StreamMessage message = (StreamMessage) obj;
 
         try
         {
@@ -87,7 +87,7 @@ public abstract class MessageBolt extends BaseConfigurationBolt
      * @param message 受信Message
      * @throws Exception 受信処理失敗時 
      */
-    public abstract void onMessage(Message message) throws Exception;
+    public abstract void onMessage(StreamMessage message) throws Exception;
 
     /**
      * @param converter the converter to set

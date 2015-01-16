@@ -102,7 +102,7 @@ public class KeyTraceBaseSpoutUnitTest
      * Spout>Boltのメッセージ送信確認を行う。
      * @throws Exception
      *
-     * @target {@link KeyTraceBaseSpout#emitWithNoKeyId(List)}
+     * @target {@link AmBaseSpout#emitWithNoKeyId(List)}
      * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
      *    condition:: キー情報履歴にキーを指定し、パラメータを1個指定してメッセージを送信する
      *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
@@ -164,7 +164,7 @@ public class KeyTraceBaseSpoutUnitTest
      * Spout>Boltのメッセージ送信確認を行う。
      * @throws Exception
      *
-     * @target {@link KeyTraceBaseSpout#emitWithNoKeyId(List)}
+     * @target {@link AmBaseSpout#emitWithNoKeyId(List)}
      * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
      *    condition:: キー情報履歴にキーを指定せず、パラメータを1個指定してメッセージを送信する
      *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
@@ -225,7 +225,7 @@ public class KeyTraceBaseSpoutUnitTest
      * Spout>Boltのメッセージ送信確認を行う。
      * @throws Exception
      *
-     * @target {@link KeyTraceBaseSpout#emitWithNoKeyId(List)}
+     * @target {@link AmBaseSpout#emitWithNoKeyId(List)}
      * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
      *    condition:: キー情報履歴にキーを指定し、パラメータを3個指定してメッセージを送信する
      *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
@@ -290,7 +290,7 @@ public class KeyTraceBaseSpoutUnitTest
      * 装置情報所得処理時の変換確認を行う。
      * @throws Exception
      *
-     * @target {@link KeyTraceBaseSpout#emitWithNoKeyId(List)}
+     * @target {@link AmBaseSpout#emitWithNoKeyId(List)}
      * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
      *    condition:: キー情報履歴にキーを指定せず、パラメータを3個指定してメッセージを送信する
      *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること

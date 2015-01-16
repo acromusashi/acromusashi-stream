@@ -23,7 +23,7 @@ import backtype.storm.task.TopologyContext;
  *
  * @author kimura
  */
-public class MockKeyTraceBaseSpout extends KeyTraceBaseSpout
+public class MockKeyTraceBaseSpout extends AmBaseSpout
 {
     /** serialVersionUID */
     private static final long serialVersionUID = -1271953207061271186L;
@@ -51,7 +51,7 @@ public class MockKeyTraceBaseSpout extends KeyTraceBaseSpout
      * {@inheritDoc}
      */
     @Override
-    public List<String> getDeclareOutputFields()
+    public List<String> getOutputStreams()
     {
         return Arrays.asList("Key", "Message");
     }

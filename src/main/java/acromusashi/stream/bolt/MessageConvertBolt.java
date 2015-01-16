@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import acromusashi.stream.constants.FieldName;
 import acromusashi.stream.converter.AbstractMessageConverter;
-import acromusashi.stream.entity.Header;
-import acromusashi.stream.entity.Message;
+import acromusashi.stream.entity.StreamMessageHeader;
+import acromusashi.stream.entity.StreamMessage;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
@@ -75,7 +75,7 @@ public class MessageConvertBolt extends BaseConfigurationBolt
 
         try
         {
-            Header header = this.converter.createHeader(obj);
+            StreamMessageHeader header = this.converter.createHeader(obj);
 
             if (StringUtils.isEmpty(header.getMessageId()) == true)
             {
@@ -88,7 +88,7 @@ public class MessageConvertBolt extends BaseConfigurationBolt
             }
 
             Object body = this.converter.createBody(obj);
-            Message message = new Message();
+            StreamMessage message = new StreamMessage();
             message.setHeader(header);
             message.setBody(body);
 

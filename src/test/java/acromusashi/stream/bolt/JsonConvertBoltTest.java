@@ -36,8 +36,8 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import acromusashi.stream.constants.FieldName;
-import acromusashi.stream.entity.Header;
-import acromusashi.stream.entity.Message;
+import acromusashi.stream.entity.StreamMessageHeader;
+import acromusashi.stream.entity.StreamMessage;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Tuple;
@@ -119,7 +119,7 @@ public class JsonConvertBoltTest
         Mockito.doReturn(messageKey).when(mockTuple).getStringByField(FieldName.MESSAGE_KEY);
         Mockito.doReturn(messageStr).when(mockTuple).getStringByField(FieldName.MESSAGE_VALUE);
 
-        Message expected = baseExpectedMessage();
+        StreamMessage expected = baseExpectedMessage();
 
         // 実施
         this.target.execute(mockTuple);
@@ -199,10 +199,10 @@ public class JsonConvertBoltTest
      * 
      * @return 共通メッセージエンティティ
      */
-    private Message baseExpectedMessage()
+    private StreamMessage baseExpectedMessage()
     {
-        Message message = new Message();
-        Header header = new Header();
+        StreamMessage message = new StreamMessage();
+        StreamMessageHeader header = new StreamMessageHeader();
         header.setMessageId("192.168.100.31_20130419182101127_0019182101");
         header.setMessageKey("192.168.100.31");
         header.setSource("192.168.100.31");

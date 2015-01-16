@@ -20,8 +20,8 @@ import acromusashi.stream.component.kestrel.spout.KestrelJsonSpout;
 import acromusashi.stream.config.StormConfigGenerator;
 import acromusashi.stream.config.StormConfigUtil;
 import acromusashi.stream.constants.FieldName;
-import acromusashi.stream.entity.Header;
-import acromusashi.stream.entity.Message;
+import acromusashi.stream.entity.StreamMessageHeader;
+import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.entity.MessageEntity;
 import backtype.storm.Config;
 import backtype.storm.scheme.StringScheme;
@@ -123,8 +123,8 @@ public class CommonMessagePrintTopology extends BaseTopology
                 "JacksonMessageConvertBolt", new Fields(FieldName.MESSAGE_KEY));
 
         // Regist Serialize Setting.
-        getConfig().registerSerialization(Message.class);
-        getConfig().registerSerialization(Header.class);
+        getConfig().registerSerialization(StreamMessage.class);
+        getConfig().registerSerialization(StreamMessageHeader.class);
         getConfig().registerSerialization(MessageEntity.class);
     }
 }

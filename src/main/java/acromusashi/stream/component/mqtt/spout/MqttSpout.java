@@ -30,8 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import acromusashi.stream.constants.FieldName;
-import acromusashi.stream.entity.Header;
-import acromusashi.stream.spout.BaseConfigurationSpout;
+import acromusashi.stream.entity.StreamMessageHeader;
+import acromusashi.stream.spout.AmConfigurationSpout;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -47,7 +47,7 @@ import com.google.common.collect.Lists;
  *
  * @author kimura
  */
-public class MqttSpout extends BaseConfigurationSpout
+public class MqttSpout extends AmConfigurationSpout
 {
     /** serialVersionUID */
     private static final long              serialVersionUID     = 670832311695197611L;
@@ -164,7 +164,7 @@ public class MqttSpout extends BaseConfigurationSpout
 
         String topic = message.getTopic();
         String payload = new String(message.getPayload(), Charset.forName("UTF-8"));
-        acromusashi.stream.entity.Message sendMessage = createMessage(topic, payload);
+        acromusashi.stream.entity.StreamMessage sendMessage = createMessage(topic, payload);
 
         // 即応答を返す設定がされているか、またはQoSレベルが0の場合はAnchorを用いずに即Ackを返したうえでTupleを流す。
         // 上記以外の場合はランダムで生成したUUIDをAnchorとしてTupleを流す。
@@ -210,14 +210,14 @@ public class MqttSpout extends BaseConfigurationSpout
      * @param payload Payload
      * @return AcroMUSASHI用メッセージ
      */
-    protected acromusashi.stream.entity.Message createMessage(String topic, String payload)
+    protected acromusashi.stream.entity.StreamMessage createMessage(String topic, String payload)
     {
-        Header header = new Header();
+        StreamMessageHeader header = new StreamMessageHeader();
         header.setTimestamp(getCurrentTime());
         header.setType("MQTT");
         header.setMessageKey(topic);
 
-        acromusashi.stream.entity.Message message = new acromusashi.stream.entity.Message(header,
+        acromusashi.stream.entity.StreamMessage message = new acromusashi.stream.entity.StreamMessage(header,
                 payload);
         return message;
     }

@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import acromusashi.stream.constants.FieldName;
-import acromusashi.stream.entity.Message;
+import acromusashi.stream.entity.StreamMessage;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -77,12 +77,12 @@ public class JsonConvertBolt<T> extends BaseConfigurationBolt
         String keyStr = input.getStringByField(FieldName.MESSAGE_KEY);
         String messageStr = input.getStringByField(FieldName.MESSAGE_VALUE);
 
-        Message parentEntity = null;
+        StreamMessage parentEntity = null;
 
         try
         {
             // JSONから共通メッセージエンティティに変換する
-            parentEntity = this.objectMapper.readValue(messageStr.toString(), Message.class);
+            parentEntity = this.objectMapper.readValue(messageStr.toString(), StreamMessage.class);
         }
         catch (IOException ex)
         {

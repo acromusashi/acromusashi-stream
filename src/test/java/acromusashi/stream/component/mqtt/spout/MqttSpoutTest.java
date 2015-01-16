@@ -143,7 +143,7 @@ public class MqttSpoutTest
 
         List tuple = tupleCaptor.getValue();
         assertThat(tuple.get(0).toString(), is("TestTopic"));
-        acromusashi.stream.entity.Message message = (acromusashi.stream.entity.Message) tuple.get(1);
+        acromusashi.stream.entity.StreamMessage message = (acromusashi.stream.entity.StreamMessage) tuple.get(1);
         assertThat(message.getHeader().getMessageKey(), is("TestTopic"));
         assertThat(message.getBody().toString(), is("TestMessage"));
     }
@@ -176,7 +176,7 @@ public class MqttSpoutTest
 
         List tuple = tupleCaptor.getValue();
         assertThat(tuple.get(0).toString(), is("TestTopic"));
-        acromusashi.stream.entity.Message message = (acromusashi.stream.entity.Message) tuple.get(1);
+        acromusashi.stream.entity.StreamMessage message = (acromusashi.stream.entity.StreamMessage) tuple.get(1);
         assertThat(message.getHeader().getMessageKey(), is("TestTopic"));
         assertThat(message.getBody().toString(), is("TestMessage"));
     }
@@ -209,7 +209,7 @@ public class MqttSpoutTest
 
         List tuple = tupleCaptor.getValue();
         assertThat(tuple.get(0).toString(), is("TestTopic"));
-        acromusashi.stream.entity.Message message = (acromusashi.stream.entity.Message) tuple.get(1);
+        acromusashi.stream.entity.StreamMessage message = (acromusashi.stream.entity.StreamMessage) tuple.get(1);
         assertThat(message.getHeader().getMessageKey(), is("TestTopic"));
         assertThat(message.getBody().toString(), is("TestMessage"));
 

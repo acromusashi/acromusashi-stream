@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import acromusashi.stream.bolt.MessageBolt;
-import acromusashi.stream.entity.Message;
+import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.exception.InitFailException;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -101,7 +101,7 @@ public class HdfsStoreBolt extends MessageBolt
     }
 
     @Override
-    public void onMessage(Message message) throws Exception
+    public void onMessage(StreamMessage message) throws Exception
     {
         this.delegate.appendLine(message.toString(), System.currentTimeMillis());
     }

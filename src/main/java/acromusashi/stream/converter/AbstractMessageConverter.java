@@ -19,8 +19,8 @@ import java.util.Map;
 
 import org.apache.commons.beanutils.PropertyUtilsBean;
 
-import acromusashi.stream.entity.Header;
-import acromusashi.stream.entity.Message;
+import acromusashi.stream.entity.StreamMessageHeader;
+import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.exception.ConvertFailException;
 
 /**
@@ -53,9 +53,9 @@ public abstract class AbstractMessageConverter implements Serializable
       * @return 共通メッセージHeader
       * @throws ConvertFailException 変換失敗時
       */
-    public Header createHeader(Object input) throws ConvertFailException
+    public StreamMessageHeader createHeader(Object input) throws ConvertFailException
     {
-        Header header = new Header();
+        StreamMessageHeader header = new StreamMessageHeader();
         header.setType(getType());
 
         return header;
@@ -82,7 +82,7 @@ public abstract class AbstractMessageConverter implements Serializable
      * @return 変換したKey-ValueのMap
      * @throws ConvertFailException 変換失敗時
      */
-    public Map<String, Object> toMap(Message message) throws ConvertFailException
+    public Map<String, Object> toMap(StreamMessage message) throws ConvertFailException
     {
         if (this.propUtilBean == null)
         {

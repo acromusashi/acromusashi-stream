@@ -22,7 +22,7 @@ import acromusashi.stream.component.rabbitmq.RabbitmqClient;
 import acromusashi.stream.component.rabbitmq.RabbitmqCommunicateException;
 import acromusashi.stream.constants.FieldName;
 import acromusashi.stream.helper.SpringContextHelper;
-import acromusashi.stream.spout.BaseConfigurationSpout;
+import acromusashi.stream.spout.AmConfigurationSpout;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -33,10 +33,10 @@ import backtype.storm.tuple.Values;
  * RabbitMQコンポーネント<br>
  * <br>
  * RabbitMQからメッセージを受信するSpoutクラス。
- * 
+ *
  * @author kimura
  */
-public class RabbitMqSpout extends BaseConfigurationSpout
+public class RabbitMqSpout extends AmConfigurationSpout
 {
     /** serialVersionUID */
     private static final long          serialVersionUID = -7039267927348254032L;

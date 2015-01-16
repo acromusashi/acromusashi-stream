@@ -19,7 +19,7 @@ import java.util.Locale;
 
 import net.sf.json.JSONObject;
 import acromusashi.stream.converter.AbstractMessageConverter;
-import acromusashi.stream.entity.Header;
+import acromusashi.stream.entity.StreamMessageHeader;
 import acromusashi.stream.exception.ConvertFailException;
 
 /**
@@ -48,7 +48,7 @@ public class TwitterJsonConverter extends AbstractMessageConverter
     }
 
     @Override
-    public Header createHeader(Object input) throws ConvertFailException
+    public StreamMessageHeader createHeader(Object input) throws ConvertFailException
     {
         JSONObject twitterJson = JSONObject.fromObject(input);
 
@@ -65,7 +65,7 @@ public class TwitterJsonConverter extends AbstractMessageConverter
             throw new ConvertFailException(pex);
         }
 
-        Header header = new Header();
+        StreamMessageHeader header = new StreamMessageHeader();
         header.setTimestamp(created.getTime());
         header.setMessageId(twitterJson.getString("id"));
         // ツイートしたクライアント名をSourceに設定

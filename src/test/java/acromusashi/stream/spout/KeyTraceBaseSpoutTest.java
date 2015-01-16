@@ -46,7 +46,7 @@ import backtype.storm.tuple.Fields;
 public class KeyTraceBaseSpoutTest
 {
     /** テスト対象 */
-    private KeyTraceBaseSpout    target;
+    private AmBaseSpout    target;
 
     /** テスト用のOutputCollector */
     @Mock
@@ -73,7 +73,7 @@ public class KeyTraceBaseSpoutTest
     /**
      * Openメソッド呼び出し時の変数初期化確認を行う。
      *
-     * @target {@link KeyTraceBaseSpout#open(Map, TopologyContext, SpoutOutputCollector)}
+     * @target {@link AmBaseSpout#open(Map, TopologyContext, SpoutOutputCollector)}
      * @test stormConf、TopologyContext、TaskIdが初期化されていることを確認<br>
      *    condition:: openメソッド実行<br>
      *    result:: stormConf、TopologyContext、TaskIdが初期化されていること
@@ -97,7 +97,7 @@ public class KeyTraceBaseSpoutTest
     /**
      * DeclareOutputFieldsメソッド呼び出し時のフィールド確認を行う。
      *
-     * @target {@link KeyTraceBaseSpout#declareOutputFields(backtype.storm.topology.OutputFieldsDeclarer)}
+     * @target {@link AmBaseSpout#declareOutputFields(backtype.storm.topology.OutputFieldsDeclarer)}
      * @test 継承クラスの返すフィールドの頭に「KeyHistory」を付けて {@link OutputFieldsDeclarer#declare(Fields fields)}を呼び出していることを確認する。<br>
      *    condition:: declareOutputFieldsメソッド実行<br>
      *    result:: 継承クラスの返すフィールドの頭に「KeyHistory」を付けて {@link OutputFieldsDeclarer#declare(Fields fields)}を呼び出していること
