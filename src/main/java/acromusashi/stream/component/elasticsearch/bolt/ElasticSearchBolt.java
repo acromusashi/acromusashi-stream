@@ -32,7 +32,7 @@ import backtype.storm.tuple.Tuple;
 
 /**
  * ElasticSearchに対してクエリを投入するBolt
- * 
+ *
  * @author kimura
  */
 public class ElasticSearchBolt extends BaseConfigurationBolt
@@ -60,7 +60,7 @@ public class ElasticSearchBolt extends BaseConfigurationBolt
 
     /**
      * Converterを指定してインスタンスを生成する。
-     * 
+     *
      * @param converter TupleをIndex Requestに変換するコンバータ
      */
     public ElasticSearchBolt(EsTupleConverter converter)
@@ -71,10 +71,12 @@ public class ElasticSearchBolt extends BaseConfigurationBolt
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"rawtypes", "resource"})
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector)
     {
+        // cleanupメソッドは呼ばれないため、リソースクローズはできない。
+        // だが、1インスタンスのみしか生成されないため、リークはしない。
         super.prepare(stormConf, context, collector);
         // ElasticSearchClientを初期化
         // Serversは「host1:port1;host2:port2;host3:port3...」形式のため分割して生成
