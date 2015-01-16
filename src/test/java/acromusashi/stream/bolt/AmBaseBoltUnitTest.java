@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import acromusashi.stream.spout.AmBaseThroughSpout;
+import acromusashi.stream.spout.BlankAmBaseSpout;
 import acromusashi.stream.trace.KeyHistory;
 import backtype.storm.Config;
 import backtype.storm.ILocalCluster;
@@ -45,7 +45,7 @@ import backtype.storm.tuple.Values;
  *
  * @author kimura
  */
-public class KeyTraceBaseBoltUnitTest
+public class AmBaseBoltUnitTest
 {
     /** JUnit実行結果を保持する変数 */
     private boolean               isAssert;
@@ -139,7 +139,7 @@ public class KeyTraceBaseBoltUnitTest
             // 実施
             Map result = Testing.completeTopology(cluster,
                     createTopology(Arrays.asList("Message"), Arrays.asList("ChildKey")),
-                    KeyTraceBaseBoltUnitTest.this.completeTopologyParam);
+                    AmBaseBoltUnitTest.this.completeTopologyParam);
 
             // 検証
             List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
@@ -154,7 +154,7 @@ public class KeyTraceBaseBoltUnitTest
             assertThat(resultTuple.get(0).toString(), equalTo("KeyHistory=[MessageKey, ChildKey]"));
             assertThat(resultTuple.get(1).toString(), equalTo("MessageValue"));
 
-            KeyTraceBaseBoltUnitTest.this.isAssert = true;
+            AmBaseBoltUnitTest.this.isAssert = true;
         }
     }
 
@@ -200,7 +200,7 @@ public class KeyTraceBaseBoltUnitTest
             // 実施
             Map result = Testing.completeTopology(cluster,
                     createAckTopology(Arrays.asList("Message"), Arrays.asList("ChildKey")),
-                    KeyTraceBaseBoltUnitTest.this.completeTopologyParam);
+                    AmBaseBoltUnitTest.this.completeTopologyParam);
 
             // 検証
             List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
@@ -215,7 +215,7 @@ public class KeyTraceBaseBoltUnitTest
             assertThat(resultTuple.get(0).toString(), equalTo("KeyHistory=[MessageKey, ChildKey]"));
             assertThat(resultTuple.get(1).toString(), equalTo("MessageValue"));
 
-            KeyTraceBaseBoltUnitTest.this.isAssert = true;
+            AmBaseBoltUnitTest.this.isAssert = true;
         }
     }
 
@@ -262,7 +262,7 @@ public class KeyTraceBaseBoltUnitTest
                     cluster,
                     createTopology(Arrays.asList("Message"),
                             Arrays.asList("ChildKey1", "ChildKey2", "ChildKey3")),
-                    KeyTraceBaseBoltUnitTest.this.completeTopologyParam);
+                    AmBaseBoltUnitTest.this.completeTopologyParam);
 
             // 検証
             List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
@@ -295,7 +295,7 @@ public class KeyTraceBaseBoltUnitTest
                     equalTo("KeyHistory=[MessageKey, ChildKey3]"));
             assertThat(resultTuple3.get(1).toString(), equalTo("MessageValue"));
 
-            KeyTraceBaseBoltUnitTest.this.isAssert = true;
+            AmBaseBoltUnitTest.this.isAssert = true;
         }
     }
 
@@ -340,7 +340,7 @@ public class KeyTraceBaseBoltUnitTest
             // 実施
             Map result = Testing.completeTopology(cluster,
                     createTopology(Arrays.asList("Message"), Arrays.asList("MessageKey")),
-                    KeyTraceBaseBoltUnitTest.this.completeTopologyParam);
+                    AmBaseBoltUnitTest.this.completeTopologyParam);
 
             // 検証
             List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
@@ -355,7 +355,7 @@ public class KeyTraceBaseBoltUnitTest
             assertThat(resultTuple.get(0).toString(), equalTo("KeyHistory=[MessageKey]"));
             assertThat(resultTuple.get(1).toString(), equalTo("MessageValue"));
 
-            KeyTraceBaseBoltUnitTest.this.isAssert = true;
+            AmBaseBoltUnitTest.this.isAssert = true;
         }
     }
 
@@ -402,7 +402,7 @@ public class KeyTraceBaseBoltUnitTest
                     cluster,
                     createTopology(Arrays.asList("Message"),
                             Arrays.asList("ChildKey1", "MessageKey", "ChildKey3")),
-                    KeyTraceBaseBoltUnitTest.this.completeTopologyParam);
+                    AmBaseBoltUnitTest.this.completeTopologyParam);
 
             // 検証
             List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
@@ -434,7 +434,7 @@ public class KeyTraceBaseBoltUnitTest
                     equalTo("KeyHistory=[MessageKey, ChildKey3]"));
             assertThat(resultTuple3.get(1).toString(), equalTo("MessageValue"));
 
-            KeyTraceBaseBoltUnitTest.this.isAssert = true;
+            AmBaseBoltUnitTest.this.isAssert = true;
         }
     }
 
@@ -479,7 +479,7 @@ public class KeyTraceBaseBoltUnitTest
             // 実施
             Map result = Testing.completeTopology(cluster,
                     createTopology(Arrays.asList("Message"), null),
-                    KeyTraceBaseBoltUnitTest.this.completeTopologyParam);
+                    AmBaseBoltUnitTest.this.completeTopologyParam);
 
             // 検証
             List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
@@ -494,7 +494,7 @@ public class KeyTraceBaseBoltUnitTest
             assertThat(resultTuple.get(0).toString(), equalTo("KeyHistory=[MessageKey]"));
             assertThat(resultTuple.get(1).toString(), equalTo("MessageValue"));
 
-            KeyTraceBaseBoltUnitTest.this.isAssert = true;
+            AmBaseBoltUnitTest.this.isAssert = true;
         }
     }
 
@@ -542,7 +542,7 @@ public class KeyTraceBaseBoltUnitTest
                     cluster,
                     createTopology(Arrays.asList("Message1", "Message2", "Message3"),
                             Arrays.asList("ChildKey")),
-                    KeyTraceBaseBoltUnitTest.this.completeTopologyParam);
+                    AmBaseBoltUnitTest.this.completeTopologyParam);
 
             // 検証
             List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
@@ -559,7 +559,7 @@ public class KeyTraceBaseBoltUnitTest
             assertThat(resultTuple.get(2).toString(), equalTo("MessageValue2"));
             assertThat(resultTuple.get(3).toString(), equalTo("MessageValue3"));
 
-            KeyTraceBaseBoltUnitTest.this.isAssert = true;
+            AmBaseBoltUnitTest.this.isAssert = true;
         }
     }
 
@@ -607,7 +607,7 @@ public class KeyTraceBaseBoltUnitTest
                     cluster,
                     createTopology(Arrays.asList("Message1", "Message2", "Message3"),
                             Arrays.asList("ChildKey1", "ChildKey2", "ChildKey3")),
-                    KeyTraceBaseBoltUnitTest.this.completeTopologyParam);
+                    AmBaseBoltUnitTest.this.completeTopologyParam);
 
             // 検証
             List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
@@ -646,7 +646,7 @@ public class KeyTraceBaseBoltUnitTest
             assertThat(resultTuple3.get(2).toString(), equalTo("MessageValue2"));
             assertThat(resultTuple3.get(3).toString(), equalTo("MessageValue3"));
 
-            KeyTraceBaseBoltUnitTest.this.isAssert = true;
+            AmBaseBoltUnitTest.this.isAssert = true;
         }
     }
 
@@ -694,7 +694,7 @@ public class KeyTraceBaseBoltUnitTest
                     cluster,
                     createTopology(Arrays.asList("Message1", "Message2", "Message3"),
                             Arrays.asList("MessageKey")),
-                    KeyTraceBaseBoltUnitTest.this.completeTopologyParam);
+                    AmBaseBoltUnitTest.this.completeTopologyParam);
 
             // 検証
             List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
@@ -711,7 +711,7 @@ public class KeyTraceBaseBoltUnitTest
             assertThat(resultTuple.get(2).toString(), equalTo("MessageValue2"));
             assertThat(resultTuple.get(3).toString(), equalTo("MessageValue3"));
 
-            KeyTraceBaseBoltUnitTest.this.isAssert = true;
+            AmBaseBoltUnitTest.this.isAssert = true;
         }
     }
 
@@ -759,7 +759,7 @@ public class KeyTraceBaseBoltUnitTest
                     cluster,
                     createTopology(Arrays.asList("Message1", "Message2", "Message3"),
                             Arrays.asList("ChildKey1", "MessageKey", "ChildKey3")),
-                    KeyTraceBaseBoltUnitTest.this.completeTopologyParam);
+                    AmBaseBoltUnitTest.this.completeTopologyParam);
 
             // 検証
             List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
@@ -797,7 +797,7 @@ public class KeyTraceBaseBoltUnitTest
             assertThat(resultTuple3.get(2).toString(), equalTo("MessageValue2"));
             assertThat(resultTuple3.get(3).toString(), equalTo("MessageValue3"));
 
-            KeyTraceBaseBoltUnitTest.this.isAssert = true;
+            AmBaseBoltUnitTest.this.isAssert = true;
         }
     }
 
@@ -843,7 +843,7 @@ public class KeyTraceBaseBoltUnitTest
             // 実施
             Map result = Testing.completeTopology(cluster,
                     createTopology(Arrays.asList("Message1", "Message2", "Message3"), null),
-                    KeyTraceBaseBoltUnitTest.this.completeTopologyParam);
+                    AmBaseBoltUnitTest.this.completeTopologyParam);
 
             // 検証
             List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
@@ -860,7 +860,7 @@ public class KeyTraceBaseBoltUnitTest
             assertThat(resultTuple.get(2).toString(), equalTo("MessageValue2"));
             assertThat(resultTuple.get(3).toString(), equalTo("MessageValue3"));
 
-            KeyTraceBaseBoltUnitTest.this.isAssert = true;
+            AmBaseBoltUnitTest.this.isAssert = true;
         }
     }
 
@@ -880,21 +880,19 @@ public class KeyTraceBaseBoltUnitTest
     {
         TopologyBuilder builder = new TopologyBuilder();
 
-        // Build Topology
-        // Add Spout(KeyTraceThroughSpout)
-        AmBaseThroughSpout throughSpout = new AmBaseThroughSpout();
-        throughSpout.setFields(fields);
-        builder.setSpout("KeyTraceThroughSpout", throughSpout);
+        // Add Spout(BlankAmBaseSpout)
+        BlankAmBaseSpout blankAmBaseSpout = new BlankAmBaseSpout();
+        builder.setSpout("BlankAmBaseSpout", blankAmBaseSpout);
 
         // Add Bolt(KeyTraceThroughSpout -> KeyTraceThroughBoltWithKey)
-        KeyTraceThroughBolt throughBoltWithKey = new KeyTraceThroughBolt();
+        AmBaseThroughBolt throughBoltWithKey = new AmBaseThroughBolt();
         throughBoltWithKey.setFields(fields);
         throughBoltWithKey.setKeys(keys);
         builder.setBolt("KeyTraceThroughBoltWithKey", throughBoltWithKey).shuffleGrouping(
                 "KeyTraceThroughSpout");
 
         // Add Bolt(KeyTraceThroughBoltWithKey -> KeyTraceThroughBolt)
-        KeyTraceThroughBolt throughBolt = new KeyTraceThroughBolt();
+        AmBaseThroughBolt throughBolt = new AmBaseThroughBolt();
         throughBolt.setFields(fields);
         builder.setBolt("KeyTraceThroughBolt", throughBolt).shuffleGrouping(
                 "KeyTraceThroughBoltWithKey");
@@ -920,13 +918,12 @@ public class KeyTraceBaseBoltUnitTest
         TopologyBuilder builder = new TopologyBuilder();
 
         // Build Topology
-        // Add Spout(KeyTraceThroughSpout)
-        AmBaseThroughSpout throughSpout = new AmBaseThroughSpout();
-        throughSpout.setFields(fields);
-        builder.setSpout("KeyTraceThroughSpout", throughSpout);
+        // Add Spout(BlankAmBaseSpout)
+        BlankAmBaseSpout blankAmBaseSpout = new BlankAmBaseSpout();
+        builder.setSpout("BlankAmBaseSpout", blankAmBaseSpout);
 
-        // Add Bolt(KeyTraceThroughSpout -> KeyTraceThroughBoltWithKey)
-        KeyTraceThroughBolt throughBoltWithKey = new KeyTraceThroughBolt();
+        // Add Bolt(BlankAmBaseSpout -> KeyTraceThroughBoltWithKey)
+        AmBaseThroughBolt throughBoltWithKey = new AmBaseThroughBolt();
         throughBoltWithKey.setFields(fields);
         throughBoltWithKey.setKeys(keys);
         throughBoltWithKey.setManualAck(true);
@@ -934,7 +931,7 @@ public class KeyTraceBaseBoltUnitTest
                 "KeyTraceThroughSpout");
 
         // Add Bolt(KeyTraceThroughBoltWithKey -> KeyTraceThroughBolt)
-        KeyTraceThroughBolt throughBolt = new KeyTraceThroughBolt();
+        AmBaseThroughBolt throughBolt = new AmBaseThroughBolt();
         throughBolt.setFields(fields);
         builder.setBolt("KeyTraceThroughBolt", throughBolt).shuffleGrouping(
                 "KeyTraceThroughBoltWithKey");

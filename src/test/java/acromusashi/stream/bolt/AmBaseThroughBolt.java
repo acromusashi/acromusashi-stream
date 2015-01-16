@@ -24,7 +24,7 @@ import backtype.storm.tuple.Tuple;
  *
  * @author kimura
  */
-public class KeyTraceThroughBolt extends KeyTraceBaseBolt
+public class AmBaseThroughBolt extends KeyTraceBaseBolt
 {
     /** serialVersionUID */
     private static final long serialVersionUID = 1668791100773315754L;
@@ -41,7 +41,7 @@ public class KeyTraceThroughBolt extends KeyTraceBaseBolt
     /**
      * パラメータを指定せずにインスタンスを生成する。
      */
-    public KeyTraceThroughBolt()
+    public AmBaseThroughBolt()
     {}
 
     @SuppressWarnings("rawtypes")

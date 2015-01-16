@@ -49,7 +49,7 @@ import backtype.storm.tuple.Tuple;
  * @author kimura
  */
 @RunWith(MockitoJUnitRunner.class)
-public class KeyTraceBaseBoltTest
+public class AmBaseBoltTest
 {
     /** テスト対象 */
     private KeyTraceBaseBolt target;
@@ -73,7 +73,7 @@ public class KeyTraceBaseBoltTest
     @Before
     public void setUp()
     {
-        this.target = new MockKeyTraceBaseBolt();
+        this.target = new MockAmBaseBolt();
     }
 
     /**
@@ -116,7 +116,7 @@ public class KeyTraceBaseBoltTest
         Mockito.when(this.mockContext.getThisComponentId()).thenReturn("ComponentId");
         Mockito.when(this.mockContext.getThisTaskIndex()).thenReturn(0);
 
-        KeyTraceThroughBolt targetBolt = new KeyTraceThroughBolt();
+        AmBaseThroughBolt targetBolt = new AmBaseThroughBolt();
         targetBolt.setFields(Arrays.asList("Key", "Message"));
         targetBolt.prepare(this.mockConfMap, this.mockContext, this.mockCollector);
 
@@ -157,10 +157,10 @@ public class KeyTraceBaseBoltTest
         Mockito.when(this.mockContext.getThisComponentId()).thenReturn("ComponentId");
         Mockito.when(this.mockContext.getThisTaskIndex()).thenReturn(0);
 
-        KeyTraceThroughBolt targetBolt = new KeyTraceThroughBolt();
+        AmBaseThroughBolt targetBolt = new AmBaseThroughBolt();
         targetBolt.setFields(Arrays.asList("Key", "Message"));
         targetBolt.prepare(this.mockConfMap, this.mockContext, this.mockCollector);
-        KeyTraceThroughBolt mockedBolt = Mockito.spy(targetBolt);
+        AmBaseThroughBolt mockedBolt = Mockito.spy(targetBolt);
         Mockito.doThrow(new RuntimeException()).when(mockedBolt).onExecute(any(Tuple.class));
 
         Tuple mockTuple = Mockito.mock(Tuple.class);

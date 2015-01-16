@@ -18,7 +18,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +25,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import acromusashi.stream.bolt.KeyTraceThroughBolt;
+import acromusashi.stream.bolt.ThroughBolt;
+import acromusashi.stream.constants.FieldName;
+import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.trace.KeyHistory;
 import backtype.storm.Config;
 import backtype.storm.ILocalCluster;
@@ -39,9 +40,11 @@ import backtype.storm.testing.TestJob;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Values;
 
+import com.google.common.collect.Lists;
+
 /**
- * KeyTraceBaseSpout向けのテストクラス<br>
- * 単一クラスではなく「Stormクラスタ」としての試験のため、KeyTraceBaseSpoutTestクラスとは別クラスとして作成する。
+ * AmBaseSpout向けのテストクラス<br>
+ * 単一クラスではなく「Stormクラスタ」としての試験のため、AmBaseSpoutTestクラスとは別クラスとして作成する。
  *
  * @author kimura
  */
@@ -102,36 +105,39 @@ public class AmBaseSpoutUnitTest
      * Spout>Boltのメッセージ送信確認を行う。
      * @throws Exception
      *
-     * @target {@link AmBaseSpout#emitWithNoKeyId(List)}
-     * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
+     * @target {@link AmBaseSpout#emitWithNoKeyIdAndGrouping(acromusashi.stream.entity.StreamMessage, String)}
+     * @test GroupingKey、キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
      *    condition:: キー情報履歴にキーを指定し、パラメータを1個指定してメッセージを送信する
      *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
      */
     @Test
-    public void testEmit_パラメータ1個_キー有()
+    public void testEmit_KeyId未指定_Grouping()
     {
         // 準備
         KeyHistory keyHistory = new KeyHistory();
-        keyHistory.addKey("MessageKey");
-        this.mockedSources.addMockData("KeyTraceThroughSpout", new Values(keyHistory,
-                "MessageValue"));
+
+        StreamMessage message = new StreamMessage();
+        message.addField("Param1", "Param1");
+
+        this.mockedSources.addMockData("BlankAmBaseSpout", new Values("GroupingKey", keyHistory,
+                message));
 
         // 実施
-        Testing.withSimulatedTimeLocalCluster(mkClusterParam, new Param1KeyHasTestJob());
+        Testing.withSimulatedTimeLocalCluster(mkClusterParam, new NoKeyIdTestJob());
 
         // 検証結果確認
         assertTrue(this.isAssert);
     }
 
     /**
-     * testEmit_パラメータ1個_キー有メソッド用のTestJobクラス
+     * testEmit_KeyId未指定_Grouping
      */
-    private class Param1KeyHasTestJob implements TestJob
+    private class NoKeyIdTestJob implements TestJob
     {
         /**
          * パラメータを指定せずにインスタンスを作成する。
          */
-        Param1KeyHasTestJob()
+        NoKeyIdTestJob()
         {}
 
         @SuppressWarnings("rawtypes")
@@ -139,212 +145,24 @@ public class AmBaseSpoutUnitTest
         public void run(ILocalCluster cluster) throws Exception
         {
             // 実施
-            Map result = Testing.completeTopology(cluster,
-                    createTopology(Arrays.asList("Message")),
+            Map result = Testing.completeTopology(cluster, createTopology(),
                     AmBaseSpoutUnitTest.this.completeTopologyParam);
 
             // 検証
-            List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
+            List resultList = Testing.readTuples(result, "ThroughBolt");
 
-            // ThroughBoltでは「Message」というフィールドを下流に送付しているため、
-            // ThroughBoltが送付するフィールドに値が入っていればThroughSpout>ThroughBoltに送付されたことが確認できる。
+            // ThroughBoltでは「messageKey」「keyHistory」「messageValue」フィールドを下流に転送しているため、
+            // ThroughBoltが送付するフィールドに値が入っていればAmBaseSpout>ThroughBoltに送付されたことが確認できる。
             assertEquals(resultList.size(), 1);
 
             List resultTuple = (List) resultList.get(0);
 
-            assertThat(resultTuple.get(0), instanceOf(KeyHistory.class));
-            assertThat(resultTuple.get(0).toString(), equalTo("KeyHistory=[MessageKey]"));
-            assertThat(resultTuple.get(1).toString(), equalTo("MessageValue"));
-
-            AmBaseSpoutUnitTest.this.isAssert = true;
-        }
-    }
-
-    /**
-     * Spout>Boltのメッセージ送信確認を行う。
-     * @throws Exception
-     *
-     * @target {@link AmBaseSpout#emitWithNoKeyId(List)}
-     * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
-     *    condition:: キー情報履歴にキーを指定せず、パラメータを1個指定してメッセージを送信する
-     *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
-     */
-    @Test
-    public void testEmit_パラメータ1個_キー無し()
-    {
-        // 準備
-        KeyHistory keyInfo = new KeyHistory();
-        this.mockedSources.addMockData("KeyTraceThroughSpout", new Values(keyInfo, "MessageValue"));
-
-        // 実施
-        Testing.withSimulatedTimeLocalCluster(mkClusterParam, new Param1NoKeyTestJob());
-
-        // 検証
-        assertTrue(this.isAssert);
-    }
-
-    /**
-     * testEmit_パラメータ1個_キー無しメソッド用のTestJobクラス
-     */
-    private class Param1NoKeyTestJob implements TestJob
-    {
-
-        /**
-         * パラメータを指定せずにインスタンスを作成する。
-         */
-        Param1NoKeyTestJob()
-        {}
-
-        @SuppressWarnings("rawtypes")
-        @Override
-        public void run(ILocalCluster cluster) throws Exception
-        {
-            // 実施
-            Map result = Testing.completeTopology(cluster,
-                    createTopology(Arrays.asList("Message")),
-                    AmBaseSpoutUnitTest.this.completeTopologyParam);
-
-            // 検証
-            List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
-
-            // ThroughBoltでは「Message」というフィールドを下流に送付しているため、
-            // ThroughBoltが送付するフィールドに値が入っていればThroughSpout>ThroughBoltに送付されたことが確認できる。
-            assertEquals(resultList.size(), 1);
-
-            List resultTuple = (List) resultList.get(0);
-
-            assertThat(resultTuple.get(0), instanceOf(KeyHistory.class));
-            assertThat(resultTuple.get(0).toString(), equalTo("KeyHistory=[]"));
-            assertThat(resultTuple.get(1).toString(), equalTo("MessageValue"));
-
-            AmBaseSpoutUnitTest.this.isAssert = true;
-        }
-    }
-
-    /**
-     * Spout>Boltのメッセージ送信確認を行う。
-     * @throws Exception
-     *
-     * @target {@link AmBaseSpout#emitWithNoKeyId(List)}
-     * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
-     *    condition:: キー情報履歴にキーを指定し、パラメータを3個指定してメッセージを送信する
-     *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
-     */
-    @Test
-    public void testEmit_パラメータ3個_キー有()
-    {
-        // 準備
-        KeyHistory keyInfo = new KeyHistory();
-        keyInfo.addKey("MessageKey");
-        this.mockedSources.addMockData("KeyTraceThroughSpout", new Values(keyInfo, "MessageValue1",
-                "MessageValue2", "MessageValue3"));
-
-        // 実施
-        Testing.withSimulatedTimeLocalCluster(mkClusterParam, new Param3KeyHasTestJob());
-
-        // 検証
-        assertTrue(this.isAssert);
-    }
-
-    /**
-     * testEmit_パラメータ3個_キー有メソッド用のTestJobクラス
-     */
-    private class Param3KeyHasTestJob implements TestJob
-    {
-
-        /**
-         * パラメータを指定せずにインスタンスを作成する。
-         */
-        Param3KeyHasTestJob()
-        {}
-
-        @SuppressWarnings("rawtypes")
-        @Override
-        public void run(ILocalCluster cluster) throws Exception
-        {
-            // 実施
-            Map result = Testing.completeTopology(cluster,
-                    createTopology(Arrays.asList("Message1", "Message2", "Message3")),
-                    AmBaseSpoutUnitTest.this.completeTopologyParam);
-
-            // 検証
-            List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
-
-            // ThroughBoltでは「Message1」「Message2」「Message3」というフィールドを下流に送付しているため、
-            // ThroughBoltが送付するフィールドに値が入っていればThroughSpout>ThroughBoltに送付されたことが確認できる。
-            assertEquals(resultList.size(), 1);
-
-            List resultTuple = (List) resultList.get(0);
-
-            assertThat(resultTuple.get(0), instanceOf(KeyHistory.class));
-            assertThat(resultTuple.get(0).toString(), equalTo("KeyHistory=[MessageKey]"));
-            assertThat(resultTuple.get(1).toString(), equalTo("MessageValue1"));
-            assertThat(resultTuple.get(2).toString(), equalTo("MessageValue2"));
-            assertThat(resultTuple.get(3).toString(), equalTo("MessageValue3"));
-
-            AmBaseSpoutUnitTest.this.isAssert = true;
-        }
-    }
-
-    /**
-     * 装置情報所得処理時の変換確認を行う。
-     * @throws Exception
-     *
-     * @target {@link AmBaseSpout#emitWithNoKeyId(List)}
-     * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
-     *    condition:: キー情報履歴にキーを指定せず、パラメータを3個指定してメッセージを送信する
-     *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
-     */
-    @Test
-    public void testEmit_パラメータ3個_キー無し()
-    {
-        // 準備
-        KeyHistory keyInfo = new KeyHistory();
-        this.mockedSources.addMockData("KeyTraceThroughSpout", new Values(keyInfo, "MessageValue1",
-                "MessageValue2", "MessageValue3"));
-
-        // 実施
-        Testing.withSimulatedTimeLocalCluster(mkClusterParam, new Param3NoKeyTestJob());
-
-        // 検証
-        assertTrue(this.isAssert);
-    }
-
-    /**
-     * testEmit_パラメータ3個_キー無しメソッド用のTestJobクラス
-     */
-    private class Param3NoKeyTestJob implements TestJob
-    {
-
-        /**
-         * パラメータを指定せずにインスタンスを作成する。
-         */
-        Param3NoKeyTestJob()
-        {}
-
-        @SuppressWarnings("rawtypes")
-        @Override
-        public void run(ILocalCluster cluster) throws Exception
-        {
-            // 実施
-            Map result = Testing.completeTopology(cluster,
-                    createTopology(Arrays.asList("Message1", "Message2", "Message3")),
-                    AmBaseSpoutUnitTest.this.completeTopologyParam);
-
-            // 検証
-            List resultList = Testing.readTuples(result, "KeyTraceThroughBolt");
-
-            // ThroughBoltでは「Message1」「Message2」「Message3」というフィールドを下流に送付しているため、
-            // ThroughBoltが送付するフィールドに値が入っていればThroughSpout>ThroughBoltに送付されたことが確認できる。
-            assertEquals(resultList.size(), 1);
-
-            List resultTuple = (List) resultList.get(0);
-
-            assertThat(resultTuple.get(0), instanceOf(KeyHistory.class));
-            assertThat(resultTuple.get(0).toString(), equalTo("KeyHistory=[]"));
-            assertThat(resultTuple.get(1).toString(), equalTo("MessageValue1"));
-            assertThat(resultTuple.get(2).toString(), equalTo("MessageValue2"));
-            assertThat(resultTuple.get(3).toString(), equalTo("MessageValue3"));
+            assertThat(resultTuple.get(0).toString(), equalTo("GroupingKey"));
+            assertThat(resultTuple.get(1), instanceOf(KeyHistory.class));
+            assertThat(resultTuple.get(1).toString(), equalTo("KeyHistory=[]"));
+            assertThat(resultTuple.get(2), instanceOf(StreamMessage.class));
+            assertThat(((StreamMessage) resultTuple.get(2)).getField("Param1").toString(),
+                    equalTo("Param1"));
 
             AmBaseSpoutUnitTest.this.isAssert = true;
         }
@@ -353,27 +171,26 @@ public class AmBaseSpoutUnitTest
     /**
      * 下記の構成を保持する検証用Topology定義を作成する。<br>
     * <ol>
-    * <li>KeyTraceThroughSpout : 指定したフィールドを指定してグルーピングを定義するSpout</li>
-    * <li>KeyTraceThroughBolt : 指定したフィールドを指定してメッセージを送信するBolt</li>
+    * <li>BlankAmBaseSpout : BlankのAmBaseSpout</li>
+    * <li>ThroughBolt : 指定したフィールドを指定してメッセージを下流に流すBolt</li>
     * </ol>
      *
-     * @param contextPath コンテキストパス
-     * @return SnmpTrapMessageSendBolt検証用のTopology定義
+     * @return AmBaseThroughSpout検証用のTopology定義
      */
-    private StormTopology createTopology(List<String> fields)
+    private StormTopology createTopology()
     {
         TopologyBuilder builder = new TopologyBuilder();
 
         // Build Topology
-        // Add Spout(KeyTraceThroughSpout)
-        AmBaseThroughSpout throughSpout = new AmBaseThroughSpout();
-        throughSpout.setFields(fields);
-        builder.setSpout("KeyTraceThroughSpout", throughSpout);
+        // Add Spout(BlankAmBaseSpout)
+        BlankAmBaseSpout blankSpout = new BlankAmBaseSpout();
+        builder.setSpout("BlankAmBaseSpout", blankSpout);
 
-        // Add Bolt(KeyTraceThroughSpout -> KeyTraceThroughBolt)
-        KeyTraceThroughBolt throughBolt = new KeyTraceThroughBolt();
-        throughBolt.setFields(fields);
-        builder.setBolt("KeyTraceThroughBolt", throughBolt).shuffleGrouping("KeyTraceThroughSpout");
+        // Add Bolt(BlankAmBaseSpout -> ThroughBolt)
+        ThroughBolt throughBolt = new ThroughBolt();
+        throughBolt.setFields(Lists.newArrayList(FieldName.MESSAGE_KEY, FieldName.KEY_HISTORY,
+                FieldName.MESSAGE_VALUE));
+        builder.setBolt("ThroughBolt", throughBolt).shuffleGrouping("BlankAmBaseSpout");
 
         StormTopology topology = builder.createTopology();
         return topology;
