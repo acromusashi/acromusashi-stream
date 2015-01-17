@@ -35,7 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  * @author kimura
  */
-public class JsonConvertBolt<T> extends BaseConfigurationBolt
+public class JsonConvertBolt<T> extends AmConfigurationBolt
 {
     /** serialVersionUID */
     private static final long        serialVersionUID = 4002032169715662295L;

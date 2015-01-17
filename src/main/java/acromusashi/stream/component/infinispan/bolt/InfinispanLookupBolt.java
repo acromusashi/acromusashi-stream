@@ -18,7 +18,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import acromusashi.stream.bolt.BaseConfigurationBolt;
+import acromusashi.stream.bolt.AmConfigurationBolt;
 import acromusashi.stream.component.infinispan.CacheHelper;
 import acromusashi.stream.component.infinispan.TupleCacheMapper;
 import acromusashi.stream.constants.FieldName;
@@ -38,7 +38,7 @@ import backtype.storm.tuple.Values;
  * @param <K> InfinispanCacheKeyの型
  * @param <V> InfinispanCacheValueの型
  */
-public class InfinispanLookupBolt<K, V> extends BaseConfigurationBolt
+public class InfinispanLookupBolt<K, V> extends AmConfigurationBolt
 {
     /** serialVersionUID */
     private static final long             serialVersionUID = 9028505967740858573L;

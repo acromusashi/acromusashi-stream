@@ -101,7 +101,7 @@ public class AmBaseBoltUnitTest
     /**
      * Bolt>Boltのメッセージ送信確認を行う。
      *
-     * @target {@link KeyTraceBaseBolt#emitWithNoAnchorKey(List)}
+     * @target {@link AmBaseBolt#emitWithNoAnchorKey(List)}
      * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
      *    condition:: パラメータ1個、キー指定、キー重複なしの状態で1メッセージ送信する
      *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
@@ -161,7 +161,7 @@ public class AmBaseBoltUnitTest
     /**
      * Bolt>Boltのメッセージ送信確認を行う。
      *
-     * @target {@link KeyTraceBaseBolt#emitWithNoAnchorKey(List)}
+     * @target {@link AmBaseBolt#emitWithNoAnchorKey(List)}
      * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
      *    condition:: パラメータ1個、キー指定、キー重複なしの状態で1メッセージ送信する
      *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
@@ -222,7 +222,7 @@ public class AmBaseBoltUnitTest
     /**
      * Bolt>Boltのメッセージ送信確認を行う。
      *
-     * @target {@link KeyTraceBaseBolt#emitWithNoAnchorKey(List)}
+     * @target {@link AmBaseBolt#emitWithNoAnchorKey(List)}
      * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
      *    condition:: パラメータ1個、キー指定、キー重複なしの状態で3メッセージ送信する
      *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
@@ -302,7 +302,7 @@ public class AmBaseBoltUnitTest
     /**
      * Bolt>Boltのメッセージ送信確認を行う。
      *
-     * @target {@link KeyTraceBaseBolt#emitWithNoAnchorKey(List)}
+     * @target {@link AmBaseBolt#emitWithNoAnchorKey(List)}
      * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
      *    condition:: パラメータ1個、キー指定、キー重複ありの状態で1メッセージ送信する
      *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
@@ -362,7 +362,7 @@ public class AmBaseBoltUnitTest
     /**
      * Bolt>Boltのメッセージ送信確認を行う。
      *
-     * @target {@link KeyTraceBaseBolt#emitWithNoAnchorKey(List)}
+     * @target {@link AmBaseBolt#emitWithNoAnchorKey(List)}
      * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
      *    condition:: パラメータ1個、キー指定、キー重複ありの状態で3メッセージ送信する
      *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
@@ -441,7 +441,7 @@ public class AmBaseBoltUnitTest
     /**
      * Bolt>Boltのメッセージ送信確認を行う。
      *
-     * @target {@link KeyTraceBaseBolt#emitWithNoAnchorKey(List)}
+     * @target {@link AmBaseBolt#emitWithNoAnchorKey(List)}
      * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
      *    condition:: パラメータ1個、キーなしの状態でメッセージ送信する
      *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
@@ -501,7 +501,7 @@ public class AmBaseBoltUnitTest
     /**
      * Bolt>Boltのメッセージ送信確認を行う。
      *
-     * @target {@link KeyTraceBaseBolt#emitWithNoAnchorKey(List)}
+     * @target {@link AmBaseBolt#emitWithNoAnchorKey(List)}
      * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
      *    condition:: パラメータ3個、キー指定、キー重複なしの状態で1メッセージ送信する
      *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
@@ -566,7 +566,7 @@ public class AmBaseBoltUnitTest
     /**
      * Bolt>Boltのメッセージ送信確認を行う。
      *
-     * @target {@link KeyTraceBaseBolt#emitWithNoAnchorKey(List)}
+     * @target {@link AmBaseBolt#emitWithNoAnchorKey(List)}
      * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
      *    condition:: パラメータ3個、キー指定、キー重複なしの状態で3メッセージ送信する
      *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
@@ -653,7 +653,7 @@ public class AmBaseBoltUnitTest
     /**
      * Bolt>Boltのメッセージ送信確認を行う。
      *
-     * @target {@link KeyTraceBaseBolt#emitWithNoAnchorKey(List)}
+     * @target {@link AmBaseBolt#emitWithNoAnchorKey(List)}
      * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
      *    condition:: パラメータ3個、キー指定、キー重複ありの状態で1メッセージ送信する
      *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
@@ -718,7 +718,7 @@ public class AmBaseBoltUnitTest
     /**
      * Bolt>Boltのメッセージ送信確認を行う。
      *
-     * @target {@link KeyTraceBaseBolt#emitWithNoAnchorKey(List)}
+     * @target {@link AmBaseBolt#emitWithNoAnchorKey(List)}
      * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
      *    condition:: パラメータ3個、キー指定、キー重複ありの状態で3メッセージ送信する
      *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
@@ -804,7 +804,7 @@ public class AmBaseBoltUnitTest
     /**
      * Bolt>Boltのメッセージ送信確認を行う。
      *
-     * @target {@link KeyTraceBaseBolt#emitWithNoAnchorKey(List)}
+     * @target {@link AmBaseBolt#emitWithNoAnchorKey(List)}
      * @test キー情報履歴、メッセージが次のBoltに指定したキーで配信されること
      *    condition:: パラメータ3個、キーなしの状態でメッセージ送信する
      *    result:: キー情報履歴、メッセージが次のBoltに指定したキーで配信されること

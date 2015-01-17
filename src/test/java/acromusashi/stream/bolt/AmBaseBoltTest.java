@@ -52,7 +52,7 @@ import backtype.storm.tuple.Tuple;
 public class AmBaseBoltTest
 {
     /** テスト対象 */
-    private KeyTraceBaseBolt target;
+    private AmBaseBolt target;
 
     /** テスト用のOutputCollector */
     @Mock
@@ -79,7 +79,7 @@ public class AmBaseBoltTest
     /**
      * Prepareメソッド呼び出し時の変数初期化確認を行う。
      *
-     * @target {@link KeyTraceBaseBolt#prepare(Map, TopologyContext, OutputCollector)}
+     * @target {@link AmBaseBolt#prepare(Map, TopologyContext, OutputCollector)}
      * @test stormConf、TopologyContext、TaskIdが初期化されていることを確認
      *    condition:: prepareメソッド実行
      *    result:: stormConf、TopologyContext、TaskIdが初期化されていること
@@ -103,7 +103,7 @@ public class AmBaseBoltTest
     /**
      * KeyHistoryInfo未保持Tuple受信時、空のKeyHistoryInfoを生成して動作を継続することを確認する。
      *
-     * @target {@link KeyTraceBaseBolt#prepare(Map, TopologyContext, OutputCollector)}
+     * @target {@link AmBaseBolt#prepare(Map, TopologyContext, OutputCollector)}
      * @test 空のKeyHistoryInfoを生成して動作を継続することを確認
      *    condition:: KeyHistoryInfo未保持Tuple受信時
      *    result:: 空のKeyHistoryInfoを生成して動作を継続することを確認
@@ -145,7 +145,7 @@ public class AmBaseBoltTest
     /**
      * Tuple処理時、onExecuteメソッド実行中に例外が発生した場合、処理が終了することを確認する。
      *
-     * @target {@link KeyTraceBaseBolt#prepare(Map, TopologyContext, OutputCollector)}
+     * @target {@link AmBaseBolt#prepare(Map, TopologyContext, OutputCollector)}
      * @test 処理が終了することを確認
      *    condition:: KeyHistoryInfo未保持Tuple受信時
      *    result:: 処理が終了することを確認
@@ -178,7 +178,7 @@ public class AmBaseBoltTest
     /**
      * DeclareOutputFieldsメソッド呼び出し時のフィールド確認を行う。
      *
-     * @target {@link KeyTraceBaseBolt#declareOutputFields(backtype.storm.topology.OutputFieldsDeclarer)}
+     * @target {@link AmBaseBolt#declareOutputFields(backtype.storm.topology.OutputFieldsDeclarer)}
      * @test 継承クラスの返すフィールドの頭に「KeyHistory」を付けて {@link OutputFieldsDeclarer#declare(Fields fields)}を呼び出していることを確認する。
      *    condition:: declareOutputFieldsメソッド実行
      *    result:: 継承クラスの返すフィールドの頭に「KeyHistory」を付けて {@link OutputFieldsDeclarer#declare(Fields fields)}を呼び出していること
@@ -206,7 +206,7 @@ public class AmBaseBoltTest
     /**
      * Anchor、Keyを指定していない状態でemitメソッド呼び出し確認を行う。
      *
-     * @target {@link KeyTraceBaseBolt#emitWithNoAnchorKey(java.util.List)}
+     * @target {@link AmBaseBolt#emitWithNoAnchorKey(java.util.List)}
      * @test Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していることを確認する。
      *    condition:: KeyTraceBaseBolt#emitメソッド実行
      *    result:: Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していること
@@ -218,7 +218,7 @@ public class AmBaseBoltTest
         // 準備
         this.target.prepare(this.mockConfMap, this.mockContext, this.mockCollector);
 
-        KeyTraceBaseBolt testTarget = spy(this.target);
+        AmBaseBolt testTarget = spy(this.target);
         Mockito.doNothing().when(testTarget).clearExecuteStatus();
         Tuple tuple = Mockito.mock(Tuple.class);
         KeyHistory history = new KeyHistory();
@@ -250,7 +250,7 @@ public class AmBaseBoltTest
     /**
      * Keyを指定した状態でemitメソッド呼び出し確認を行う。
      *
-     * @target {@link KeyTraceBaseBolt#emitWithNoAnchor(List, Object)}
+     * @target {@link AmBaseBolt#emitWithNoAnchor(List, Object)}
      * @test Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していることを確認する。
      *    condition:: KeyTraceBaseBolt#emitメソッド実行
      *    result:: Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していること
@@ -262,7 +262,7 @@ public class AmBaseBoltTest
         // 準備
         this.target.prepare(this.mockConfMap, this.mockContext, this.mockCollector);
 
-        KeyTraceBaseBolt testTarget = spy(this.target);
+        AmBaseBolt testTarget = spy(this.target);
         Mockito.doNothing().when(testTarget).clearExecuteStatus();
         Tuple tuple = Mockito.mock(Tuple.class);
         KeyHistory history = new KeyHistory();
@@ -294,7 +294,7 @@ public class AmBaseBoltTest
     /**
      * Anchorを指定した状態でemitメソッド呼び出し確認を行う。
      *
-     * @target {@link KeyTraceBaseBolt#emitWithNoKey(Tuple, List)}
+     * @target {@link AmBaseBolt#emitWithNoKey(Tuple, List)}
      * @test Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していることを確認する。
      *    condition:: KeyTraceBaseBolt#emitメソッド実行
      *    result:: Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していること
@@ -306,7 +306,7 @@ public class AmBaseBoltTest
         // 準備
         this.target.prepare(this.mockConfMap, this.mockContext, this.mockCollector);
 
-        KeyTraceBaseBolt testTarget = spy(this.target);
+        AmBaseBolt testTarget = spy(this.target);
         Mockito.doNothing().when(testTarget).clearExecuteStatus();
         Tuple tuple = Mockito.mock(Tuple.class);
         Tuple anchor = Mockito.mock(Tuple.class);
@@ -342,7 +342,7 @@ public class AmBaseBoltTest
     /**
      * Anchor、MessageKeyを指定した状態でemitメソッド呼び出し確認を行う。
      *
-     * @target {@link KeyTraceBaseBolt#emit(Tuple, List, Object)}
+     * @target {@link AmBaseBolt#emit(Tuple, List, Object)}
      * @test Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していることを確認する。
      *    condition:: KeyTraceBaseBolt#emitメソッド実行
      *    result:: Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していること
@@ -354,7 +354,7 @@ public class AmBaseBoltTest
         // 準備
         this.target.prepare(this.mockConfMap, this.mockContext, this.mockCollector);
 
-        KeyTraceBaseBolt testTarget = spy(this.target);
+        AmBaseBolt testTarget = spy(this.target);
         Mockito.doNothing().when(testTarget).clearExecuteStatus();
         Tuple tuple = Mockito.mock(Tuple.class);
         Tuple anchor = Mockito.mock(Tuple.class);

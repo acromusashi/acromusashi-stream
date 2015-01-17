@@ -16,7 +16,7 @@ import backtype.storm.tuple.Tuple;
  *
  * @author kimura
  */
-public class MockAmBaseBolt extends KeyTraceBaseBolt
+public class MockAmBaseBolt extends AmBaseBolt
 {
 
     /** serialVersionUID */

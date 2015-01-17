@@ -31,7 +31,7 @@ import backtype.storm.tuple.Tuple;
  * 
  * @author kimura
  */
-public abstract class MessageBolt extends BaseConfigurationBolt
+public abstract class MessageBolt extends AmConfigurationBolt
 {
     /** serialVersionUID */
     private static final long          serialVersionUID = -434252908894821429L;

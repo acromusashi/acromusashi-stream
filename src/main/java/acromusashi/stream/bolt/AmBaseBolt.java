@@ -37,13 +37,13 @@ import backtype.storm.tuple.Tuple;
  *
  * @author kimura
  */
-public abstract class KeyTraceBaseBolt extends BaseConfigurationBolt
+public abstract class AmBaseBolt extends AmConfigurationBolt
 {
     /** serialVersionUID */
     private static final long   serialVersionUID = 1546366821557201305L;
 
     /** ロガー */
-    private static final Logger logger           = LoggerFactory.getLogger(KeyTraceBaseBolt.class);
+    private static final Logger logger           = LoggerFactory.getLogger(AmBaseBolt.class);
 
     /** タスクID */
     protected String            taskId;

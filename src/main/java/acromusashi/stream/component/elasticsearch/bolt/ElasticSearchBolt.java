@@ -24,7 +24,7 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import acromusashi.stream.bolt.BaseConfigurationBolt;
+import acromusashi.stream.bolt.AmConfigurationBolt;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -35,7 +35,7 @@ import backtype.storm.tuple.Tuple;
  *
  * @author kimura
  */
-public class ElasticSearchBolt extends BaseConfigurationBolt
+public class ElasticSearchBolt extends AmConfigurationBolt
 {
     /** serialVersionUID */
     private static final long   serialVersionUID  = 4987555107871741041L;

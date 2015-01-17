@@ -80,7 +80,7 @@ public class JsonConvertBoltTest
     {
         this.target = new JsonConvertBolt<TestUserEntity>();
         this.target.setUserObjectClass(TestUserEntity.class);
-        BaseConfigurationBolt baseBolt = (BaseConfigurationBolt) this.target;
+        AmConfigurationBolt baseBolt = (AmConfigurationBolt) this.target;
         baseBolt.prepare(this.mockConfMap, this.mockContext, this.mockCollector);
     }
 

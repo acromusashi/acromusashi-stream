@@ -24,7 +24,7 @@ import backtype.storm.tuple.Tuple;
  *
  * @author kimura
  */
-public class AmBaseThroughBolt extends KeyTraceBaseBolt
+public class AmBaseThroughBolt extends AmBaseBolt
 {
     /** serialVersionUID */
     private static final long serialVersionUID = 1668791100773315754L;

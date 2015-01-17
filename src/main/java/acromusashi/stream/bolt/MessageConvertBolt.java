@@ -35,7 +35,7 @@ import backtype.storm.tuple.Values;
  * 
  * @author kimura
  */
-public class MessageConvertBolt extends BaseConfigurationBolt
+public class MessageConvertBolt extends AmConfigurationBolt
 {
     /** serialVersionUID */
     private static final long          serialVersionUID = 8285275433076201532L;

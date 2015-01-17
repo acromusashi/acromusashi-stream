@@ -22,7 +22,7 @@ import backtype.storm.tuple.Tuple;
 /**
  * 受信したTupleに対して指定したフィールドを抽出して下流に流すStorm-UnitTest用Bolt<br>
  */
-public class ThroughBolt extends BaseConfigurationBolt
+public class ThroughBolt extends AmConfigurationBolt
 {
     /** serialVersionUID */
     private static final long serialVersionUID = 1668791100773315754L;
