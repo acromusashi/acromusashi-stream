@@ -13,6 +13,7 @@
 package acromusashi.stream.bolt.hdfs;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
@@ -21,18 +22,19 @@ import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import acromusashi.stream.bolt.MessageBolt;
+import acromusashi.stream.bolt.AmConfigurationBolt;
 import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.exception.InitFailException;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
 
 /**
  * 受信したメッセージをHDFSに出力するBolt<br/>
- * 
+ *
  * @author kimura
  */
-public class HdfsStoreBolt extends MessageBolt
+public class HdfsStoreBolt extends AmConfigurationBolt
 {
     /** serialVersionUID */
     private static final long            serialVersionUID = -2877852415844943739L;
@@ -101,9 +103,19 @@ public class HdfsStoreBolt extends MessageBolt
     }
 
     @Override
-    public void onMessage(StreamMessage message) throws Exception
+    public void onMessage(StreamMessage message)
     {
-        this.delegate.appendLine(message.toString(), System.currentTimeMillis());
+        try
+        {
+            this.delegate.appendLine(message.toString(), System.currentTimeMillis());
+        }
+        catch (IOException ex)
+        {
+            String logFormat = "Fail write to hdfs. Dispose received message. : Message={0}";
+            logger.warn(MessageFormat.format(logFormat, message), ex);
+        }
+
+        ack();
     }
 
     @Override
@@ -122,5 +134,14 @@ public class HdfsStoreBolt extends MessageBolt
         }
 
         logger.info("HDFSSinkBolt Cleanup finished.");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void declareOutputFields(OutputFieldsDeclarer declarer)
+    {
+        // This class not has downstream component.
     }
 }

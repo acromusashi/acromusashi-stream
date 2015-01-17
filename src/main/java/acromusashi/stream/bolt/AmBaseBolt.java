@@ -12,27 +12,25 @@
 */
 package acromusashi.stream.bolt;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import acromusashi.stream.constants.FieldName;
+import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.trace.KeyHistory;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
+
+import com.google.common.collect.Lists;
 
 /**
- * メッセージ中のキー情報履歴を保持する機能を持つBaseBoltクラス。<br>
- * 本クラスを継承したBoltを使用することで下記の機能を利用可能。<br>
+ * AcroMUSASHI Stream's basis bolt class<br>
+ * Spout that inherit this class has following function.<br>
  * <ol>
- * <li>メッセージ中のキー情報を履歴として保持</li>
+ * <li>Has message's key history.</li>
  * </ol>
  *
  * @author kimura
@@ -40,93 +38,82 @@ import backtype.storm.tuple.Tuple;
 public abstract class AmBaseBolt extends AmConfigurationBolt
 {
     /** serialVersionUID */
-    private static final long   serialVersionUID = 1546366821557201305L;
+    private static final long serialVersionUID = 1546366821557201305L;
 
-    /** ロガー */
-    private static final Logger logger           = LoggerFactory.getLogger(AmBaseBolt.class);
+    /** Task id. */
+    protected String          taskId;
 
-    /** タスクID */
-    protected String            taskId;
+    /** Executing message's key history */
+    private KeyHistory        executingKeyHistory;
 
-    /** Executeメソッドで処理中のメッセージが保持するキー情報履歴 */
-    private KeyHistory          executingKeyHistory;
+    /** Message acked flag. */
+    private boolean           responsed;
 
-    /** メッセージ処理時に応答を返したかどうかを示すフラグ */
-    private boolean             isResponsed;
+    /** Record key history flag. */
+    protected boolean         recordHistory    = true;
 
     /**
-     * BoltがWorkerプロセスに展開された後に実行される初期化メソッド。<br>
-     * Stormクラスタから受け取ったオブジェクト群の設定と、TaskIdの算出を行う。
+     * Initialize method called after extracted for worker processes.<br>
+     * <br>
+     * Initialize task id.
      *
-     * @param stormConf Storm設定オブジェクト
-     * @param context Topologyコンテキスト
-     * @param collector Collectorオブジェクト
+     * @param stormConf Storm configuration
+     * @param context Topology context
+     * @param collector SpoutOutputCollector
      */
     @SuppressWarnings("rawtypes")
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector)
     {
         super.prepare(stormConf, context, collector);
-        // TaskIdを算出し、フィールドに保持
+
         this.taskId = context.getThisComponentId() + "_" + context.getThisTaskId();
         onPrepare(stormConf, context);
     }
 
     /**
-     * Boltの初期化処理を行う。<br>
-     * リソースの初期化など起動時に必要な処理を記述する。
+     * Initialize method for individual bolt.<br>
+     * <br>
+     * Describe processing at startup, such as initialization of resources.
      *
-     * @param stormConf Storm設定オブジェクト
-     * @param context Topologyコンテキスト
+     * @param stormConf Storm configuration
+     * @param context Topology context
      */
     @SuppressWarnings("rawtypes")
     public abstract void onPrepare(Map stormConf, TopologyContext context);
 
     /**
-     * メッセージを受信した際に実行される。
+     * Execute when receive message.
      *
-     * @param input 受信メッセージ
+     * @param received received message
      */
     @Override
-    public void execute(Tuple input)
+    public void onMessage(StreamMessage received)
     {
-        // メッセージ処理中を示すステータスを初期化する。
+        this.executingKeyHistory = received.getHeader().getHistory();
+        this.responsed = false;
+
+        // Execute message processing.
+        // This class not handles exceptions.
+        // Because if throws exception, this class not need ack.
         try
         {
-            this.executingKeyHistory = (KeyHistory) input.getValueByField(FieldName.KEY_HISTORY);
-        }
-        catch (IllegalArgumentException iaex)
-        {
-            // TupleにKeyHistoryInfoが含まれていない場合はWARNログを出力し、空のKeyHistoryInfoを生成する。
-            String logFormat = "Message has no keyhistory. Default blank keyhistory generate and continue. : Message={0}, KeyHistoryField={1}";
-            logger.warn(MessageFormat.format(logFormat, input, FieldName.KEY_HISTORY), iaex);
-
-            this.executingKeyHistory = new KeyHistory();
-        }
-
-        this.isResponsed = false;
-
-        // メッセージ処理を行う。
-        // onExecuteメソッドから例外が投げられた場合はackを返す必要はないため、本クラス内でハンドリングは行わない。
-        try
-        {
-            onExecute(input);
+            onExecute(received);
         }
         finally
         {
-            // 処理中Tupleは例外の発生有無に関わらずクリアする。
             clearExecuteStatus();
         }
 
-        // 応答を返していない場合は自動でackを返す。
-        if (this.isResponsed == false)
+        // If not responsed, auto ack
+        if (this.responsed == false)
         {
-            getCollector().ack(input);
+            super.ack();
         }
     }
 
     /**
-     * メッセージの実行中状態を解除
+     * Clear message executing status.
      */
     protected void clearExecuteStatus()
     {
@@ -134,125 +121,497 @@ public abstract class AmBaseBolt extends AmConfigurationBolt
     }
 
     /**
-     * メッセージ受信時の処理を記述する。
+     * Execute when receive message.
      *
-     * @param input 受信メッセージ
+     * @param input received message
      */
-    public abstract void onExecute(Tuple input);
+    public abstract void onExecute(StreamMessage input);
 
     /**
-     * 継承クラス側で指定されたフィールドリストに追加してキーの履歴情報を示すキーを追加して返す。
+     * Declare output fields and streams.<br>
+     * Declare fields are following.<br>
+     * <ol>
+     * <li>messageKey   : Groupingkey if exists.</li>
+     * <li>messageValue : Message value.</li>
+     * </ol>
+     * Streams are "default" and user setting streams.
      *
-     * @param declarer フィールド取得オブジェクト
+     * @param declarer declarer object
      */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer)
     {
-        List<String> baseList = new ArrayList<>();
-        baseList.add(FieldName.KEY_HISTORY);
-        baseList.addAll(getDeclareOutputFields());
-        declarer.declare(new Fields(baseList));
+        List<String> fields = Lists.newArrayList(FieldName.MESSAGE_KEY, FieldName.MESSAGE_VALUE);
+
+        // Declare default stream
+        declarer.declare(new Fields(fields));
+
+        for (String stream : getOutputStreams())
+        {
+            declarer.declareStream(stream, new Fields(fields));
+        }
     }
 
     /**
-     * メッセージに設定するフィールドリストを取得する。
+     * Define downstream streams.<br>
+     * If it needs other than default stream, inherit this method and return extra streams.
      *
-     * @return メッセージに設定するフィールドリスト
+     * @return Extra streams
      */
-    public abstract List<String> getDeclareOutputFields();
+    protected List<String> getOutputStreams()
+    {
+        return Lists.newArrayList();
+    }
 
     /**
-     * 親メッセージ、MessageKey(キー情報履歴として出力する値)を指定せずに下流コンポーネントへメッセージを送信する。<br>
-     * 下記の条件の時に用いること。
+     * Notify ack for inputed tuple.
+     */
+    @Override
+    protected void ack()
+    {
+        super.ack();
+        this.responsed = true;
+    }
+
+    /**
+     * Notify fail for inputed tuple.
+     */
+    @Override
+    protected void fail()
+    {
+        super.fail();
+        this.responsed = true;
+    }
+
+    /**
+     * Create keyhistory from original key history.<br>
+     * Use following situation.
      * <ol>
-     * <li>本クラスの提供するキー情報履歴を使用しない。</li>
-     * <li>Stormのメッセージ処理失敗検知機構を使用しない。</li>
+     * <li>Not used current message key.</li>
+     * <li>This class's key history function is not executed.</li>
      * </ol>
      *
-     * @param message 送信メッセージ
+     * @param history original key history
+     * @return created key history
      */
-    protected void emitWithNoAnchorKey(List<Object> message)
+    protected KeyHistory createKeyRecorededHistory(KeyHistory history)
     {
-        message.add(0, this.executingKeyHistory);
-        getCollector().emit(message);
+        KeyHistory result = null;
+
+        if (history != null)
+        {
+            // For adjust message splited, use keyhistory's deepcopy.
+            result = history.createDeepCopy();
+        }
+
+        return result;
     }
 
     /**
-     * 親メッセージのみ指定して下流コンポーネントへメッセージを送信する。<br>
-     * 下記の条件の時に用いること。
+     * Create keyhistory from original key history and current message key.
+     *
+     * @param history original key history
+     * @param messageKey current message key
+     * @return created key history
+     */
+    protected KeyHistory createKeyRecorededHistory(KeyHistory history, Object messageKey)
+    {
+        KeyHistory result = null;
+
+        if (history == null)
+        {
+            result = new KeyHistory();
+        }
+        else
+        {
+            // For adjust message splited, use keyhistory's deepcopy.
+            result = history.createDeepCopy();
+        }
+
+        result.addKey(messageKey.toString());
+
+        return result;
+    }
+
+    /**
+     * Use anchor function(child message failed. notify fail to parent message.), MessageKey(Use key history's value).<br>
+     * Send message to downstream component.<br>
+     * Use following situation.
      * <ol>
-     * <li>本クラスの提供するキー情報履歴を使用しない。</li>
-     * <li>Stormのメッセージ処理失敗検知機構を使用しており、かつ下流のBoltでTupleの処理に失敗した場合Spoutから取得したTupleを失敗と扱う。</li>
+     * <li>Use this class's key history function.</li>
+     * <li>Use storm's fault detect function.</li>
      * </ol>
      *
-     * @param anchor 親メッセージ
-     * @param message 送信メッセージ
+     * @param message sending message
+     * @param messageKey MessageKey(Use key history's value)
      */
-    protected void emitWithNoKey(Tuple anchor, List<Object> message)
+    protected void emit(StreamMessage message, Object messageKey)
     {
-        message.add(0, this.executingKeyHistory);
-        getCollector().emit(anchor, message);
+        KeyHistory newHistory = null;
+        if (this.recordHistory)
+        {
+            newHistory = createKeyRecorededHistory(this.executingKeyHistory, messageKey);
+        }
+        else
+        {
+            newHistory = createKeyRecorededHistory(this.executingKeyHistory);
+        }
+
+        message.getHeader().setHistory(newHistory);
+
+        getCollector().emit(this.getExecutingTuple(), new Values("", message));
     }
 
     /**
-     * MessageKey(キー情報履歴として出力する値)のみ指定して下流コンポーネントへメッセージを送信する。<br>
-     * 下記の条件の時に用いること。
+     * Use anchor function(child message failed. notify fail to parent message.), MessageKey(Use key history's value).<br>
+     * Send message to downstream component with grouping key.<br>
+     * Use following situation.
      * <ol>
-     * <li>本クラスの提供するキー情報履歴を使用する。</li>
-     * <li>Stormのメッセージ処理失敗検知機構を使用しない。</li>
-     *
-     * @param message 送信メッセージ
-     * @param messageKey メッセージを一意に特定するためのキー情報
-     */
-    protected void emitWithNoAnchor(List<Object> message, Object messageKey)
-    {
-        // メッセージを分割した場合に対応するため、KeyHistoryを複製して用いている。
-        KeyHistory newHistory = this.executingKeyHistory.createDeepCopy();
-        newHistory.addKey(messageKey.toString());
-        message.add(0, newHistory);
-        getCollector().emit(message);
-    }
-
-    /**
-     * 親メッセージ、MessageKey(キー情報履歴として出力する値)を指定してTupleのemitを行う。<br>
-     * 下記の条件の時に用いること。
-     * <ol>
-     * <li>本クラスの提供するキー情報履歴を使用する。</li>
-     * <li>Stormのメッセージ処理失敗検知機構を使用しており、かつ下流のBoltでTupleの処理に失敗した場合Spoutから取得したTupleを失敗と扱う。</li>
+     * <li>Use this class's key history function.</li>
+     * <li>Use storm's fault detect function.</li>
      * </ol>
      *
-     * @param anchor 親メッセージ
-     * @param message 送信メッセージ
-     * @param messageKey メッセージを一意に特定するためのキー情報
+     * @param message sending message
+     * @param messageKey MessageKey(Use key history's value)
+     * @param groupingKey grouping key
      */
-    protected void emit(Tuple anchor, List<Object> message, Object messageKey)
+    protected void emitWithGrouping(StreamMessage message, Object messageKey, String groupingKey)
     {
-        // メッセージを分割した場合に対応するため、KeyHistoryを複製して用いている。
-        KeyHistory newHistory = this.executingKeyHistory.createDeepCopy();
-        newHistory.addKey(messageKey.toString());
-        message.add(0, newHistory);
-        getCollector().emit(anchor, message);
+        KeyHistory newHistory = null;
+        if (this.recordHistory)
+        {
+            newHistory = createKeyRecorededHistory(this.executingKeyHistory, messageKey);
+        }
+        else
+        {
+            newHistory = createKeyRecorededHistory(this.executingKeyHistory);
+        }
+
+        message.getHeader().setHistory(newHistory);
+
+        getCollector().emit(this.getExecutingTuple(), new Values(groupingKey, message));
     }
 
     /**
-     * 対象の親メッセージに対してackを返す。
+     * Use anchor function(child message failed. notify fail to parent message.), MessageKey(Use key history's value).<br>
+     * Send message to downstream component with streamId.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Use this class's key history function.</li>
+     * <li>Use storm's fault detect function.</li>
+     * </ol>
      *
-     * @param tuple 親メッセージ
+     * @param message sending message
+     * @param messageKey MessageKey(Use key history's value)
+     * @param streamId streamId
      */
-    protected void ack(Tuple tuple)
+    protected void emitWithStream(StreamMessage message, Object messageKey, String streamId)
     {
-        this.isResponsed = true;
-        getCollector().ack(tuple);
+        KeyHistory newHistory = null;
+        if (this.recordHistory)
+        {
+            newHistory = createKeyRecorededHistory(this.executingKeyHistory, messageKey);
+        }
+        else
+        {
+            newHistory = createKeyRecorededHistory(this.executingKeyHistory);
+        }
+
+        message.getHeader().setHistory(newHistory);
+
+        getCollector().emit(streamId, this.getExecutingTuple(), new Values("", message));
     }
 
     /**
-     * 対象の親メッセージに対してfailを返す。
+     * Use anchor function(child message failed. notify fail to parent message.), MessageKey(Use key history's value).<br>
+     * Send message to downstream component with grouping key and streamId.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Use this class's key history function.</li>
+     * <li>Use storm's fault detect function.</li>
+     * </ol>
      *
-     * @param tuple 親メッセージ
+     * @param message sending message
+     * @param messageKey MessageKey(Use key history's value)
+     * @param groupingKey grouping key
+     * @param streamId streamId
      */
-    protected void fail(Tuple tuple)
+    protected void emitWithGroupingStream(StreamMessage message, Object messageKey,
+            String groupingKey, String streamId)
     {
-        this.isResponsed = true;
-        getCollector().fail(tuple);
+        KeyHistory newHistory = null;
+        if (this.recordHistory)
+        {
+            newHistory = createKeyRecorededHistory(this.executingKeyHistory, messageKey);
+        }
+        else
+        {
+            newHistory = createKeyRecorededHistory(this.executingKeyHistory);
+        }
+
+        message.getHeader().setHistory(newHistory);
+
+        getCollector().emit(streamId, this.getExecutingTuple(), new Values(groupingKey, message));
+    }
+
+    /**
+     * Not use this class's key history function, and not use anchor function(child message failed. notify fail to parent message.).<br>
+     * Send message to downstream component.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Not use this class's key history function.</li>
+     * <li>Not use storm's fault detect function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     */
+    protected void emitWithNoAnchorKey(StreamMessage message)
+    {
+        getCollector().emit(new Values("", message));
+    }
+
+    /**
+     * Not use this class's key history function, and not use anchor function(child message failed. notify fail to parent message.).<br>
+     * Send message to downstream component with grouping key.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Not use this class's key history function.</li>
+     * <li>Not use storm's fault detect function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param groupingKey grouping key
+     */
+    protected void emitWithNoAnchorKeyAndGrouping(StreamMessage message, String groupingKey)
+    {
+        getCollector().emit(new Values(groupingKey, message));
+    }
+
+    /**
+     * Not use this class's key history function, and not use anchor function(child message failed. notify fail to parent message.).<br>
+     * Send message to downstream component with streamId.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Not use this class's key history function.</li>
+     * <li>Not use storm's fault detect function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param streamId streamId
+     */
+    protected void emitWithNoAnchorKeyAndStream(StreamMessage message, String streamId)
+    {
+        getCollector().emit(streamId, new Values("", message));
+    }
+
+    /**
+     * Not use this class's key history function, and not use anchor function(child message failed. notify fail to parent message.).<br>
+     * Send message to downstream component with grouping key.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Not use this class's key history function.</li>
+     * <li>Not use storm's fault detect function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param groupingKey grouping key
+     * @param streamId streamId
+     */
+    protected void emitWithNoAnchorKeyAndGroupingStream(StreamMessage message, String groupingKey,
+            String streamId)
+    {
+        getCollector().emit(streamId, new Values(groupingKey, message));
+    }
+
+    /**
+     * Use this class's key history function, and not use anchor function(child message failed. notify fail to parent message.).<br>
+     * Send message to downstream component.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Use this class's key history function.</li>
+     * <li>Not use storm's fault detect function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param messageKey MessageKey(Use key history's value)
+     */
+    protected void emitWithOnlyKey(StreamMessage message, Object messageKey)
+    {
+        KeyHistory newHistory = null;
+        if (this.recordHistory)
+        {
+            newHistory = createKeyRecorededHistory(this.executingKeyHistory, messageKey);
+        }
+        else
+        {
+            newHistory = createKeyRecorededHistory(this.executingKeyHistory);
+        }
+
+        message.getHeader().setHistory(newHistory);
+
+        getCollector().emit(new Values("", message));
+    }
+
+    /**
+     * Use this class's key history function, and not use anchor function(child message failed. notify fail to parent message.).<br>
+     * Send message to downstream component with grouping key.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Use this class's key history function.</li>
+     * <li>Not use storm's fault detect function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param messageKey MessageKey(Use key history's value)
+     * @param groupingKey grouping key
+     */
+    protected void emitWithOnlyKeyAndGrouping(StreamMessage message, Object messageKey,
+            String groupingKey)
+    {
+        KeyHistory newHistory = null;
+        if (this.recordHistory)
+        {
+            newHistory = createKeyRecorededHistory(this.executingKeyHistory, messageKey);
+        }
+        else
+        {
+            newHistory = createKeyRecorededHistory(this.executingKeyHistory);
+        }
+
+        message.getHeader().setHistory(newHistory);
+
+        getCollector().emit(new Values(groupingKey, message));
+    }
+
+    /**
+     * Use this class's key history function, and not use anchor function(child message failed. notify fail to parent message.).<br>
+     * Send message to downstream component with streamId.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Use this class's key history function.</li>
+     * <li>Not use storm's fault detect function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param messageKey MessageKey(Use key history's value)
+     * @param streamId streamId
+     */
+    protected void emitWithOnlyKeyAndStream(StreamMessage message, Object messageKey,
+            String streamId)
+    {
+        KeyHistory newHistory = null;
+        if (this.recordHistory)
+        {
+            newHistory = createKeyRecorededHistory(this.executingKeyHistory, messageKey);
+        }
+        else
+        {
+            newHistory = createKeyRecorededHistory(this.executingKeyHistory);
+        }
+
+        message.getHeader().setHistory(newHistory);
+
+        getCollector().emit(streamId, new Values("", message));
+    }
+
+    /**
+     * Use this class's key history function, and not use anchor function(child message failed. notify fail to parent message.).<br>
+     * Send message to downstream component with grouping key and streamId.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Use this class's key history function.</li>
+     * <li>Not use storm's fault detect function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param messageKey MessageKey(Use key history's value)
+     * @param groupingKey grouping key
+     * @param streamId streamId
+     */
+    protected void emitWithOnlyKeyAndGroupingStream(StreamMessage message, Object messageKey,
+            String groupingKey, String streamId)
+    {
+        KeyHistory newHistory = null;
+        if (this.recordHistory)
+        {
+            newHistory = createKeyRecorededHistory(this.executingKeyHistory, messageKey);
+        }
+        else
+        {
+            newHistory = createKeyRecorededHistory(this.executingKeyHistory);
+        }
+
+        message.getHeader().setHistory(newHistory);
+
+        getCollector().emit(streamId, new Values(groupingKey, message));
+    }
+
+    /**
+     * Use anchor function(child message failed. notify fail to parent message.), and not use this class's key history function.<br>
+     * Send message to downstream component.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Not use this class's key history function.</li>
+     * <li>Use storm's fault detect function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     */
+    protected void emitWithOnlyAnchor(StreamMessage message)
+    {
+        getCollector().emit(this.getExecutingTuple(), new Values("", message));
+    }
+
+    /**
+     * Use anchor function(child message failed. notify fail to parent message.), and not use this class's key history function.<br>
+     * Send message to downstream component with grouping key.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Not use this class's key history function.</li>
+     * <li>Use storm's fault detect function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param groupingKey grouping key
+     */
+    protected void emitWithOnlyAnchorAndGrouping(StreamMessage message, String groupingKey)
+    {
+        getCollector().emit(this.getExecutingTuple(), new Values(groupingKey, message));
+    }
+
+    /**
+     * Use anchor function(child message failed. notify fail to parent message.), and not use this class's key history function.<br>
+     * Send message to downstream component with streamId.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Not use this class's key history function.</li>
+     * <li>Use storm's fault detect function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param streamId streamId
+     */
+    protected void emitWithOnlyAnchorAndStream(StreamMessage message, String streamId)
+    {
+        getCollector().emit(streamId, this.getExecutingTuple(), new Values("", message));
+    }
+
+    /**
+     * Use anchor function(child message failed. notify fail to parent message.), and not use this class's key history function.<br>
+     * Send message to downstream component with grouping key.<br>
+     * Use following situation.
+     * <ol>
+     * <li>Not use this class's key history function.</li>
+     * <li>Use storm's fault detect function.</li>
+     * </ol>
+     *
+     * @param message sending message
+     * @param groupingKey grouping key
+     * @param streamId streamId
+     */
+    protected void emitWithOnlyAnchorAndGroupingStream(StreamMessage message, String groupingKey,
+            String streamId)
+    {
+        getCollector().emit(streamId, this.getExecutingTuple(), new Values(groupingKey, message));
     }
 }

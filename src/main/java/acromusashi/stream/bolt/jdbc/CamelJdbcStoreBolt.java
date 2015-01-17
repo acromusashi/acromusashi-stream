@@ -12,7 +12,7 @@
 */
 package acromusashi.stream.bolt.jdbc;
 
-import java.util.ArrayList;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -21,18 +21,22 @@ import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import acromusashi.stream.bolt.MessageBolt;
+import acromusashi.stream.bolt.AmConfigurationBolt;
 import acromusashi.stream.camel.CamelInitializer;
+import acromusashi.stream.converter.AbstractMessageConverter;
 import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.exception.ConvertFailException;
 import acromusashi.stream.exception.InitFailException;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+
+import com.google.common.collect.Lists;
 
 /**
  * Camel-SQL Componentを利用して、受信したMessageをDBに保存するBolt。<br/>
  * 指定したテーブルに対して下記の順にカラムにマッピングさせ、データを投入する。<br/>
- * 
+ *
  * <ol>
  * <li>Message:HeaderのMessageId</li>
  * <li>Message:Headerのtimestamp</li>
@@ -40,10 +44,10 @@ import backtype.storm.task.TopologyContext;
  * <li>Message:Body1要素目</li>
  * <li>Message:Body2要素目....(以後、Bodyの要素がなくなるまで追加)</li>
  * </ol>
- * 
+ *
  * @author tsukano
  */
-public class CamelJdbcStoreBolt extends MessageBolt
+public class CamelJdbcStoreBolt extends AmConfigurationBolt
 {
     /** serialVersionUID */
     private static final long          serialVersionUID = -668373233969623288L;
@@ -56,6 +60,9 @@ public class CamelJdbcStoreBolt extends MessageBolt
 
     /** ApplicationContextのファイルパス。デフォルト値は"camel-context_jdbc.xml" */
     private String                     contextUri       = "camel-context_jdbc.xml";
+
+    /** メッセージからレコードを生成するコンバータクラス */
+    protected AbstractMessageConverter converter;
 
     /** Camelにオブジェクトを送信するクラス */
     private transient ProducerTemplate producerTemplate;
@@ -85,19 +92,30 @@ public class CamelJdbcStoreBolt extends MessageBolt
 
     /**
      * Message受信時の処理を行う
-     * 
+     *
      * @param message 受信Message
-     * @throws ConvertFailException 変換失敗時
      */
     @Override
     @SuppressWarnings("unchecked")
-    public void onMessage(StreamMessage message) throws ConvertFailException
+    public void onMessage(StreamMessage message)
     {
         String endopointUri = getEndpointUri();
 
-        Map<String, Object> resultMap = this.converter.toMap(message);
+        Map<String, Object> resultMap = null;
 
-        List<Object> valueList = new ArrayList<Object>();
+        try
+        {
+            resultMap = this.converter.toMap(message);
+        }
+        catch (ConvertFailException ex)
+        {
+            String logFormat = "Fail convert to jdbc record. Dispose received message. : Message={0}";
+            logger.warn(MessageFormat.format(logFormat, message), ex);
+            ack();
+            return;
+        }
+
+        List<Object> valueList = Lists.newArrayList();
 
         valueList.add(resultMap.get("messageId"));
         valueList.add(resultMap.get("timestamp"));
@@ -108,6 +126,16 @@ public class CamelJdbcStoreBolt extends MessageBolt
         valueList.addAll(bodyList);
 
         insert(endopointUri, valueList);
+        ack();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void declareOutputFields(OutputFieldsDeclarer declarer)
+    {
+        // This class not has downstream component.
     }
 
     /**
@@ -143,11 +171,19 @@ public class CamelJdbcStoreBolt extends MessageBolt
 
     /**
      * endpointUriを設定する。
-     * 
+     *
      * @param endpointUri endpointUri
      */
     public void setEndpointUri(String endpointUri)
     {
         this.endpointUri = endpointUri;
+    }
+
+    /**
+     * @param converter セットする converter
+     */
+    public void setConverter(AbstractMessageConverter converter)
+    {
+        this.converter = converter;
     }
 }

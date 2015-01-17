@@ -43,7 +43,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
 /**
- * KeyTraceBaseBoltクラスのテストクラス<br>
+ * AmBaseBoltクラスのテストクラス<br>
  * モッククラスを用いて検証を行う。
  *
  * @author kimura
@@ -73,7 +73,7 @@ public class AmBaseBoltTest
     @Before
     public void setUp()
     {
-        this.target = new MockAmBaseBolt();
+        this.target = new BlankAmBaseBolt();
     }
 
     /**

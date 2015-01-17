@@ -12,6 +12,7 @@
 */
 package acromusashi.stream.bolt.hbase;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -22,13 +23,15 @@ import org.apache.camel.component.hbase.model.HBaseRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import acromusashi.stream.bolt.MessageBolt;
+import acromusashi.stream.bolt.AmConfigurationBolt;
 import acromusashi.stream.camel.CamelInitializer;
+import acromusashi.stream.converter.AbstractMessageConverter;
 import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.exception.ConvertFailException;
 import acromusashi.stream.exception.InitFailException;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
 
 /**
  * Camel-HBase Componentを利用して、受信したMessageをHBaseに保存するBolt。<br/>
@@ -36,10 +39,10 @@ import backtype.storm.task.TopologyContext;
  * <br/>
  * <li>rowId = Message:HeaderのTimeStamp + "_" + Message:HeaderのSource</li>
  * <li>Message:Bodyの内容をリスト化し、変数cellDefineListの値に併せてFamily/Quantifierを設定</li>
- * 
+ *
  * @author otoda
  */
-public class CamelHbaseStoreBolt extends MessageBolt
+public class CamelHbaseStoreBolt extends AmConfigurationBolt
 {
     /** serialVersionUID */
     private static final long          serialVersionUID = -668373233969623288L;
@@ -59,12 +62,18 @@ public class CamelHbaseStoreBolt extends MessageBolt
     /** Camelにオブジェクトを送信するクラス */
     private transient ProducerTemplate producerTemplate;
 
+    /** メッセージからレコードを生成するコンバータクラス */
+    protected AbstractMessageConverter converter;
+
     /**
      * パラメータを指定せずにインスタンスを生成する。
      */
     public CamelHbaseStoreBolt()
     {}
 
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("rawtypes")
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector)
@@ -83,11 +92,26 @@ public class CamelHbaseStoreBolt extends MessageBolt
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("unchecked")
     @Override
-    public void onMessage(StreamMessage message) throws ConvertFailException
+    public void onMessage(StreamMessage message)
     {
-        Map<String, Object> values = this.converter.toMap(message);
+        Map<String, Object> values = null;
+
+        try
+        {
+            values = this.converter.toMap(message);
+        }
+        catch (ConvertFailException ex)
+        {
+            String logFormat = "Fail convert to hbase record. Dispose received message. : Message={0}";
+            logger.warn(MessageFormat.format(logFormat, message), ex);
+            ack();
+            return;
+        }
 
         // rowidを設定する。
         HBaseData data = new HBaseData();
@@ -108,13 +132,23 @@ public class CamelHbaseStoreBolt extends MessageBolt
         }
 
         data.getRows().add(row);
-
         insert(data);
+
+        ack();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void declareOutputFields(OutputFieldsDeclarer declarer)
+    {
+        // This class not has downstream component.
     }
 
     /**
      * endpointUriを指定して、DBにinsertを行う。
-     * 
+     *
      * @param values
      *            PreparedStatementに設定する値
      */
@@ -128,7 +162,7 @@ public class CamelHbaseStoreBolt extends MessageBolt
      * {@link #prepare(Map, TopologyContext, OutputCollector)}が呼び出されるより前に呼び出すこと。
      * したがって、Topologyをsubmitするより前に呼び出すこと。 ApplicationContextUriに指定したファイルは
      * {@link #prepare(Map, TopologyContext, OutputCollector)}で読み込む。
-     * 
+     *
      * @param applicationContextUri
      *            ApplicationContextUri
      */
@@ -145,4 +179,11 @@ public class CamelHbaseStoreBolt extends MessageBolt
         this.cellDefineList = cellDefineList;
     }
 
+    /**
+     * @param converter セットする converter
+     */
+    public void setConverter(AbstractMessageConverter converter)
+    {
+        this.converter = converter;
+    }
 }
