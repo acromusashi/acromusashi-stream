@@ -14,14 +14,14 @@ package acromusashi.stream.bolt;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.spy;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -32,10 +32,10 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import acromusashi.stream.entity.StreamMessage;
-import acromusashi.stream.trace.KeyHistory;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -216,10 +216,10 @@ public class AmBaseBoltTest
     /**
      * Anchor、Keyを指定していない状態でemitメソッド呼び出し確認を行う。
      *
-     * @target {@link AmBaseBolt#emitWithNoAnchorKey(java.util.List)}
-     * @test Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していることを確認する。
-     *    condition:: KeyTraceBaseBolt#emitメソッド実行
-     *    result:: Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していること
+     * @target {@link AmBaseBolt#emitWithNoAnchorKey(StreamMessage)}
+     * @test 送信メッセージのKeyHistoryが空であることを確認
+     *    condition:: Anchor、Keyを指定していない状態でメッセージ送信
+     *    result:: 送信メッセージのKeyHistoryが空であること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
@@ -230,19 +230,12 @@ public class AmBaseBoltTest
 
         AmBaseBolt testTarget = spy(this.target);
         Mockito.doNothing().when(testTarget).clearExecuteStatus();
-        Tuple tuple = Mockito.mock(Tuple.class);
-        KeyHistory history = new KeyHistory();
-        Mockito.doReturn(history).when(tuple).getValueByField(anyString());
-        testTarget.execute(tuple);
 
-        List<Object> objectList = new ArrayList<Object>();
-        Object param1 = new Object();
-        Object param2 = new Object();
-        objectList.add(param1);
-        objectList.add(param2);
+        StreamMessage message = new StreamMessage();
+        message.addField("Param1", "Param1");
 
         // 実施
-        // testTarget.emitWithNoAnchorKey(objectList);
+        testTarget.emitWithNoAnchorKey(message);
 
         // 検証
         ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
@@ -250,20 +243,24 @@ public class AmBaseBoltTest
 
         List<Object> argList = argument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
-        assertThat(argList.get(0), instanceOf(KeyHistory.class));
-        assertThat(argList.get(0).toString(), equalTo("KeyHistory=[]"));
-        assertThat(argList.get(1), sameInstance(param1));
-        assertThat(argList.get(2), sameInstance(param2));
+        assertThat(argList.size(), equalTo(2));
+        assertThat(argList.get(0).toString(), equalTo(""));
+
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+
+        assertThat(sendMessage.getField("Param1").toString(), equalTo("Param1"));
+        assertThat(sendMessage.getHeader().getHistory(), nullValue());
     }
 
     /**
      * Keyを指定した状態でemitメソッド呼び出し確認を行う。
      *
-     * @target {@link AmBaseBolt#emitWithNoAnchor(List, Object)}
-     * @test Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していることを確認する。
-     *    condition:: KeyTraceBaseBolt#emitメソッド実行
-     *    result:: Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していること
+     * @target {@link AmBaseBolt#emitWithOnlyKey(StreamMessage, Object)}
+     * @test 送信メッセージのKeyHistoryに指定したKey情報が追加されていること
+     *    condition::  Keyを指定した状態でメッセージ送信
+     *    result:: 送信メッセージのKeyHistoryに指定したKey情報が追加されていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
@@ -274,19 +271,12 @@ public class AmBaseBoltTest
 
         AmBaseBolt testTarget = spy(this.target);
         Mockito.doNothing().when(testTarget).clearExecuteStatus();
-        Tuple tuple = Mockito.mock(Tuple.class);
-        KeyHistory history = new KeyHistory();
-        Mockito.doReturn(history).when(tuple).getValueByField(anyString());
-        testTarget.execute(tuple);
 
-        List<Object> objectList = new ArrayList<Object>();
-        Object param1 = new Object();
-        Object param2 = new Object();
-        objectList.add(param1);
-        objectList.add(param2);
+        StreamMessage message = new StreamMessage();
+        message.addField("Param1", "Param1");
 
         // 実施
-        // testTarget.emitWithNoAnchor(objectList, "MessageKey");
+        testTarget.emitWithOnlyKey(message, "MessageKey");
 
         // 検証
         ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
@@ -294,20 +284,25 @@ public class AmBaseBoltTest
 
         List<Object> argList = argument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
-        assertThat(argList.get(0), instanceOf(KeyHistory.class));
-        assertThat(argList.get(0).toString(), equalTo("KeyHistory=[MessageKey]"));
-        assertThat(argList.get(1), sameInstance(param1));
-        assertThat(argList.get(2), sameInstance(param2));
+        assertThat(argList.size(), equalTo(2));
+        assertThat(argList.get(0).toString(), equalTo(""));
+
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+
+        assertThat(sendMessage.getField("Param1").toString(), equalTo("Param1"));
+        assertThat(sendMessage.getHeader().getHistory().toString(),
+                equalTo("KeyHistory=[MessageKey]"));
     }
 
     /**
-     * Anchorを指定した状態でemitメソッド呼び出し確認を行う。
+     * Anchorを指定した状態でのメッセージ送信確認を行う。
      *
-     * @target {@link AmBaseBolt#emitWithNoKey(Tuple, List)}
-     * @test Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していることを確認する。
-     *    condition:: KeyTraceBaseBolt#emitメソッド実行
-     *    result:: Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していること
+     * @target {@link AmBaseBolt#emitWithOnlyAnchor(StreamMessage)}
+     * @test 送信メッセージのKeyHistoryが空であることを確認
+     *    condition:: Anchorを指定した状態でメッセージ送信
+     *    result:: 送信メッセージのKeyHistoryが空であること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
@@ -315,47 +310,42 @@ public class AmBaseBoltTest
     {
         // 準備
         this.target.prepare(this.mockConfMap, this.mockContext, this.mockCollector);
+        Tuple mockTuple = Mockito.mock(Tuple.class);
+        Whitebox.setInternalState(this.target, "executingTuple", mockTuple);
 
         AmBaseBolt testTarget = spy(this.target);
         Mockito.doNothing().when(testTarget).clearExecuteStatus();
-        Tuple tuple = Mockito.mock(Tuple.class);
-        Tuple anchor = Mockito.mock(Tuple.class);
-        KeyHistory history = new KeyHistory();
-        Mockito.doReturn(history).when(tuple).getValueByField(anyString());
-        testTarget.execute(tuple);
 
-        List<Object> objectList = new ArrayList<Object>();
-        Object param1 = new Object();
-        Object param2 = new Object();
-        objectList.add(param1);
-        objectList.add(param2);
+        StreamMessage message = new StreamMessage();
+        message.addField("Param1", "Param1");
 
         // 実施
-        // testTarget.emitWithNoKey(anchor, objectList);
+        testTarget.emitWithOnlyAnchor(message);
 
         // 検証
         ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
-        ArgumentCaptor<Tuple> anchorArgument = ArgumentCaptor.forClass(Tuple.class);
-        Mockito.verify(this.mockCollector).emit(anchorArgument.capture(), argument.capture());
+        Mockito.verify(this.mockCollector).emit(eq(mockTuple), argument.capture());
 
         List<Object> argList = argument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
-        assertThat(argList.get(0), instanceOf(KeyHistory.class));
-        assertThat(argList.get(0).toString(), equalTo("KeyHistory=[]"));
-        assertThat(argList.get(1), sameInstance(param1));
-        assertThat(argList.get(2), sameInstance(param2));
+        assertThat(argList.size(), equalTo(2));
+        assertThat(argList.get(0).toString(), equalTo(""));
 
-        assertThat(anchorArgument.getValue(), sameInstance(anchor));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+
+        assertThat(sendMessage.getField("Param1").toString(), equalTo("Param1"));
+        assertThat(sendMessage.getHeader().getHistory(), nullValue());
     }
 
     /**
-     * Anchor、MessageKeyを指定した状態でemitメソッド呼び出し確認を行う。
+     * Anchor、MessageKeyを指定した状態でメッセージ送信確認を行う。
      *
-     * @target {@link AmBaseBolt#emit(Tuple, List, Object)}
-     * @test Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していることを確認する。
-     *    condition:: KeyTraceBaseBolt#emitメソッド実行
-     *    result:: Tuple中のKeyHistoryをTupleの頭に追加してCollectorを呼び出していること
+     * @target {@link AmBaseBolt#emit(StreamMessage, Object)}
+     * @test 送信メッセージのKeyHistoryに指定したKey情報が追加されていること
+     *    condition:: Anchor、MessageKeyを指定した状態でメッセージ送信
+     *    result:: 送信メッセージのKeyHistoryに指定したKey情報が追加されていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
@@ -363,37 +353,33 @@ public class AmBaseBoltTest
     {
         // 準備
         this.target.prepare(this.mockConfMap, this.mockContext, this.mockCollector);
+        Tuple mockTuple = Mockito.mock(Tuple.class);
+        Whitebox.setInternalState(this.target, "executingTuple", mockTuple);
 
         AmBaseBolt testTarget = spy(this.target);
         Mockito.doNothing().when(testTarget).clearExecuteStatus();
-        Tuple tuple = Mockito.mock(Tuple.class);
-        Tuple anchor = Mockito.mock(Tuple.class);
-        KeyHistory history = new KeyHistory();
-        Mockito.doReturn(history).when(tuple).getValueByField(anyString());
-        testTarget.execute(tuple);
 
-        List<Object> objectList = new ArrayList<Object>();
-        Object param1 = new Object();
-        Object param2 = new Object();
-        objectList.add(param1);
-        objectList.add(param2);
+        StreamMessage message = new StreamMessage();
+        message.addField("Param1", "Param1");
 
         // 実施
-        // testTarget.emit(anchor, objectList, "MessageKey");
+        testTarget.emit(message, "MessageKey");
 
         // 検証
         ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
-        ArgumentCaptor<Tuple> anchorArgument = ArgumentCaptor.forClass(Tuple.class);
-        Mockito.verify(this.mockCollector).emit(anchorArgument.capture(), argument.capture());
+        Mockito.verify(this.mockCollector).emit(eq(mockTuple), argument.capture());
 
         List<Object> argList = argument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
-        assertThat(argList.get(0), instanceOf(KeyHistory.class));
-        assertThat(argList.get(0).toString(), equalTo("KeyHistory=[MessageKey]"));
-        assertThat(argList.get(1), sameInstance(param1));
-        assertThat(argList.get(2), sameInstance(param2));
+        assertThat(argList.size(), equalTo(2));
+        assertThat(argList.get(0).toString(), equalTo(""));
 
-        assertThat(anchorArgument.getValue(), sameInstance(anchor));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+
+        assertThat(sendMessage.getField("Param1").toString(), equalTo("Param1"));
+        assertThat(sendMessage.getHeader().getHistory().toString(),
+                equalTo("KeyHistory=[MessageKey]"));
     }
 }

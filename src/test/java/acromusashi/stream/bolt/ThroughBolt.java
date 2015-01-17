@@ -14,21 +14,28 @@ package acromusashi.stream.bolt;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
 /**
  * 受信したTupleに対して指定したフィールドを抽出して下流に流すStorm-UnitTest用Bolt<br>
  */
-public class ThroughBolt extends AmConfigurationBolt
+public class ThroughBolt extends BaseRichBolt
 {
     /** serialVersionUID */
-    private static final long serialVersionUID = 1668791100773315754L;
+    private static final long         serialVersionUID = 1668791100773315754L;
 
     /** 下流に転送するフィールドリスト */
-    private List<String>      fields;
+    private List<String>              fields;
+
+    /** Output Collector */
+    private transient OutputCollector collector;
 
     /**
      * パラメータを指定せずにインスタンスを生成する。
@@ -38,6 +45,19 @@ public class ThroughBolt extends AmConfigurationBolt
         // Do nothing.
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("rawtypes")
+    @Override
+    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector)
+    {
+        this.collector = collector;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void execute(Tuple input)
     {
@@ -50,8 +70,8 @@ public class ThroughBolt extends AmConfigurationBolt
             tuple.add(targetValue);
         }
 
-        getCollector().emit(tuple);
-        getCollector().ack(input);
+        this.collector.emit(tuple);
+        this.collector.ack(input);
     }
 
     /**
@@ -70,4 +90,5 @@ public class ThroughBolt extends AmConfigurationBolt
     {
         declarer.declare(new Fields(this.fields.toArray(new String[0])));
     }
+
 }

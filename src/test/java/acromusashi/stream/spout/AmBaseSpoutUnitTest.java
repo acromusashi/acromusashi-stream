@@ -148,7 +148,7 @@ public class AmBaseSpoutUnitTest
             // 検証
             List resultList = Testing.readTuples(result, "ThroughBolt");
 
-            // ThroughBoltでは「messageKey」「keyHistory」「messageValue」フィールドを下流に転送しているため、
+            // ThroughBoltでは「messageKey」「messageValue」フィールドを下流に転送しているため、
             // ThroughBoltが送付するフィールドに値が入っていればAmBaseSpout>ThroughBoltに送付されたことが確認できる。
             assertEquals(resultList.size(), 1);
 
