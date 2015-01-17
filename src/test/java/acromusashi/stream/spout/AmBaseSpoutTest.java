@@ -122,16 +122,52 @@ public class AmBaseSpoutTest
     }
 
     /**
-     * Emitメソッド呼び出し時（KeyId指定）の引数確認を行う。
+     * Emitメソッド呼び出し時（KeyId個別指定）の引数確認を行う。
      *
-     * @target {@link AmBaseSpout#emit(StreamMessage, Object)}
+     * @target {@link AmBaseSpout#emit(StreamMessage, Object, Object)}
      * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
-     *    condition:: MessageKey、MessageIdを指定してTupleのemitを行う。<br>
+     *    condition:: MessageKey、MessageIdを個別指定してTupleのemitを行う。<br>
      *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
-    public void testEmit_KeyId指定()
+    public void testEmit_KeyId個別指定()
+    {
+        // 準備
+        this.target.open(this.mockConfMap, this.mockContext, this.mockCollector);
+
+        StreamMessage message = new StreamMessage();
+        message.addField("Param1", "Param1");
+
+        // 実施
+        this.target.emit(message, "MessageKey", "MessageId");
+
+        // 検証
+        ArgumentCaptor<List> tupleArgument = ArgumentCaptor.forClass(List.class);
+        Mockito.verify(this.mockCollector).emit(tupleArgument.capture(), eq("MessageId"));
+
+        List<Object> argList = tupleArgument.getValue();
+
+        assertThat(argList.size(), equalTo(2));
+        assertThat(argList.get(0).toString(), equalTo(""));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory().toString(),
+                equalTo("KeyHistory=[MessageKey]"));
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
+    }
+
+    /**
+     * Emitメソッド呼び出し時（KeyId個別指定）の引数確認を行う。
+     *
+     * @target {@link AmBaseSpout#emit(StreamMessage, Object, Object)}
+     * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
+     *    condition:: MessageKey、MessageIdを個別指定してTupleのemitを行う。<br>
+     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Test
+    public void testEmit_KeyId個別指定_NoRecord()
     {
         // 準備
         this.target.open(this.mockConfMap, this.mockContext, this.mockCollector);
@@ -141,16 +177,15 @@ public class AmBaseSpoutTest
         message.addField("Param1", "Param1");
 
         // 実施
-        this.target.emit(message, "MessageKeyId");
+        this.target.emit(message, "MessageKey", "MessageId");
 
         // 検証
         ArgumentCaptor<List> tupleArgument = ArgumentCaptor.forClass(List.class);
-        Mockito.verify(this.mockCollector).emit(tupleArgument.capture(), eq("MessageKeyId"));
+        Mockito.verify(this.mockCollector).emit(tupleArgument.capture(), eq("MessageId"));
 
         List<Object> argList = tupleArgument.getValue();
 
         assertThat(argList.size(), equalTo(2));
-
         assertThat(argList.get(0).toString(), equalTo(""));
         assertThat(argList.get(1), instanceOf(StreamMessage.class));
         StreamMessage sendMessage = (StreamMessage) argList.get(1);
@@ -159,53 +194,16 @@ public class AmBaseSpoutTest
     }
 
     /**
-     * Emitメソッド呼び出し時（KeyId指定、履歴記録オフ）の引数確認を行う。
+     * Emitメソッド呼び出し時（KeyId個別指定、GroupingKey指定）の引数確認を行う。
      *
-     * @target {@link AmBaseSpout#emit(StreamMessage, Object)}
-     * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
-     *    condition:: MessageKey、MessageIdを指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
-     */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    @Test
-    public void testEmit_KeyId指定_履歴記録オフ()
-    {
-        // 準備
-        this.target.open(this.mockConfMap, this.mockContext, this.mockCollector);
-
-        StreamMessage message = new StreamMessage();
-        message.addField("Param1", "Param1");
-
-        // 実施
-        this.target.emit(message, "MessageKeyId");
-
-        // 検証
-        ArgumentCaptor<List> tupleArgument = ArgumentCaptor.forClass(List.class);
-        Mockito.verify(this.mockCollector).emit(tupleArgument.capture(), eq("MessageKeyId"));
-
-        List<Object> argList = tupleArgument.getValue();
-
-        assertThat(argList.size(), equalTo(2));
-
-        assertThat(argList.get(0).toString(), equalTo(""));
-        assertThat(argList.get(1), instanceOf(StreamMessage.class));
-        StreamMessage sendMessage = (StreamMessage) argList.get(1);
-        assertThat(sendMessage.getHeader().getHistory().toString(),
-                equalTo("KeyHistory=[MessageKeyId]"));
-        assertThat((StreamMessage) argList.get(1), sameInstance(message));
-    }
-
-    /**
-     * Emitメソッド呼び出し時（KeyId指定、GroupingKey指定）の引数確認を行う。
-     *
-     * @target {@link AmBaseSpout#emitWithGrouping(StreamMessage, Object, String)}
+     * @target {@link AmBaseSpout#emitWithGrouping(StreamMessage, Object, Object, String)}
      * @test collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること。<br>
-     *    condition:: MessageKey、MessageId、GroupingKeyを指定してTupleのemitを行う。<br>
+     *    condition:: MessageKey、MessageIdを個別指定してTupleのemitを行う。<br>
      *    result:: collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
-    public void testEmit_KeyId指定_Grouping()
+    public void testEmit_KeyId個別指定_Grouping()
     {
         // 準備
         this.target.open(this.mockConfMap, this.mockContext, this.mockCollector);
@@ -214,35 +212,34 @@ public class AmBaseSpoutTest
         message.addField("Param1", "Param1");
 
         // 実施
-        this.target.emitWithGrouping(message, "MessageKeyId", "GroupingKey");
+        this.target.emitWithGrouping(message, "MessageKey", "MessageId", "GroupingKey");
 
         // 検証
         ArgumentCaptor<List> tupleArgument = ArgumentCaptor.forClass(List.class);
-        Mockito.verify(this.mockCollector).emit(tupleArgument.capture(), eq("MessageKeyId"));
+        Mockito.verify(this.mockCollector).emit(tupleArgument.capture(), eq("MessageId"));
 
         List<Object> argList = tupleArgument.getValue();
 
         assertThat(argList.size(), equalTo(2));
-
         assertThat(argList.get(0).toString(), equalTo("GroupingKey"));
         assertThat(argList.get(1), instanceOf(StreamMessage.class));
         StreamMessage sendMessage = (StreamMessage) argList.get(1);
         assertThat(sendMessage.getHeader().getHistory().toString(),
-                equalTo("KeyHistory=[MessageKeyId]"));
+                equalTo("KeyHistory=[MessageKey]"));
         assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
     /**
-     * Emitメソッド呼び出し時（KeyId指定、StreamId指定）の引数確認を行う。
+     * Emitメソッド呼び出し時（KeyId個別指定、StreamId指定）の引数確認を行う。
      *
-     * @target {@link AmBaseSpout#emitWithStream(StreamMessage, Object, String)}
+     * @target {@link AmBaseSpout#emitWithStream(StreamMessage, Object, Object, String)}
      * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
-     *    condition:: MessageKey、MessageIdを指定してTupleのemitを行う。<br>
+     *    condition:: MessageKey、MessageIdを個別指定してTupleのemitを行う。<br>
      *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
-    public void testEmit_KeyId指定_Stream()
+    public void testEmit_KeyId個別指定_Stream()
     {
         // 準備
         this.target.open(this.mockConfMap, this.mockContext, this.mockCollector);
@@ -251,36 +248,35 @@ public class AmBaseSpoutTest
         message.addField("Param1", "Param1");
 
         // 実施
-        this.target.emitWithStream(message, "MessageKeyId", "StreamId");
+        this.target.emitWithStream(message, "MessageKey", "MessageId", "StreamId");
 
         // 検証
         ArgumentCaptor<List> tupleArgument = ArgumentCaptor.forClass(List.class);
         Mockito.verify(this.mockCollector).emit(eq("StreamId"), tupleArgument.capture(),
-                eq("MessageKeyId"));
+                eq("MessageId"));
 
         List<Object> argList = tupleArgument.getValue();
 
         assertThat(argList.size(), equalTo(2));
-
         assertThat(argList.get(0).toString(), equalTo(""));
         assertThat(argList.get(1), instanceOf(StreamMessage.class));
         StreamMessage sendMessage = (StreamMessage) argList.get(1);
         assertThat(sendMessage.getHeader().getHistory().toString(),
-                equalTo("KeyHistory=[MessageKeyId]"));
+                equalTo("KeyHistory=[MessageKey]"));
         assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
     /**
-     * Emitメソッド呼び出し時（KeyId指定、GroupingKey&StreamId指定）の引数確認を行う。
+     * Emitメソッド呼び出し時（KeyId個別指定、GroupingKey&StreamId指定）の引数確認を行う。
      *
-     * @target {@link AmBaseSpout#emitWithGroupingStream(StreamMessage, Object, String, String)}
-     * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
-     *    condition:: MessageKey、MessageIdを指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
+     * @target {@link AmBaseSpout#emitWithGroupingStream(StreamMessage, Object, Object, String, String)}
+     * @test collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること。<br>
+     *    condition:: MessageKey、MessageIdを個別指定してTupleのemitを行う。<br>
+     *    result:: collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
-    public void testEmit_KeyId指定_GroupingStream()
+    public void testEmit_KeyId個別指定_GroupingStream()
     {
         // 準備
         this.target.open(this.mockConfMap, this.mockContext, this.mockCollector);
@@ -289,22 +285,22 @@ public class AmBaseSpoutTest
         message.addField("Param1", "Param1");
 
         // 実施
-        this.target.emitWithGroupingStream(message, "MessageKeyId", "GroupingKey", "StreamId");
+        this.target.emitWithGroupingStream(message, "MessageKey", "MessageId", "GroupingKey",
+                "StreamId");
 
         // 検証
         ArgumentCaptor<List> tupleArgument = ArgumentCaptor.forClass(List.class);
         Mockito.verify(this.mockCollector).emit(eq("StreamId"), tupleArgument.capture(),
-                eq("MessageKeyId"));
+                eq("MessageId"));
 
         List<Object> argList = tupleArgument.getValue();
 
         assertThat(argList.size(), equalTo(2));
-
         assertThat(argList.get(0).toString(), equalTo("GroupingKey"));
         assertThat(argList.get(1), instanceOf(StreamMessage.class));
         StreamMessage sendMessage = (StreamMessage) argList.get(1);
         assertThat(sendMessage.getHeader().getHistory().toString(),
-                equalTo("KeyHistory=[MessageKeyId]"));
+                equalTo("KeyHistory=[MessageKey]"));
         assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
@@ -455,7 +451,7 @@ public class AmBaseSpoutTest
     /**
      * Emitメソッド呼び出し時（Key指定）の引数確認を行う。
      *
-     * @target {@link AmBaseSpout#emitWithKey(StreamMessage, Object)}
+     * @target {@link AmBaseSpout#emitWithOnlyKey(StreamMessage, Object)}
      * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
      *    condition:: MessageKeyを指定してTupleのemitを行う。<br>
      *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
@@ -471,7 +467,7 @@ public class AmBaseSpoutTest
         message.addField("Param1", "Param1");
 
         // 実施
-        this.target.emitWithKey(message, "MessageKey");
+        this.target.emitWithOnlyKey(message, "MessageKey");
 
         // 検証
         ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
@@ -492,7 +488,7 @@ public class AmBaseSpoutTest
     /**
      * Emitメソッド呼び出し時（Key指定、GroupingKey指定）の引数確認を行う。
      *
-     * @target {@link AmBaseSpout#emitWithKeyAndGrouping(StreamMessage, Object, String)}
+     * @target {@link AmBaseSpout#emitWithOnlyKeyAndGrouping(StreamMessage, Object, String)}
      * @test collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること。<br>
      *    condition:: MessageKeyを指定してTupleのemitを行う。<br>
      *    result:: collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること
@@ -508,7 +504,7 @@ public class AmBaseSpoutTest
         message.addField("Param1", "Param1");
 
         // 実施
-        this.target.emitWithKeyAndGrouping(message, "MessageKey", "GroupingKey");
+        this.target.emitWithOnlyKeyAndGrouping(message, "MessageKey", "GroupingKey");
 
         // 検証
         ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
@@ -529,7 +525,7 @@ public class AmBaseSpoutTest
     /**
      * Emitメソッド呼び出し時（Key指定、StreamId指定）の引数確認を行う。
      *
-     * @target {@link AmBaseSpout#emitWithKeyAndStream(StreamMessage, Object, String)}
+     * @target {@link AmBaseSpout#emitWithOnlyKeyAndStream(StreamMessage, Object, String)}
      * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
      *    condition:: MessageKeyを指定してTupleのemitを行う。<br>
      *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
@@ -545,7 +541,7 @@ public class AmBaseSpoutTest
         message.addField("Param1", "Param1");
 
         // 実施
-        this.target.emitWithKeyAndStream(message, "MessageKey", "StreamId");
+        this.target.emitWithOnlyKeyAndStream(message, "MessageKey", "StreamId");
 
         // 検証
         ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
@@ -566,7 +562,7 @@ public class AmBaseSpoutTest
     /**
      * Emitメソッド呼び出し時（Key指定、GroupingKey&StreamId指定）の引数確認を行う。
      *
-     * @target {@link AmBaseSpout#emitWithKeyAndGroupingStream(StreamMessage, Object, String, String)}
+     * @target {@link AmBaseSpout#emitWithOnlyKeyAndGroupingStream(StreamMessage, Object, String, String)}
      * @test collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること。<br>
      *    condition:: MessageKeyを指定してTupleのemitを行う。<br>
      *    result:: collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること
@@ -582,7 +578,8 @@ public class AmBaseSpoutTest
         message.addField("Param1", "Param1");
 
         // 実施
-        this.target.emitWithKeyAndGroupingStream(message, "MessageKey", "GroupingKey", "StreamId");
+        this.target.emitWithOnlyKeyAndGroupingStream(message, "MessageKey", "GroupingKey",
+                "StreamId");
 
         // 検証
         ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
@@ -592,153 +589,6 @@ public class AmBaseSpoutTest
 
         assertThat(argList.size(), equalTo(2));
 
-        assertThat(argList.get(0).toString(), equalTo("GroupingKey"));
-        assertThat(argList.get(1), instanceOf(StreamMessage.class));
-        StreamMessage sendMessage = (StreamMessage) argList.get(1);
-        assertThat(sendMessage.getHeader().getHistory().toString(),
-                equalTo("KeyHistory=[MessageKey]"));
-        assertThat((StreamMessage) argList.get(1), sameInstance(message));
-    }
-
-    /**
-     * Emitメソッド呼び出し時（KeyId個別指定）の引数確認を行う。
-     *
-     * @target {@link AmBaseSpout#emitWithKeyId(StreamMessage, Object, Object)}
-     * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
-     *    condition:: MessageKey、MessageIdを個別指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
-     */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    @Test
-    public void testEmit_KeyId個別指定()
-    {
-        // 準備
-        this.target.open(this.mockConfMap, this.mockContext, this.mockCollector);
-
-        StreamMessage message = new StreamMessage();
-        message.addField("Param1", "Param1");
-
-        // 実施
-        this.target.emitWithKeyId(message, "MessageKey", "MessageId");
-
-        // 検証
-        ArgumentCaptor<List> tupleArgument = ArgumentCaptor.forClass(List.class);
-        Mockito.verify(this.mockCollector).emit(tupleArgument.capture(), eq("MessageId"));
-
-        List<Object> argList = tupleArgument.getValue();
-
-        assertThat(argList.size(), equalTo(2));
-        assertThat(argList.get(0).toString(), equalTo(""));
-        assertThat(argList.get(1), instanceOf(StreamMessage.class));
-        StreamMessage sendMessage = (StreamMessage) argList.get(1);
-        assertThat(sendMessage.getHeader().getHistory().toString(),
-                equalTo("KeyHistory=[MessageKey]"));
-        assertThat((StreamMessage) argList.get(1), sameInstance(message));
-    }
-
-    /**
-     * Emitメソッド呼び出し時（KeyId個別指定、GroupingKey指定）の引数確認を行う。
-     *
-     * @target {@link AmBaseSpout#emitWithKeyIdAndGrouping(StreamMessage, Object, Object, String)}
-     * @test collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること。<br>
-     *    condition:: MessageKey、MessageIdを個別指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること
-     */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    @Test
-    public void testEmit_KeyId個別指定_Grouping()
-    {
-        // 準備
-        this.target.open(this.mockConfMap, this.mockContext, this.mockCollector);
-
-        StreamMessage message = new StreamMessage();
-        message.addField("Param1", "Param1");
-
-        // 実施
-        this.target.emitWithKeyIdAndGrouping(message, "MessageKey", "MessageId", "GroupingKey");
-
-        // 検証
-        ArgumentCaptor<List> tupleArgument = ArgumentCaptor.forClass(List.class);
-        Mockito.verify(this.mockCollector).emit(tupleArgument.capture(), eq("MessageId"));
-
-        List<Object> argList = tupleArgument.getValue();
-
-        assertThat(argList.size(), equalTo(2));
-        assertThat(argList.get(0).toString(), equalTo("GroupingKey"));
-        assertThat(argList.get(1), instanceOf(StreamMessage.class));
-        StreamMessage sendMessage = (StreamMessage) argList.get(1);
-        assertThat(sendMessage.getHeader().getHistory().toString(),
-                equalTo("KeyHistory=[MessageKey]"));
-        assertThat((StreamMessage) argList.get(1), sameInstance(message));
-    }
-
-    /**
-     * Emitメソッド呼び出し時（KeyId個別指定、StreamId指定）の引数確認を行う。
-     *
-     * @target {@link AmBaseSpout#emitWithKeyIdAndStream(StreamMessage, Object, Object, String)}
-     * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
-     *    condition:: MessageKey、MessageIdを個別指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
-     */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    @Test
-    public void testEmit_KeyId個別指定_Stream()
-    {
-        // 準備
-        this.target.open(this.mockConfMap, this.mockContext, this.mockCollector);
-
-        StreamMessage message = new StreamMessage();
-        message.addField("Param1", "Param1");
-
-        // 実施
-        this.target.emitWithKeyIdAndStream(message, "MessageKey", "MessageId", "StreamId");
-
-        // 検証
-        ArgumentCaptor<List> tupleArgument = ArgumentCaptor.forClass(List.class);
-        Mockito.verify(this.mockCollector).emit(eq("StreamId"), tupleArgument.capture(),
-                eq("MessageId"));
-
-        List<Object> argList = tupleArgument.getValue();
-
-        assertThat(argList.size(), equalTo(2));
-        assertThat(argList.get(0).toString(), equalTo(""));
-        assertThat(argList.get(1), instanceOf(StreamMessage.class));
-        StreamMessage sendMessage = (StreamMessage) argList.get(1);
-        assertThat(sendMessage.getHeader().getHistory().toString(),
-                equalTo("KeyHistory=[MessageKey]"));
-        assertThat((StreamMessage) argList.get(1), sameInstance(message));
-    }
-
-    /**
-     * Emitメソッド呼び出し時（KeyId個別指定、GroupingKey&StreamId指定）の引数確認を行う。
-     *
-     * @target {@link AmBaseSpout#emitWithKeyIdAndGroupingStream(StreamMessage, Object, Object, String, String)}
-     * @test collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること。<br>
-     *    condition:: MessageKey、MessageIdを個別指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること
-     */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    @Test
-    public void testEmit_KeyId個別指定_GroupingStream()
-    {
-        // 準備
-        this.target.open(this.mockConfMap, this.mockContext, this.mockCollector);
-
-        StreamMessage message = new StreamMessage();
-        message.addField("Param1", "Param1");
-
-        // 実施
-        this.target.emitWithKeyIdAndGroupingStream(message, "MessageKey", "MessageId",
-                "GroupingKey", "StreamId");
-
-        // 検証
-        ArgumentCaptor<List> tupleArgument = ArgumentCaptor.forClass(List.class);
-        Mockito.verify(this.mockCollector).emit(eq("StreamId"), tupleArgument.capture(),
-                eq("MessageId"));
-
-        List<Object> argList = tupleArgument.getValue();
-
-        assertThat(argList.size(), equalTo(2));
         assertThat(argList.get(0).toString(), equalTo("GroupingKey"));
         assertThat(argList.get(1), instanceOf(StreamMessage.class));
         StreamMessage sendMessage = (StreamMessage) argList.get(1);

@@ -96,7 +96,6 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      * Declare fields are following.<br>
      * <ol>
      * <li>messageKey   : Groupingkey if exists.</li>
-     * <li>keyHistory   : Key history.</li>
      * <li>messageValue : Message value.</li>
      * </ol>
      * Streams are "default" and user setting streams.
@@ -129,100 +128,114 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
     }
 
     /**
-     * Use same value used by MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
+     * @param recordHistory the recordHistory to set
+     */
+    public void setRecordHistory(boolean recordHistory)
+    {
+        this.recordHistory = recordHistory;
+    }
+
+    /**
+     * Use MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
      * Send message to downstream component.<br>
      * Use following situation.
      * <ol>
      * <li>Use this class's key history function.</li>
-     * <li>Use storm's fault tolerant function.</li>
-     * <li>MessageKey and MessageId are same value.</li>
+     * <li>Use storm's fault detect function.</li>
+     * <li>MessageKey and MessageId are different value.</li>
      * </ol>
      *
      * @param message sending message
-     * @param messageKeyId MessageKey(Use key history's value), MessageId(Id identify by storm)
+     * @param messageKey MessageKey(Use key history's value)
+     * @param messageId MessageId(Id identify by storm)
      */
-    protected void emit(StreamMessage message, Object messageKeyId)
+    protected void emit(StreamMessage message, Object messageKey, Object messageId)
     {
         if (this.recordHistory)
         {
-            message.getHeader().addHistory(messageKeyId.toString());
+            message.getHeader().addHistory(messageKey.toString());
         }
 
-        this.getCollector().emit(new Values("", message), messageKeyId);
+        this.getCollector().emit(new Values("", message), messageId);
     }
 
     /**
-     * Use same value used by MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
+     * Use MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
      * Send message to downstream component with grouping key.<br>
      * Use following situation.
      * <ol>
      * <li>Use this class's key history function.</li>
-     * <li>Use storm's fault tolerant function.</li>
-     * <li>MessageKey and MessageId are same value.</li>
+     * <li>Use storm's fault detect function.</li>
+     * <li>MessageKey and MessageId are different value.</li>
      * </ol>
      *
      * @param message sending message
-     * @param messageKeyId MessageKey(Use key history's value), MessageId(Id identify by storm)
+     * @param messageKey MessageKey(Use key history's value)
+     * @param messageId MessageId(Id identify by storm)
      * @param groupingKey grouping key
      */
-    protected void emitWithGrouping(StreamMessage message, Object messageKeyId, String groupingKey)
+    protected void emitWithGrouping(StreamMessage message, Object messageKey, Object messageId,
+            String groupingKey)
     {
         if (this.recordHistory)
         {
-            message.getHeader().addHistory(messageKeyId.toString());
+            message.getHeader().addHistory(messageKey.toString());
         }
 
-        this.getCollector().emit(new Values(groupingKey, message), messageKeyId);
+        this.getCollector().emit(new Values(groupingKey, message), messageId);
     }
 
     /**
-     * Use same value used by MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
+     * Use MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
      * Send message to downstream component with streamId.<br>
      * Use following situation.
      * <ol>
      * <li>Use this class's key history function.</li>
-     * <li>Use storm's fault tolerant function.</li>
-     * <li>MessageKey and MessageId are same value.</li>
+     * <li>Use storm's fault detect function.</li>
+     * <li>MessageKey and MessageId are different value.</li>
      * </ol>
      *
      * @param message sending message
-     * @param messageKeyId MessageKey(Use key history's value), MessageId(Id identify by storm)
+     * @param messageKey MessageKey(Use key history's value)
+     * @param messageId MessageId(Id identify by storm)
      * @param streamId streamId
      */
-    protected void emitWithStream(StreamMessage message, Object messageKeyId, String streamId)
+    protected void emitWithStream(StreamMessage message, Object messageKey, Object messageId,
+            String streamId)
     {
         if (this.recordHistory)
         {
-            message.getHeader().addHistory(messageKeyId.toString());
+            message.getHeader().addHistory(messageKey.toString());
         }
 
-        this.getCollector().emit(streamId, new Values("", message), messageKeyId);
+        this.getCollector().emit(streamId, new Values("", message), messageId);
     }
 
     /**
-     * Use same value used by MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
+     * Use MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
      * Send message to downstream component with grouping key and streamId.<br>
      * Use following situation.
      * <ol>
      * <li>Use this class's key history function.</li>
-     * <li>Use storm's fault tolerant function.</li>
-     * <li>MessageKey and MessageId are same value.</li>
+     * <li>Use storm's fault detect function.</li>
+     * <li>MessageKey and MessageId are different value.</li>
      * </ol>
      *
      * @param message sending message
-     * @param messageKeyId MessageKey(Use key history's value), MessageId(Id identify by storm)
+     * @param messageKey MessageKey(Use key history's value)
+     * @param messageId MessageId(Id identify by storm)
      * @param groupingKey grouping key
      * @param streamId streamId
      */
-    protected void emitWithGroupingStream(StreamMessage message, Object messageKeyId,
-            String groupingKey, String streamId)
+    protected void emitWithGroupingStream(StreamMessage message, Object messageKey,
+            Object messageId, String groupingKey, String streamId)
     {
         if (this.recordHistory)
         {
-            message.getHeader().addHistory(messageKeyId.toString());
+            message.getHeader().addHistory(messageKey.toString());
         }
 
-        this.getCollector().emit(streamId, new Values(groupingKey, message), messageKeyId);
+        this.getCollector().emit(streamId, new Values(groupingKey, message), messageId);
     }
 
     /**
@@ -231,7 +244,7 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      * Use following situation.
      * <ol>
      * <li>Not use this class's key history function.</li>
-     * <li>Not use storm's fault tolerant function.</li>
+     * <li>Not use storm's fault detect function.</li>
      * </ol>
      *
      * @param message sending message
@@ -247,7 +260,7 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      * Use following situation.
      * <ol>
      * <li>Not use this class's key history function.</li>
-     * <li>Not use storm's fault tolerant function.</li>
+     * <li>Not use storm's fault detect function.</li>
      * </ol>
      *
      * @param message sending message
@@ -264,7 +277,7 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      * Use following situation.
      * <ol>
      * <li>Not use this class's key history function.</li>
-     * <li>Not use storm's fault tolerant function.</li>
+     * <li>Not use storm's fault detect function.</li>
      * </ol>
      *
      * @param message sending message
@@ -281,7 +294,7 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      * Use following situation.
      * <ol>
      * <li>Not use this class's key history function.</li>
-     * <li>Not use storm's fault tolerant function.</li>
+     * <li>Not use storm's fault detect function.</li>
      * </ol>
      *
      * @param message sending message
@@ -300,13 +313,13 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      * Use following situation.
      * <ol>
      * <li>Use this class's key history function.</li>
-     * <li>Not use storm's fault tolerant function.</li>
+     * <li>Not use storm's fault detect function.</li>
      * </ol>
      *
      * @param message sending message
      * @param messageKey MessageKey(Use key history's value)
      */
-    protected void emitWithKey(StreamMessage message, Object messageKey)
+    protected void emitWithOnlyKey(StreamMessage message, Object messageKey)
     {
         if (this.recordHistory)
         {
@@ -322,14 +335,14 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      * Use following situation.
      * <ol>
      * <li>Use this class's key history function.</li>
-     * <li>Not use storm's fault tolerant function.</li>
+     * <li>Not use storm's fault detect function.</li>
      * </ol>
      *
      * @param message sending message
      * @param messageKey MessageKey(Use key history's value)
      * @param groupingKey grouping key
      */
-    protected void emitWithKeyAndGrouping(StreamMessage message, Object messageKey,
+    protected void emitWithOnlyKeyAndGrouping(StreamMessage message, Object messageKey,
             String groupingKey)
     {
         if (this.recordHistory)
@@ -346,14 +359,15 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      * Use following situation.
      * <ol>
      * <li>Use this class's key history function.</li>
-     * <li>Not use storm's fault tolerant function.</li>
+     * <li>Not use storm's fault detect function.</li>
      * </ol>
      *
      * @param message sending message
      * @param messageKey MessageKey(Use key history's value)
      * @param streamId streamId
      */
-    protected void emitWithKeyAndStream(StreamMessage message, Object messageKey, String streamId)
+    protected void emitWithOnlyKeyAndStream(StreamMessage message, Object messageKey,
+            String streamId)
     {
         if (this.recordHistory)
         {
@@ -369,7 +383,7 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      * Use following situation.
      * <ol>
      * <li>Use this class's key history function.</li>
-     * <li>Not use storm's fault tolerant function.</li>
+     * <li>Not use storm's fault detect function.</li>
      * </ol>
      *
      * @param message sending message
@@ -377,7 +391,7 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      * @param groupingKey grouping key
      * @param streamId streamId
      */
-    protected void emitWithKeyAndGroupingStream(StreamMessage message, Object messageKey,
+    protected void emitWithOnlyKeyAndGroupingStream(StreamMessage message, Object messageKey,
             String groupingKey, String streamId)
     {
         if (this.recordHistory)
@@ -386,116 +400,5 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
         }
 
         this.getCollector().emit(streamId, new Values(groupingKey, message));
-    }
-
-    /**
-     * Use different value used by MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
-     * Send message to downstream component.<br>
-     * Use following situation.
-     * <ol>
-     * <li>Use this class's key history function.</li>
-     * <li>Use storm's fault tolerant function.</li>
-     * <li>MessageKey and MessageId are different value.</li>
-     * </ol>
-     *
-     * @param message sending message
-     * @param messageKey MessageKey(Use key history's value)
-     * @param messageId MessageId(Id identify by storm)
-     */
-    protected void emitWithKeyId(StreamMessage message, Object messageKey, Object messageId)
-    {
-        if (this.recordHistory)
-        {
-            message.getHeader().addHistory(messageKey.toString());
-        }
-
-        this.getCollector().emit(new Values("", message), messageId);
-    }
-
-    /**
-     * Use different value used by MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
-     * Send message to downstream component with grouping key.<br>
-     * Use following situation.
-     * <ol>
-     * <li>Use this class's key history function.</li>
-     * <li>Use storm's fault tolerant function.</li>
-     * <li>MessageKey and MessageId are different value.</li>
-     * </ol>
-     *
-     * @param message sending message
-     * @param messageKey MessageKey(Use key history's value)
-     * @param messageId MessageId(Id identify by storm)
-     * @param groupingKey grouping key
-     */
-    protected void emitWithKeyIdAndGrouping(StreamMessage message, Object messageKey,
-            Object messageId, String groupingKey)
-    {
-        if (this.recordHistory)
-        {
-            message.getHeader().addHistory(messageKey.toString());
-        }
-
-        this.getCollector().emit(new Values(groupingKey, message), messageId);
-    }
-
-    /**
-     * Use different value used by MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
-     * Send message to downstream component with streamId.<br>
-     * Use following situation.
-     * <ol>
-     * <li>Use this class's key history function.</li>
-     * <li>Use storm's fault tolerant function.</li>
-     * <li>MessageKey and MessageId are different value.</li>
-     * </ol>
-     *
-     * @param message sending message
-     * @param messageKey MessageKey(Use key history's value)
-     * @param messageId MessageId(Id identify by storm)
-     * @param streamId streamId
-     */
-    protected void emitWithKeyIdAndStream(StreamMessage message, Object messageKey,
-            Object messageId, String streamId)
-    {
-        if (this.recordHistory)
-        {
-            message.getHeader().addHistory(messageKey.toString());
-        }
-
-        this.getCollector().emit(streamId, new Values("", message), messageId);
-    }
-
-    /**
-     * Use different value used by MessageKey(Use key history's value), MessageId(Id identify by storm).<br>
-     * Send message to downstream component with grouping key and streamId.<br>
-     * Use following situation.
-     * <ol>
-     * <li>Use this class's key history function.</li>
-     * <li>Use storm's fault tolerant function.</li>
-     * <li>MessageKey and MessageId are different value.</li>
-     * </ol>
-     *
-     * @param message sending message
-     * @param messageKey MessageKey(Use key history's value)
-     * @param messageId MessageId(Id identify by storm)
-     * @param groupingKey grouping key
-     * @param streamId streamId
-     */
-    protected void emitWithKeyIdAndGroupingStream(StreamMessage message, Object messageKey,
-            Object messageId, String groupingKey, String streamId)
-    {
-        if (this.recordHistory)
-        {
-            message.getHeader().addHistory(messageKey.toString());
-        }
-
-        this.getCollector().emit(streamId, new Values(groupingKey, message), messageId);
-    }
-
-    /**
-     * @param recordHistory the recordHistory to set
-     */
-    public void setRecordHistory(boolean recordHistory)
-    {
-        this.recordHistory = recordHistory;
     }
 }
