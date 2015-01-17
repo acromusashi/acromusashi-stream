@@ -16,14 +16,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import backtype.storm.tuple.Tuple;
+import acromusashi.stream.entity.StreamMessage;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * TupleにElasticSearchに投入するJSONが含まれるケースに使用するコンバータ
- * 
+ *
  * @author kimura
  */
 public class JsonConverter implements EsTupleConverter
@@ -45,7 +45,7 @@ public class JsonConverter implements EsTupleConverter
 
     /**
      * Index、Type、fieldを指定してインスタンスを生成する。
-     * 
+     *
      * @param index Index Name
      * @param type Type Name
      * @param field TupleField
@@ -61,7 +61,7 @@ public class JsonConverter implements EsTupleConverter
      * {@inheritDoc}
      */
     @Override
-    public String convertToIndex(Tuple tuple)
+    public String convertToIndex(StreamMessage message)
     {
         return this.index;
     }
@@ -70,7 +70,7 @@ public class JsonConverter implements EsTupleConverter
      * {@inheritDoc}
      */
     @Override
-    public String convertToType(Tuple tuple)
+    public String convertToType(StreamMessage message)
     {
         return this.type;
     }
@@ -79,7 +79,7 @@ public class JsonConverter implements EsTupleConverter
      * {@inheritDoc}
      */
     @Override
-    public String convertToId(Tuple tuple)
+    public String convertToId(StreamMessage message)
     {
         return null;
     }
@@ -89,14 +89,14 @@ public class JsonConverter implements EsTupleConverter
      */
     @SuppressWarnings("unchecked")
     @Override
-    public String convertToDocument(Tuple tuple)
+    public String convertToDocument(StreamMessage message)
     {
         if (this.mapper == null)
         {
             this.mapper = new ObjectMapper();
         }
 
-        String jsonStr = tuple.getStringByField(this.field);
+        String jsonStr = message.getField(this.field).toString();
         Map<String, Object> jsonMap = null;
 
         try
@@ -129,8 +129,8 @@ public class JsonConverter implements EsTupleConverter
     /**
      * 受信したログデータに以下のフィールドが存在した場合、数値に変換する。<br>
      * 変換対象のフィールドは以下の通り。<br>
-     * 
-     * 
+     *
+     *
      * @param jsonMap 受信したログデータ(JSON)
      */
     private void convertToNumeric(Map<String, Object> jsonMap)

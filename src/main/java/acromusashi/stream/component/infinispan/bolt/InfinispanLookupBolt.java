@@ -18,17 +18,13 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import acromusashi.stream.bolt.AmConfigurationBolt;
+import acromusashi.stream.bolt.AmBaseBolt;
 import acromusashi.stream.component.infinispan.CacheHelper;
 import acromusashi.stream.component.infinispan.TupleCacheMapper;
 import acromusashi.stream.constants.FieldName;
+import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.exception.ConvertFailException;
-import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
 
 /**
  * InfinispanからTupleに指定したKeyに対応したValueを取得し、取得結果を基に処理を実施するBolt
@@ -38,7 +34,7 @@ import backtype.storm.tuple.Values;
  * @param <K> InfinispanCacheKeyの型
  * @param <V> InfinispanCacheValueの型
  */
-public class InfinispanLookupBolt<K, V> extends AmConfigurationBolt
+public class InfinispanLookupBolt<K, V> extends AmBaseBolt
 {
     /** serialVersionUID */
     private static final long             serialVersionUID = 9028505967740858573L;
@@ -78,9 +74,8 @@ public class InfinispanLookupBolt<K, V> extends AmConfigurationBolt
      */
     @SuppressWarnings("rawtypes")
     @Override
-    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector)
+    public void onPrepare(Map stormConf, TopologyContext context)
     {
-        super.prepare(stormConf, context, collector);
         this.cacheHelper = new CacheHelper<K, V>(this.cacheServerUrl, this.cacheName);
         this.cacheHelper.initCache();
     }
@@ -89,7 +84,7 @@ public class InfinispanLookupBolt<K, V> extends AmConfigurationBolt
      * {@inheritDoc}
      */
     @Override
-    public void execute(Tuple input)
+    public void onExecute(StreamMessage input)
     {
         // データ取得前実行処理を実行
         onLookupBefore(input);
@@ -123,7 +118,6 @@ public class InfinispanLookupBolt<K, V> extends AmConfigurationBolt
 
         // データ取得後実行処理を実行
         onLookupAfter(input, lookupKey, lookupValue);
-        getCollector().ack(input);
     }
 
     /**
@@ -131,7 +125,7 @@ public class InfinispanLookupBolt<K, V> extends AmConfigurationBolt
      *
      * @param input Tuple
      */
-    protected void onLookupBefore(Tuple input)
+    protected void onLookupBefore(StreamMessage input)
     {
         // デフォルトでは何も行わない。
     }
@@ -143,22 +137,16 @@ public class InfinispanLookupBolt<K, V> extends AmConfigurationBolt
      * @param lookupKey 取得に使用したKey
      * @param lookupValue 取得したValue(取得されなかった場合はnull)
      */
-    protected void onLookupAfter(Tuple input, K lookupKey, V lookupValue)
+    protected void onLookupAfter(StreamMessage input, K lookupKey, V lookupValue)
     {
         // デフォルトでは取得した結果がnull以外の場合、下流にデータを流す。
         if (lookupValue != null)
         {
-            getCollector().emit(input, new Values(lookupKey, lookupValue));
-        }
-    }
+            StreamMessage message = new StreamMessage();
+            message.addField(FieldName.MESSAGE_KEY, lookupKey);
+            message.addField(FieldName.MESSAGE_VALUE, lookupValue);
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void declareOutputFields(OutputFieldsDeclarer declarer)
-    {
-        // デフォルトでは
-        declarer.declare(new Fields(FieldName.MESSAGE_KEY, FieldName.MESSAGE_VALUE));
+            emitWithGrouping(message, lookupKey, lookupKey.toString());
+        }
     }
 }

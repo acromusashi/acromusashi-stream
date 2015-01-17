@@ -18,14 +18,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import acromusashi.stream.bolt.AmConfigurationBolt;
+import acromusashi.stream.bolt.AmBaseBolt;
 import acromusashi.stream.component.infinispan.CacheHelper;
 import acromusashi.stream.component.infinispan.TupleCacheMapper;
+import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.exception.ConvertFailException;
-import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.tuple.Tuple;
 
 /**
  * InfinispanにTupleの内容を保存するBolt
@@ -35,7 +33,7 @@ import backtype.storm.tuple.Tuple;
  * @param <K> InfinispanCacheKeyの型
  * @param <V> InfinispanCacheValueの型
  */
-public class InfinispanStoreBolt<K, V> extends AmConfigurationBolt
+public class InfinispanStoreBolt<K, V> extends AmBaseBolt
 {
     /** serialVersionUID */
     private static final long             serialVersionUID = -1793029528020234403L;
@@ -75,9 +73,8 @@ public class InfinispanStoreBolt<K, V> extends AmConfigurationBolt
      */
     @SuppressWarnings("rawtypes")
     @Override
-    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector)
+    public void onPrepare(Map stormConf, TopologyContext context)
     {
-        super.prepare(stormConf, context, collector);
         this.cacheHelper = new CacheHelper<K, V>(this.cacheServerUrl, this.cacheName);
         this.cacheHelper.initCache();
     }
@@ -86,7 +83,7 @@ public class InfinispanStoreBolt<K, V> extends AmConfigurationBolt
      * {@inheritDoc}
      */
     @Override
-    public void execute(Tuple input)
+    public void onExecute(StreamMessage input)
     {
         // データ保存前実行処理を実行
         onStoreBefore(input);
@@ -101,7 +98,6 @@ public class InfinispanStoreBolt<K, V> extends AmConfigurationBolt
             String messageFormat = "Tuple convert to key failed. Trash tuple. : InputTuple={0}";
             String errorMessage = MessageFormat.format(messageFormat, input.toString());
             logger.warn(errorMessage, ex);
-            getCollector().ack(input);
             return;
         }
 
@@ -115,7 +111,6 @@ public class InfinispanStoreBolt<K, V> extends AmConfigurationBolt
             String messageFormat = "Tuple convert to value failed. Trash tuple. : InputTuple={0}";
             String errorMessage = MessageFormat.format(messageFormat, input.toString());
             logger.warn(errorMessage, ex);
-            getCollector().ack(input);
             return;
         }
 
@@ -128,30 +123,20 @@ public class InfinispanStoreBolt<K, V> extends AmConfigurationBolt
             String messageFormat = "Cache store failed. Trash tuple. : InputTuple={0}";
             String errorMessage = MessageFormat.format(messageFormat, input.toString());
             logger.warn(errorMessage, ex);
-            getCollector().ack(input);
             return;
         }
 
         // データ保存後実行処理を実行
         onStoreAfter(input, storeKey, storeValue);
-        getCollector().ack(input);
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void declareOutputFields(OutputFieldsDeclarer declarer)
-    {
-        // 下流に送信を行わないため、未設定
     }
 
     /**
      * Infinispanへのデータ保存前に実行される処理。<br>
      *
-     * @param input Tuple
+     * @param input recievedMessage
      */
-    protected void onStoreBefore(Tuple input)
+    protected void onStoreBefore(StreamMessage input)
     {
         // デフォルトでは何も行わない。
     }
@@ -160,11 +145,11 @@ public class InfinispanStoreBolt<K, V> extends AmConfigurationBolt
      * Infinispanへのデータ保存後に実行される処理。<br>
      * 保存失敗した場合は実行されない。
      *
-     * @param input Tuple
+     * @param input recievedMessage
      * @param storedKey 保存したKey
      * @param storedValue 保存したValue
      */
-    protected void onStoreAfter(Tuple input, K storedKey, V storedValue)
+    protected void onStoreAfter(StreamMessage input, K storedKey, V storedValue)
     {
         // デフォルトでは何も行わない。
     }

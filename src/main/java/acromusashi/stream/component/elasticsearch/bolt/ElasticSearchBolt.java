@@ -24,27 +24,25 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import acromusashi.stream.bolt.AmConfigurationBolt;
-import backtype.storm.task.OutputCollector;
+import acromusashi.stream.bolt.AmBaseBolt;
+import acromusashi.stream.entity.StreamMessage;
 import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.tuple.Tuple;
 
 /**
  * ElasticSearchに対してクエリを投入するBolt
  *
  * @author kimura
  */
-public class ElasticSearchBolt extends AmConfigurationBolt
+public class ElasticSearchBolt extends AmBaseBolt
 {
     /** serialVersionUID */
-    private static final long   serialVersionUID  = 4987555107871741041L;
+    private static final long   serialVersionUID = 4987555107871741041L;
 
     /** logger */
-    private static final Logger logger            = LoggerFactory.getLogger(ElasticSearchBolt.class);
+    private static final Logger logger           = LoggerFactory.getLogger(ElasticSearchBolt.class);
 
     /** デフォルトポート値 */
-    private static final int    DEFAULT_PORT      = 9300;
+    private static final int    DEFAULT_PORT     = 9300;
 
     /** クラスタ名称 */
     protected String            clusterName;
@@ -73,11 +71,11 @@ public class ElasticSearchBolt extends AmConfigurationBolt
      */
     @SuppressWarnings({"rawtypes", "resource"})
     @Override
-    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector)
+    public void onPrepare(Map stormConf, TopologyContext context)
     {
         // cleanupメソッドは呼ばれないため、リソースクローズはできない。
         // だが、1インスタンスのみしか生成されないため、リークはしない。
-        super.prepare(stormConf, context, collector);
+
         // ElasticSearchClientを初期化
         // Serversは「host1:port1;host2:port2;host3:port3...」形式のため分割して生成
         Settings settings = ImmutableSettings.settingsBuilder().put("cluster.name",
@@ -103,8 +101,7 @@ public class ElasticSearchBolt extends AmConfigurationBolt
     /**
      * {@inheritDoc}
      */
-    @Override
-    public void execute(Tuple input)
+    public void onExecute(StreamMessage input)
     {
         String documentId = null;
         String indexName = null;
@@ -133,18 +130,7 @@ public class ElasticSearchBolt extends AmConfigurationBolt
             String logFormat = "Document Index failed. Dispose Tuple. Id={0}, Type={1}, Index={2}";
             logger.warn(MessageFormat.format(logFormat, documentId, typeName, indexName), ex);
         }
-
-        getCollector().ack(input);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void declareOutputFields(OutputFieldsDeclarer declarer)
-    {
-        // 下流に送信を行わないため、未設定
-    }
+    };
 
     /**
      * @param clusterName the clusterName to set

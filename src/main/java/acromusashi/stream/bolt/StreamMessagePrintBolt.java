@@ -12,57 +12,56 @@
 */
 package acromusashi.stream.bolt;
 
+import java.util.Map;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import acromusashi.stream.constants.FieldName;
-import acromusashi.stream.entity.StreamMessageHeader;
 import acromusashi.stream.entity.StreamMessage;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.tuple.Tuple;
+import acromusashi.stream.entity.StreamMessageHeader;
+import backtype.storm.task.TopologyContext;
 
 /**
- * 受信したTupleの内容をログ出力するBolt
- * 
+ * 受信したMessageの内容をログ出力するBolt
+ *
  * @author kimura
  */
-public class MessagePrintBolt extends AmConfigurationBolt
+public class StreamMessagePrintBolt extends AmBaseBolt
 {
     /** serialVersionUID */
     private static final long   serialVersionUID = -6390790906598881431L;
 
     /** logger */
-    private static final Logger logger           = LoggerFactory.getLogger(MessageConvertBolt.class);
+    private static final Logger logger           = LoggerFactory.getLogger(StreamMessagePrintBolt.class);
 
     /**
      * パラメータを指定せずにインスタンスを生成する。
      */
-    public MessagePrintBolt()
+    public StreamMessagePrintBolt()
     {}
 
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("rawtypes")
     @Override
-    public void execute(Tuple input)
+    public void onPrepare(Map stormConf, TopologyContext context)
     {
-        StreamMessage message = (StreamMessage) input.getValueByField(FieldName.MESSAGE_VALUE);
-
-        StreamMessageHeader header = message.getHeader();
-        Object body = message.getBody();
-
-        logger.info("ReceiveHeader=" + header.toString() + " ,ReceiveBody="
-                + ToStringBuilder.reflectionToString(body, ToStringStyle.SHORT_PREFIX_STYLE));
-
-        getCollector().ack(input);
+        // Do nothing.
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void declareOutputFields(OutputFieldsDeclarer declarer)
+    public void onExecute(StreamMessage input)
     {
-        // Do nothing.
-    }
+        StreamMessageHeader header = input.getHeader();
+        Object body = input.getBody();
 
+        logger.info("ReceiveHeader=" + header.toString() + " ,ReceiveBody="
+                + ToStringBuilder.reflectionToString(body, ToStringStyle.SHORT_PREFIX_STYLE));
+    }
 }

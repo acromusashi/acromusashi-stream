@@ -13,8 +13,8 @@
 package acromusashi.stream.component.infinispan;
 
 import acromusashi.stream.constants.FieldName;
+import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.exception.ConvertFailException;
-import backtype.storm.tuple.Tuple;
 
 /**
  * Tuple中の指定したキーから値を取得してKey、Valueを生成するSimpleなMapper
@@ -58,13 +58,13 @@ public class SimpleCacheMapper<K, V> implements TupleCacheMapper<K, V>
      */
     @SuppressWarnings("unchecked")
     @Override
-    public K convertToKey(Tuple input) throws ConvertFailException
+    public K convertToKey(StreamMessage input) throws ConvertFailException
     {
         K key = null;
 
         try
         {
-            key = (K) input.getValueByField(this.keyField);
+            key = (K) input.getField(this.keyField);
         }
         catch (Exception ex)
         {
@@ -79,13 +79,13 @@ public class SimpleCacheMapper<K, V> implements TupleCacheMapper<K, V>
      */
     @SuppressWarnings("unchecked")
     @Override
-    public V convertToValue(Tuple input) throws ConvertFailException
+    public V convertToValue(StreamMessage input) throws ConvertFailException
     {
         V value = null;
 
         try
         {
-            value = (V) input.getValueByField(this.valueField);
+            value = (V) input.getField(this.valueField);
         }
         catch (Exception ex)
         {
@@ -94,5 +94,4 @@ public class SimpleCacheMapper<K, V> implements TupleCacheMapper<K, V>
 
         return value;
     }
-
 }

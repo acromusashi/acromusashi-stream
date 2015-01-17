@@ -14,44 +14,44 @@ package acromusashi.stream.component.elasticsearch.bolt;
 
 import java.io.Serializable;
 
-import backtype.storm.tuple.Tuple;
+import acromusashi.stream.entity.StreamMessage;
 
 /**
  * Storm TupleをElastic Searchに投入するIndex Requestに変換するコンバータインタフェース
- * 
+ *
  * @author kimura
  */
 public interface EsTupleConverter extends Serializable
 {
     /**
      * Storm TupleからElastic SearchにIndex Requestを投入する際のIndex Nameを生成する
-     * 
-     * @param tuple StormTuple
+     *
+     * @param message received message
      * @return Index Name
      */
-    String convertToIndex(Tuple tuple);
+    String convertToIndex(StreamMessage message);
 
     /**
      * Storm TupleからElastic SearchにIndex Requestを投入する際のType Nameを生成する
-     * 
-     * @param tuple StormTuple
+     *
+     * @param message received message
      * @return Type Name
      */
-    String convertToType(Tuple tuple);
+    String convertToType(StreamMessage message);
 
     /**
      * Storm TupleからElastic SearchにIndex Requestを投入する際のDocument IDを生成する
-     * 
-     * @param tuple StormTuple
+     *
+     * @param message received message
      * @return Document ID
      */
-    String convertToId(Tuple tuple);
+    String convertToId(StreamMessage message);
 
     /**
      * Storm TupleからElastic SearchにIndex Requestを投入する際のDocumentを生成する
-     * 
-     * @param tuple StormTuple
+     *
+     * @param message received message
      * @return Document
      */
-    String convertToDocument(Tuple tuple);
+    String convertToDocument(StreamMessage message);
 }

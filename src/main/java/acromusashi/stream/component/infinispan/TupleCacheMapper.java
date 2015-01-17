@@ -14,8 +14,8 @@ package acromusashi.stream.component.infinispan;
 
 import java.io.Serializable;
 
+import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.exception.ConvertFailException;
-import backtype.storm.tuple.Tuple;
 
 /**
  * Cacheに保存するKey、ValueをTupleから生成する変換インタフェース
@@ -30,18 +30,18 @@ public interface TupleCacheMapper<K, V> extends Serializable
     /**
      * Cacheに保存するKeyを生成する。
      *
-     * @param input Tuple
+     * @param input received message
      * @return Cacheに保存するKey
      * @throws ConvertFailException 変換失敗時
      */
-    K convertToKey(Tuple input) throws ConvertFailException;
+    K convertToKey(StreamMessage input) throws ConvertFailException;
 
     /**
      * Cacheに保存するValueを生成する。
      *
-     * @param input Tuple
+     * @param input received message
      * @return Cacheに保存するValue
      * @throws ConvertFailException 変換失敗時
      */
-    V convertToValue(Tuple input) throws ConvertFailException;
+    V convertToValue(StreamMessage input) throws ConvertFailException;
 }

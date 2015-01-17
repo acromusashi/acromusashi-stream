@@ -14,35 +14,32 @@ package acromusashi.stream.topology;
 
 import java.util.List;
 
-import acromusashi.stream.bolt.JsonConvertBolt;
-import acromusashi.stream.bolt.MessagePrintBolt;
+import acromusashi.stream.bolt.StreamMessagePrintBolt;
 import acromusashi.stream.component.kestrel.spout.KestrelJsonSpout;
 import acromusashi.stream.config.StormConfigGenerator;
 import acromusashi.stream.config.StormConfigUtil;
 import acromusashi.stream.constants.FieldName;
-import acromusashi.stream.entity.StreamMessageHeader;
-import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.entity.MessageEntity;
+import acromusashi.stream.entity.StreamMessage;
+import acromusashi.stream.entity.StreamMessageHeader;
 import backtype.storm.Config;
 import backtype.storm.scheme.StringScheme;
 import backtype.storm.tuple.Fields;
 
 /**
- * データベース用のTopologyを起動する。
+ * Kestrelからのメッセージ取得用のTopologyを起動する。
  * <br/>
  * Topologyの動作フローは下記の通り。<br/>
  * <ol>
  * <li>KestrelThriftSpoutにてSNMPメッセージをJSON形式で受信する</li>
- * <li>MessageConvertBoltにてJSON形式のTrapを共通メッセージ形式に変換する</li>
- * <li>CamelJdbcStoreBoltにて設定項目[dataSource]に設定したDataSourceに対してデータを投入する</li>
+ * <li>StreamMessagePrintBoltにて受信したメッセージをログ出力する</li>
  * </ol>
- * 
+ *
  * yamlファイルから読み込む設定値
  * <ul>
  * <li>kestrel.servers : Kestrelが配置されるホスト:Portの配列(デフォルト値:無)</li>
  * <li>kestrel.queue : Kestrelのキュー名称(デフォルト値:MessageQueue)</li>
  * <li>kestrel.parallelism : KestrelThriftSpoutの並列度(デフォルト値:1)</li>
- * <li>convert.parallelism : MessageConvertBoltの並列度(デフォルト値:1)</li>
  * <li>print.parallelism : CamelJdbcStoreBoltの並列度(デフォルト値:1)</li>
  * </ul>
  * @author kimura
@@ -51,7 +48,7 @@ public class CommonMessagePrintTopology extends BaseTopology
 {
     /**
      * コンストラクタ
-     * 
+     *
      * @param topologyName Topology名称
      * @param config Storm設定オブジェクト
      */
@@ -102,7 +99,6 @@ public class CommonMessagePrintTopology extends BaseTopology
         String kestrelQueueName = StormConfigUtil.getStringValue(getConfig(),
                 KestrelJsonSpout.KESTREL_QUEUE, "MessageQueue");
         int kestrelSpoutPara = StormConfigUtil.getIntValue(getConfig(), "kestrel.parallelism", 1);
-        int msgConvertPara = StormConfigUtil.getIntValue(getConfig(), "convert.parallelism", 1);
         int printPara = StormConfigUtil.getIntValue(getConfig(), "print.parallelism", 1);
 
         // Topology Setting
@@ -111,16 +107,10 @@ public class CommonMessagePrintTopology extends BaseTopology
                 new StringScheme());
         getBuilder().setSpout("KestrelJsonSpout", kestrelSpout, kestrelSpoutPara);
 
-        // Add Bolt(KestrelJsonSpout -> JacksonMessageConvertBolt)
-        JsonConvertBolt<MessageEntity> convertBolt = new JsonConvertBolt<MessageEntity>();
-        convertBolt.setUserObjectClass(MessageEntity.class);
-        getBuilder().setBolt("JacksonMessageConvertBolt", convertBolt, msgConvertPara).fieldsGrouping(
+        // Add Bolt(KestrelJsonSpout -> StreamMessagePrintBolt)
+        StreamMessagePrintBolt streamMessagePrintBolt = new StreamMessagePrintBolt();
+        getBuilder().setBolt("StreamMessagePrintBolt", streamMessagePrintBolt, printPara).fieldsGrouping(
                 "KestrelJsonSpout", new Fields(FieldName.MESSAGE_KEY));
-
-        // Add Bolt(JacksonMessageConvertBolt -> TuplePrintBolt)
-        MessagePrintBolt tuplePrintBolt = new MessagePrintBolt();
-        getBuilder().setBolt("TuplePrintBolt", tuplePrintBolt, printPara).fieldsGrouping(
-                "JacksonMessageConvertBolt", new Fields(FieldName.MESSAGE_KEY));
 
         // Regist Serialize Setting.
         getConfig().registerSerialization(StreamMessage.class);
