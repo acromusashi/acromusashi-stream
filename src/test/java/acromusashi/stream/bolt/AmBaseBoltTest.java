@@ -34,13 +34,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import acromusashi.stream.constants.FieldName;
+import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.trace.KeyHistory;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+
+import com.google.common.collect.Lists;
 
 /**
  * AmBaseBoltクラスのテストクラス<br>
@@ -52,20 +54,20 @@ import backtype.storm.tuple.Tuple;
 public class AmBaseBoltTest
 {
     /** テスト対象 */
-    private AmBaseBolt target;
+    private AmBaseBolt      target;
 
     /** テスト用のOutputCollector */
     @Mock
-    private OutputCollector  mockCollector;
+    private OutputCollector mockCollector;
 
     /** テスト用のStormConfigMap */
     @SuppressWarnings("rawtypes")
     @Mock
-    private Map              mockConfMap;
+    private Map             mockConfMap;
 
     /** テスト用のTopologyContext */
     @Mock
-    private TopologyContext  mockContext;
+    private TopologyContext mockContext;
 
     /**
      * 初期化メソッド
@@ -73,7 +75,7 @@ public class AmBaseBoltTest
     @Before
     public void setUp()
     {
-        this.target = new BlankAmBaseBolt();
+        this.target = new AmBaseThroughBolt();
     }
 
     /**
@@ -101,87 +103,12 @@ public class AmBaseBoltTest
     }
 
     /**
-     * KeyHistoryInfo未保持Tuple受信時、空のKeyHistoryInfoを生成して動作を継続することを確認する。
-     *
-     * @target {@link AmBaseBolt#prepare(Map, TopologyContext, OutputCollector)}
-     * @test 空のKeyHistoryInfoを生成して動作を継続することを確認
-     *    condition:: KeyHistoryInfo未保持Tuple受信時
-     *    result:: 空のKeyHistoryInfoを生成して動作を継続することを確認
-     */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    @Test
-    public void testExecute_KeyHistoryInfo未保持Tuple処理確認()
-    {
-        // 準備
-        Mockito.when(this.mockContext.getThisComponentId()).thenReturn("ComponentId");
-        Mockito.when(this.mockContext.getThisTaskIndex()).thenReturn(0);
-
-        AmBaseThroughBolt targetBolt = new AmBaseThroughBolt();
-        targetBolt.setFields(Arrays.asList("Key", "Message"));
-        targetBolt.prepare(this.mockConfMap, this.mockContext, this.mockCollector);
-
-        Tuple mockTuple = Mockito.mock(Tuple.class);
-        Mockito.doThrow(new IllegalArgumentException()).when(mockTuple).getValueByField(
-                FieldName.KEY_HISTORY);
-        Mockito.doReturn("Key").when(mockTuple).getValueByField("Key");
-        Mockito.doReturn("Message").when(mockTuple).getValueByField("Message");
-
-        // 実施
-        targetBolt.execute(mockTuple);
-
-        // 検証
-        ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
-        Mockito.verify(this.mockCollector).emit(argument.capture());
-
-        List<Object> argList = argument.getValue();
-
-        assertThat(argList.size(), equalTo(3));
-        assertThat(argList.get(0), instanceOf(KeyHistory.class));
-        assertThat(argList.get(0).toString(), equalTo("KeyHistory=[]"));
-        assertThat(argList.get(1).toString(), equalTo("Key"));
-        assertThat(argList.get(2).toString(), equalTo("Message"));
-    }
-
-    /**
-     * Tuple処理時、onExecuteメソッド実行中に例外が発生した場合、処理が終了することを確認する。
-     *
-     * @target {@link AmBaseBolt#prepare(Map, TopologyContext, OutputCollector)}
-     * @test 処理が終了することを確認
-     *    condition:: KeyHistoryInfo未保持Tuple受信時
-     *    result:: 処理が終了することを確認
-     */
-    @Test(expected = RuntimeException.class)
-    public void testExecute_OnExecute実行中例外発生()
-    {
-        // 準備
-        Mockito.when(this.mockContext.getThisComponentId()).thenReturn("ComponentId");
-        Mockito.when(this.mockContext.getThisTaskIndex()).thenReturn(0);
-
-        AmBaseThroughBolt targetBolt = new AmBaseThroughBolt();
-        targetBolt.setFields(Arrays.asList("Key", "Message"));
-        targetBolt.prepare(this.mockConfMap, this.mockContext, this.mockCollector);
-        AmBaseThroughBolt mockedBolt = Mockito.spy(targetBolt);
-        Mockito.doThrow(new RuntimeException()).when(mockedBolt).onExecute(any(Tuple.class));
-
-        Tuple mockTuple = Mockito.mock(Tuple.class);
-        Mockito.doReturn(new KeyHistory()).when(mockTuple).getValueByField(FieldName.KEY_HISTORY);
-        Mockito.doReturn("Key").when(mockTuple).getValueByField("Key");
-        Mockito.doReturn("Message").when(mockTuple).getValueByField("Message");
-
-        // 実施
-        mockedBolt.execute(mockTuple);
-
-        // 検証
-        fail("処理継続");
-    }
-
-    /**
      * DeclareOutputFieldsメソッド呼び出し時のフィールド確認を行う。
      *
-     * @target {@link AmBaseBolt#declareOutputFields(backtype.storm.topology.OutputFieldsDeclarer)}
-     * @test 継承クラスの返すフィールドの頭に「KeyHistory」を付けて {@link OutputFieldsDeclarer#declare(Fields fields)}を呼び出していることを確認する。
-     *    condition:: declareOutputFieldsメソッド実行
-     *    result:: 継承クラスの返すフィールドの頭に「KeyHistory」を付けて {@link OutputFieldsDeclarer#declare(Fields fields)}を呼び出していること
+     * @target {@link AmBaseBolt#declareOutputFields(OutputFieldsDeclarer)}
+     * @test メッセージキー、メッセージ値を指定して {@link OutputFieldsDeclarer#declare(Fields fields)}を呼び出していることを確認する。<br>
+     *    condition:: declareOutputFieldsメソッド実行<br>
+     *    result:: メッセージキー、メッセージ値を指定して {@link OutputFieldsDeclarer#declare(Fields fields)}を呼び出していること
      */
     @Test
     public void testDeclareOutputFields_フィールド確認()
@@ -197,10 +124,93 @@ public class AmBaseBoltTest
         Mockito.verify(mockDeclarer).declare(argument.capture());
 
         Fields argFields = argument.getValue();
-        assertThat(argFields.size(), equalTo(3));
-        assertThat(argFields.get(0), equalTo("keyHistory"));
-        assertThat(argFields.get(1), equalTo("Key"));
-        assertThat(argFields.get(2), equalTo("Message"));
+        assertThat(argFields.size(), equalTo(2));
+        assertThat(argFields.get(0), equalTo("messageKey"));
+        assertThat(argFields.get(1), equalTo("messageValue"));
+    }
+
+    /**
+     * KeyHistoryInfo未保持Tuple受信時、新規KeyHistoryInfoを生成して動作を継続することを確認する。
+     *
+     * @target {@link AmBaseBolt#execute(Tuple)}
+     * @test 新規KeyHistoryInfoを生成して動作を継続することを確認
+     *    condition:: KeyHistoryInfo未保持Tuple受信時
+     *    result:: 新規KeyHistoryInfoを生成して動作を継続することを確認
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @Test
+    public void testExecute_KeyHistoryInfo未保持Tuple処理確認()
+    {
+        // 準備
+        Mockito.when(this.mockContext.getThisComponentId()).thenReturn("ComponentId");
+        Mockito.when(this.mockContext.getThisTaskIndex()).thenReturn(0);
+
+        AmBaseThroughBolt targetBolt = new AmBaseThroughBolt();
+        targetBolt.setFields(Lists.newArrayList("Param1"));
+        targetBolt.prepare(this.mockConfMap, this.mockContext, this.mockCollector);
+
+        StreamMessage message = new StreamMessage();
+        message.addField("Param1", "Param1");
+
+        Tuple mockTuple = Mockito.mock(Tuple.class);
+        Mockito.doReturn("messageKey").when(mockTuple).getValueByField("messageKey");
+        Mockito.doReturn(message).when(mockTuple).getValueByField("messageValue");
+        Mockito.doReturn(new Fields("messageKey", "messageValue")).when(mockTuple).getFields();
+        Mockito.doReturn(true).when(mockTuple).contains("messageValue");
+
+        // 実施
+        targetBolt.execute(mockTuple);
+
+        // 検証
+        ArgumentCaptor<Tuple> anchorCaptor = ArgumentCaptor.forClass(Tuple.class);
+        ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
+        Mockito.verify(this.mockCollector).emit(anchorCaptor.capture(), argument.capture());
+
+        assertThat(anchorCaptor.getValue(), instanceOf(Tuple.class));
+        assertThat(anchorCaptor.getValue(), sameInstance(mockTuple));
+
+        List<Object> argList = argument.getValue();
+
+        assertThat(argList.size(), equalTo(2));
+        assertThat(argList.get(0).toString(), equalTo(""));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+
+        assertThat(sendMessage.getField("Param1").toString(), equalTo("Param1"));
+        assertThat(sendMessage.getHeader().getHistory().toString(),
+                equalTo("KeyHistory=[KeyHistory]"));
+    }
+
+    /**
+     * Tuple処理時、onExecuteメソッド実行中に例外が発生した場合、処理が終了することを確認する。
+     *
+     * @target {@link AmBaseBolt#execute(Tuple)}
+     * @test 処理が終了することを確認
+     *    condition:: onExecuteメソッド実行中に例外が発生した場合
+     *    result:: 処理が終了することを確認
+     */
+    @Test(expected = RuntimeException.class)
+    public void testExecute_OnExecute実行中例外発生()
+    {
+        // 準備
+        Mockito.when(this.mockContext.getThisComponentId()).thenReturn("ComponentId");
+        Mockito.when(this.mockContext.getThisTaskIndex()).thenReturn(0);
+
+        AmBaseThroughBolt targetBolt = new AmBaseThroughBolt();
+        targetBolt.setFields(Arrays.asList("Key", "Message"));
+        targetBolt.prepare(this.mockConfMap, this.mockContext, this.mockCollector);
+        AmBaseThroughBolt mockedBolt = Mockito.spy(targetBolt);
+        Mockito.doThrow(new RuntimeException()).when(mockedBolt).onExecute(any(StreamMessage.class));
+
+        Tuple mockTuple = Mockito.mock(Tuple.class);
+        Mockito.doReturn("Key").when(mockTuple).getValueByField("Key");
+        Mockito.doReturn("Message").when(mockTuple).getValueByField("Message");
+
+        // 実施
+        mockedBolt.execute(mockTuple);
+
+        // 検証
+        fail("処理継続");
     }
 
     /**
@@ -232,7 +242,7 @@ public class AmBaseBoltTest
         objectList.add(param2);
 
         // 実施
-        testTarget.emitWithNoAnchorKey(objectList);
+        // testTarget.emitWithNoAnchorKey(objectList);
 
         // 検証
         ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
@@ -276,7 +286,7 @@ public class AmBaseBoltTest
         objectList.add(param2);
 
         // 実施
-        testTarget.emitWithNoAnchor(objectList, "MessageKey");
+        // testTarget.emitWithNoAnchor(objectList, "MessageKey");
 
         // 検証
         ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
@@ -321,7 +331,7 @@ public class AmBaseBoltTest
         objectList.add(param2);
 
         // 実施
-        testTarget.emitWithNoKey(anchor, objectList);
+        // testTarget.emitWithNoKey(anchor, objectList);
 
         // 検証
         ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
@@ -369,7 +379,7 @@ public class AmBaseBoltTest
         objectList.add(param2);
 
         // 実施
-        testTarget.emit(anchor, objectList, "MessageKey");
+        // testTarget.emit(anchor, objectList, "MessageKey");
 
         // 検証
         ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
