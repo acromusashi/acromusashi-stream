@@ -370,6 +370,8 @@
     <resources>
       <resource>
         <directory>src/main/resources</directory>
+        <excludes>
+        </excludes>
       </resource>
     </resources>
     <!-- テストコードのルートパスの指定 -->
@@ -385,24 +387,60 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.3.2</version>
+          <version>3.2</version>
           <configuration>
             <source>${jdk.version}</source>
             <target>${jdk.version}</target>
             <encoding>${project.build.sourceEncoding}</encoding>
             <failOnError>true</failOnError>
-            <fork>true</fork>
-            <compilerArgument>-nowarn</compilerArgument>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.0</version>
+          <version>3.4</version>
           <configuration>
             <locales>ja</locales>
             <inputEncoding>${project.build.sourceEncoding}</inputEncoding>
-            <outputEncoding>${site.encoding}</outputEncoding>
+            <outputEncoding>${project.reporting.outputEncoding}</outputEncoding>
+          </configuration>
+        </plugin>
+        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <versionRange>[3.2,)</versionRange>
+                    <goals>
+                      <goal>testCompile</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore></ignore>
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <versionRange>[0.7.2.201409121644,)</versionRange>
+                    <goals>
+                      <goal>prepare-agent</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore></ignore>
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
           </configuration>
         </plugin>
       </plugins>
@@ -411,7 +449,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>2.2.1</version>
+        <version>2.4</version>
+        <configuration>
+          <skipSource>true</skipSource>
+        </configuration>
         <executions>
           <execution>
             <phase>package</phase>
@@ -424,12 +465,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9</version>
+        <version>2.10.1</version>
         <configuration>
-          <source>${java.version}</source>
+          <source>${jdk.version}</source>
           <encoding>${project.build.sourceEncoding}</encoding>
           <docencoding>${site.encoding}</docencoding>
           <charset>${site.encoding}</charset>
+          <skip>true</skip>
         </configuration>
         <executions>
           <execution>
@@ -443,19 +485,20 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.10</version>
+        <version>2.18</version>
         <configuration>
-          <argLine>${argLine}</argLine>
+          <argLine>${jacocoArgs}</argLine>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.18</version>
       </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>${jacoco.include.package}</include>
-          </includes>
-        </configuration>
+        <version>0.7.2.201409121644</version>
         <executions>
           <execution>
             <id>prepare-agent</id>
@@ -463,6 +506,12 @@
             <goals>
               <goal>prepare-agent</goal>
             </goals>
+            <configuration>
+              <propertyName>jacocoArgs</propertyName>
+              <includes>
+                <include>${jacoco.include.package}</include>
+              </includes>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -495,7 +544,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.6</version>
+        <version>2.7</version>
         <reportSets>
           <reportSet>
             <reports>
@@ -512,54 +561,62 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
-        <version>2.3</version>
+        <version>2.5</version>
         <configuration>
-          <inputEncoding> ${project.build.sourceEncoding} </inputEncoding>
-          <outputEncoding>${site.encoding}</outputEncoding>
+          <inputEncoding>${project.build.sourceEncoding}</inputEncoding>
+          <outputEncoding>${project.reporting.outputEncoding}</outputEncoding>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9</version>
+        <version>2.10.1</version>
         <configuration>
-          <source>${java.version}</source>
+          <source>${jdk.version}</source>
           <encoding>${project.build.sourceEncoding}</encoding>
-          <docencoding>${site.encoding}</docencoding>
-          <charset>${site.encoding}</charset>
+          <docencoding>${project.reporting.outputEncoding}</docencoding>
+          <charset>${project.reporting.outputEncoding}</charset>
         </configuration>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>javadoc</report>
+              <!-- report>test-javadoc</report -->
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.5</version>
+        <version>2.13</version>
         <configuration>
+          <configLocation>${project.basedir}/checkstyle.xml</configLocation>
           <encoding>${project.build.sourceEncoding}</encoding>
-          <configLocation>${basedir}/checkstyle.xml</configLocation>
-            <!--
-            <includes>**/*.java</includes>
-            <excludes>**/stub/**/*.java, **/Test*.java</excludes>
-            -->
+          <!--
+          <includes>**/*.java</includes>
+          <excludes>**/stub/**/*.java, **/Test*.java</excludes>
+          -->
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
-        <version>3.0.1</version>
+        <version>3.3</version>
         <configuration>
           <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
           <targetJdk>${jdk.version}</targetJdk>
-            <!--
-            <includes>
-              <include>**/*foo.java</include>
-            </includes>
-            <excludes>
-              <exclude>**/bar.java</exclude>
-            </excludes>
-            <excludeRoots>
-              <excludeRoot>src/main/java/stubs</excludeRoot>
-            </excludeRoots>
-            -->
+          <!--
+          <includes>
+            <include>**/foo.java</include>
+          </includes>
+          <excludes>
+            <exclude>**/bar.java</exclude>
+          </excludes>
+          <excludeRoots>
+            <excludeRoot>src/main/java/stubs</excludeRoot>
+          </excludeRoots>
+          -->
         </configuration>
         <reportSets>
           <reportSet>
@@ -573,14 +630,16 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
-        <version>2.5.2</version>
+        <version>3.0.0</version>
         <configuration>
-          <!-- includeFilterFile>${basedir}/findbugs-include.xml</includeFilterFile -->
+          <!--
+          <includeFilterFile>${basedir}/dev/findbugs-include.xml</includeFilterFile>
+          -->
           <excludeFilterFile>${basedir}/findbugs-exclude.xml</excludeFilterFile>
           <xmlOutput>true</xmlOutput>
           <failOnError>false</failOnError>
-          <!-- High|Normal|Low|Exp|Ignore -->
-          <threshold>Normal</threshold>
+          <!-- High|Default|Low|Exp|Ignore -->
+          <threshold>Default</threshold>
           <!-- Min|Default|Max -->
           <effort>Default</effort>
           <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
@@ -589,15 +648,23 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>javancss-maven-plugin</artifactId>
-        <version>2.0</version>
+        <version>2.1</version>
         <configuration>
           <lineThreshold>300</lineThreshold>
           <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
+          <!--
+          <includes>
+            <include>**/*foo.java</include>
+          </includes>
+          <excludes>
+            <exclude>**/bar.java</exclude>
+          </excludes>
+          -->
         </configuration>
         <reportSets>
           <reportSet>
             <reports>
-              <report>ncss</report>
+              <report>report</report>
             </reports>
           </reportSet>
         </reportSets>
@@ -605,8 +672,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.14.1</version>
-        <!--
         <reportSets>
           <reportSet>
             <reports>
@@ -614,7 +679,6 @@
             </reports>
           </reportSet>
         </reportSets>
-        -->
       </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>
