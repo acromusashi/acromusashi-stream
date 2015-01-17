@@ -18,12 +18,14 @@ import java.util.Map;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
+import acromusashi.stream.trace.KeyHistory;
+
 import com.google.common.collect.Maps;
 
 /**
  * Common message header used in AcroMUSASHI Stream
  *
- * @author tsukano
+ * @author kimura
  */
 public class StreamMessageHeader implements Serializable
 {
@@ -38,6 +40,9 @@ public class StreamMessageHeader implements Serializable
 
     /** Message Identifier */
     private String              messageId        = "";
+
+    /** Key History */
+    private KeyHistory          history;
 
     /** TimeStamp */
     private long                timestamp        = 0;
@@ -90,6 +95,37 @@ public class StreamMessageHeader implements Serializable
     public void setMessageId(String messageId)
     {
         this.messageId = messageId;
+    }
+
+    /**
+     * @return history
+     */
+    public KeyHistory getHistory()
+    {
+        return this.history;
+    }
+
+    /**
+     * @param history the history to set
+     */
+    public void setHistory(KeyHistory history)
+    {
+        this.history = history;
+    }
+
+    /**
+     * Add key to history.
+     *
+     * @param historyKey history key
+     */
+    public void addHistory(Object historyKey)
+    {
+        if (this.history == null)
+        {
+            this.history = new KeyHistory();
+        }
+
+        this.history.addKey(historyKey.toString());
     }
 
     /**

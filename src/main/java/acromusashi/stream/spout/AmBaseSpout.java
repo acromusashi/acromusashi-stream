@@ -17,7 +17,6 @@ import java.util.Map;
 
 import acromusashi.stream.constants.FieldName;
 import acromusashi.stream.entity.StreamMessage;
-import acromusashi.stream.trace.KeyHistory;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -42,6 +41,9 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
 
     /** Task id. */
     protected String          taskId;
+
+    /** Record key history flag. */
+    protected boolean         recordHistory    = true;
 
     /**
      * Initialize method called after extracted for worker processes.<br>
@@ -104,8 +106,7 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer)
     {
-        List<String> fields = Lists.newArrayList(FieldName.MESSAGE_KEY, FieldName.KEY_HISTORY,
-                FieldName.MESSAGE_VALUE);
+        List<String> fields = Lists.newArrayList(FieldName.MESSAGE_KEY, FieldName.MESSAGE_VALUE);
 
         // Declare default stream
         declarer.declare(new Fields(fields));
@@ -142,10 +143,12 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      */
     protected void emit(StreamMessage message, Object messageKeyId)
     {
-        KeyHistory history = new KeyHistory();
-        history.addKey(messageKeyId.toString());
+        if (this.recordHistory)
+        {
+            message.getHeader().addHistory(messageKeyId.toString());
+        }
 
-        this.getCollector().emit(new Values("", history, message), messageKeyId);
+        this.getCollector().emit(new Values("", message), messageKeyId);
     }
 
     /**
@@ -164,10 +167,12 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      */
     protected void emitWithGrouping(StreamMessage message, Object messageKeyId, String groupingKey)
     {
-        KeyHistory history = new KeyHistory();
-        history.addKey(messageKeyId.toString());
+        if (this.recordHistory)
+        {
+            message.getHeader().addHistory(messageKeyId.toString());
+        }
 
-        this.getCollector().emit(new Values(groupingKey, history, message), messageKeyId);
+        this.getCollector().emit(new Values(groupingKey, message), messageKeyId);
     }
 
     /**
@@ -186,10 +191,12 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      */
     protected void emitWithStream(StreamMessage message, Object messageKeyId, String streamId)
     {
-        KeyHistory history = new KeyHistory();
-        history.addKey(messageKeyId.toString());
+        if (this.recordHistory)
+        {
+            message.getHeader().addHistory(messageKeyId.toString());
+        }
 
-        this.getCollector().emit(streamId, new Values("", history, message), messageKeyId);
+        this.getCollector().emit(streamId, new Values("", message), messageKeyId);
     }
 
     /**
@@ -210,10 +217,12 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
     protected void emitWithGroupingStream(StreamMessage message, Object messageKeyId,
             String groupingKey, String streamId)
     {
-        KeyHistory history = new KeyHistory();
-        history.addKey(messageKeyId.toString());
+        if (this.recordHistory)
+        {
+            message.getHeader().addHistory(messageKeyId.toString());
+        }
 
-        this.getCollector().emit(streamId, new Values(groupingKey, history, message), messageKeyId);
+        this.getCollector().emit(streamId, new Values(groupingKey, message), messageKeyId);
     }
 
     /**
@@ -229,9 +238,7 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      */
     protected void emitWithNoKeyId(StreamMessage message)
     {
-        KeyHistory history = new KeyHistory();
-
-        this.getCollector().emit(new Values("", history, message));
+        this.getCollector().emit(new Values("", message));
     }
 
     /**
@@ -248,8 +255,7 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      */
     protected void emitWithNoKeyIdAndGrouping(StreamMessage message, String groupingKey)
     {
-        KeyHistory history = new KeyHistory();
-        this.getCollector().emit(new Values(groupingKey, history, message));
+        this.getCollector().emit(new Values(groupingKey, message));
     }
 
     /**
@@ -266,8 +272,7 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      */
     protected void emitWithNoKeyIdAndStream(StreamMessage message, String streamId)
     {
-        KeyHistory history = new KeyHistory();
-        this.getCollector().emit(streamId, new Values("", history, message));
+        this.getCollector().emit(streamId, new Values("", message));
     }
 
     /**
@@ -286,8 +291,7 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
     protected void emitWithNoKeyIdAndGroupingStream(StreamMessage message, String groupingKey,
             String streamId)
     {
-        KeyHistory history = new KeyHistory();
-        this.getCollector().emit(streamId, new Values(groupingKey, history, message));
+        this.getCollector().emit(streamId, new Values(groupingKey, message));
     }
 
     /**
@@ -304,10 +308,12 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      */
     protected void emitWithKey(StreamMessage message, Object messageKey)
     {
-        KeyHistory history = new KeyHistory();
-        history.addKey(messageKey.toString());
+        if (this.recordHistory)
+        {
+            message.getHeader().addHistory(messageKey.toString());
+        }
 
-        this.getCollector().emit(new Values("", history, message));
+        this.getCollector().emit(new Values("", message));
     }
 
     /**
@@ -326,10 +332,12 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
     protected void emitWithKeyAndGrouping(StreamMessage message, Object messageKey,
             String groupingKey)
     {
-        KeyHistory history = new KeyHistory();
-        history.addKey(messageKey.toString());
+        if (this.recordHistory)
+        {
+            message.getHeader().addHistory(messageKey.toString());
+        }
 
-        this.getCollector().emit(new Values(groupingKey, history, message));
+        this.getCollector().emit(new Values(groupingKey, message));
     }
 
     /**
@@ -347,10 +355,12 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      */
     protected void emitWithKeyAndStream(StreamMessage message, Object messageKey, String streamId)
     {
-        KeyHistory history = new KeyHistory();
-        history.addKey(messageKey.toString());
+        if (this.recordHistory)
+        {
+            message.getHeader().addHistory(messageKey.toString());
+        }
 
-        this.getCollector().emit(streamId, new Values("", history, message));
+        this.getCollector().emit(streamId, new Values("", message));
     }
 
     /**
@@ -370,10 +380,12 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
     protected void emitWithKeyAndGroupingStream(StreamMessage message, Object messageKey,
             String groupingKey, String streamId)
     {
-        KeyHistory history = new KeyHistory();
-        history.addKey(messageKey.toString());
+        if (this.recordHistory)
+        {
+            message.getHeader().addHistory(messageKey.toString());
+        }
 
-        this.getCollector().emit(streamId, new Values(groupingKey, history, message));
+        this.getCollector().emit(streamId, new Values(groupingKey, message));
     }
 
     /**
@@ -392,10 +404,12 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      */
     protected void emitWithKeyId(StreamMessage message, Object messageKey, Object messageId)
     {
-        KeyHistory history = new KeyHistory();
-        history.addKey(messageKey.toString());
+        if (this.recordHistory)
+        {
+            message.getHeader().addHistory(messageKey.toString());
+        }
 
-        this.getCollector().emit(new Values("", history, message), messageId);
+        this.getCollector().emit(new Values("", message), messageId);
     }
 
     /**
@@ -416,10 +430,12 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
     protected void emitWithKeyIdAndGrouping(StreamMessage message, Object messageKey,
             Object messageId, String groupingKey)
     {
-        KeyHistory history = new KeyHistory();
-        history.addKey(messageKey.toString());
+        if (this.recordHistory)
+        {
+            message.getHeader().addHistory(messageKey.toString());
+        }
 
-        this.getCollector().emit(new Values(groupingKey, history, message), messageId);
+        this.getCollector().emit(new Values(groupingKey, message), messageId);
     }
 
     /**
@@ -440,10 +456,12 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
     protected void emitWithKeyIdAndStream(StreamMessage message, Object messageKey,
             Object messageId, String streamId)
     {
-        KeyHistory history = new KeyHistory();
-        history.addKey(messageKey.toString());
+        if (this.recordHistory)
+        {
+            message.getHeader().addHistory(messageKey.toString());
+        }
 
-        this.getCollector().emit(streamId, new Values("", history, message), messageId);
+        this.getCollector().emit(streamId, new Values("", message), messageId);
     }
 
     /**
@@ -465,9 +483,19 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
     protected void emitWithKeyIdAndGroupingStream(StreamMessage message, Object messageKey,
             Object messageId, String groupingKey, String streamId)
     {
-        KeyHistory history = new KeyHistory();
-        history.addKey(messageKey.toString());
+        if (this.recordHistory)
+        {
+            message.getHeader().addHistory(messageKey.toString());
+        }
 
-        this.getCollector().emit(streamId, new Values(groupingKey, history, message), messageId);
+        this.getCollector().emit(streamId, new Values(groupingKey, message), messageId);
+    }
+
+    /**
+     * @param recordHistory the recordHistory to set
+     */
+    public void setRecordHistory(boolean recordHistory)
+    {
+        this.recordHistory = recordHistory;
     }
 }

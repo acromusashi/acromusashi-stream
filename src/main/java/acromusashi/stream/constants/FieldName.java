@@ -13,18 +13,15 @@
 package acromusashi.stream.constants;
 
 /**
- * Tuple中のフィールド名に用いる定数
+ * Tuple's field define Constants class.
  *
  * @author kimura
  */
 public interface FieldName
 {
-    /** メッセージをグルーピングするKey用のフィールド名称 */
+    /** Message grouping key's field name. */
     String MESSAGE_KEY   = "messageKey";
 
-    /** メッセージ値を格納するフィールド名称 */
+    /** Message value's field name. */
     String MESSAGE_VALUE = "messageValue";
-
-    /** メッセージのキー情報履歴を保持するField名称 */
-    String KEY_HISTORY = "keyHistory";
 }

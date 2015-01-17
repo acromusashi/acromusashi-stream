@@ -19,7 +19,7 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.base.BaseRichSpout;
 
 /**
- * BaseBolt , this class has the following values ​​in the field.
+ * BaseSpout, this class has the following values ​​in the field.
  *
  * <ol>
  * <li>Storm configuration</li>

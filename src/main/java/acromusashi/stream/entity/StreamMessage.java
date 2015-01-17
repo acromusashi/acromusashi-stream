@@ -37,7 +37,9 @@ public class StreamMessage implements Serializable
      * Constructs instance.
      */
     public StreamMessage()
-    {}
+    {
+        this.header = new StreamMessageHeader();
+    }
 
     /**
      * Constructs instance with Header and body.

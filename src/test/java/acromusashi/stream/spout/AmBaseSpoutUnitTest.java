@@ -28,7 +28,6 @@ import org.junit.Test;
 import acromusashi.stream.bolt.ThroughBolt;
 import acromusashi.stream.constants.FieldName;
 import acromusashi.stream.entity.StreamMessage;
-import acromusashi.stream.trace.KeyHistory;
 import backtype.storm.Config;
 import backtype.storm.ILocalCluster;
 import backtype.storm.Testing;
@@ -114,13 +113,11 @@ public class AmBaseSpoutUnitTest
     public void testEmit_KeyId未指定_Grouping()
     {
         // 準備
-        KeyHistory keyHistory = new KeyHistory();
-
         StreamMessage message = new StreamMessage();
         message.addField("Param1", "Param1");
+        message.getHeader().addHistory("KeyHistory");
 
-        this.mockedSources.addMockData("BlankAmBaseSpout", new Values("GroupingKey", keyHistory,
-                message));
+        this.mockedSources.addMockData("BlankAmBaseSpout", new Values("GroupingKey", message));
 
         // 実施
         Testing.withSimulatedTimeLocalCluster(mkClusterParam, new NoKeyIdTestJob());
@@ -158,11 +155,11 @@ public class AmBaseSpoutUnitTest
             List resultTuple = (List) resultList.get(0);
 
             assertThat(resultTuple.get(0).toString(), equalTo("GroupingKey"));
-            assertThat(resultTuple.get(1), instanceOf(KeyHistory.class));
-            assertThat(resultTuple.get(1).toString(), equalTo("KeyHistory=[]"));
-            assertThat(resultTuple.get(2), instanceOf(StreamMessage.class));
-            assertThat(((StreamMessage) resultTuple.get(2)).getField("Param1").toString(),
-                    equalTo("Param1"));
+            assertThat(resultTuple.get(1), instanceOf(StreamMessage.class));
+            StreamMessage resultMessage = (StreamMessage) resultTuple.get(1);
+            assertThat(resultMessage.getHeader().getHistory().toString(),
+                    equalTo("KeyHistory=[KeyHistory]"));
+            assertThat(resultMessage.getField("Param1").toString(), equalTo("Param1"));
 
             AmBaseSpoutUnitTest.this.isAssert = true;
         }
@@ -188,8 +185,7 @@ public class AmBaseSpoutUnitTest
 
         // Add Bolt(BlankAmBaseSpout -> ThroughBolt)
         ThroughBolt throughBolt = new ThroughBolt();
-        throughBolt.setFields(Lists.newArrayList(FieldName.MESSAGE_KEY, FieldName.KEY_HISTORY,
-                FieldName.MESSAGE_VALUE));
+        throughBolt.setFields(Lists.newArrayList(FieldName.MESSAGE_KEY, FieldName.MESSAGE_VALUE));
         builder.setBolt("ThroughBolt", throughBolt).shuffleGrouping("BlankAmBaseSpout");
 
         StormTopology topology = builder.createTopology();

@@ -14,6 +14,7 @@ package acromusashi.stream.spout;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
@@ -30,7 +31,6 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import acromusashi.stream.entity.StreamMessage;
-import acromusashi.stream.trace.KeyHistory;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -98,9 +98,9 @@ public class AmBaseSpoutTest
      * DeclareOutputFieldsメソッド呼び出し時のフィールド確認を行う。
      *
      * @target {@link AmBaseSpout#declareOutputFields(backtype.storm.topology.OutputFieldsDeclarer)}
-     * @test メッセージキー、キー履歴、メッセージ値を指定して {@link OutputFieldsDeclarer#declare(Fields fields)}を呼び出していることを確認する。<br>
+     * @test メッセージキー、メッセージ値を指定して {@link OutputFieldsDeclarer#declare(Fields fields)}を呼び出していることを確認する。<br>
      *    condition:: declareOutputFieldsメソッド実行<br>
-     *    result:: メッセージキー、キー履歴、メッセージ値を指定して {@link OutputFieldsDeclarer#declare(Fields fields)}を呼び出していること
+     *    result:: メッセージキー、メッセージ値を指定して {@link OutputFieldsDeclarer#declare(Fields fields)}を呼び出していること
      */
     @Test
     public void testDeclareOutputFields_フィールド確認()
@@ -116,23 +116,59 @@ public class AmBaseSpoutTest
         Mockito.verify(mockDeclarer).declare(argument.capture());
 
         Fields argFields = argument.getValue();
-        assertThat(argFields.size(), equalTo(3));
+        assertThat(argFields.size(), equalTo(2));
         assertThat(argFields.get(0), equalTo("messageKey"));
-        assertThat(argFields.get(1), equalTo("keyHistory"));
-        assertThat(argFields.get(2), equalTo("messageValue"));
+        assertThat(argFields.get(1), equalTo("messageValue"));
     }
 
     /**
      * Emitメソッド呼び出し時（KeyId指定）の引数確認を行う。
      *
      * @target {@link AmBaseSpout#emit(StreamMessage, Object)}
-     * @test collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること。<br>
+     * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
      *    condition:: MessageKey、MessageIdを指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること
+     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
     public void testEmit_KeyId指定()
+    {
+        // 準備
+        this.target.open(this.mockConfMap, this.mockContext, this.mockCollector);
+        this.target.setRecordHistory(false);
+
+        StreamMessage message = new StreamMessage();
+        message.addField("Param1", "Param1");
+
+        // 実施
+        this.target.emit(message, "MessageKeyId");
+
+        // 検証
+        ArgumentCaptor<List> tupleArgument = ArgumentCaptor.forClass(List.class);
+        Mockito.verify(this.mockCollector).emit(tupleArgument.capture(), eq("MessageKeyId"));
+
+        List<Object> argList = tupleArgument.getValue();
+
+        assertThat(argList.size(), equalTo(2));
+
+        assertThat(argList.get(0).toString(), equalTo(""));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory(), nullValue());
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
+    }
+
+    /**
+     * Emitメソッド呼び出し時（KeyId指定、履歴記録オフ）の引数確認を行う。
+     *
+     * @target {@link AmBaseSpout#emit(StreamMessage, Object)}
+     * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
+     *    condition:: MessageKey、MessageIdを指定してTupleのemitを行う。<br>
+     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Test
+    public void testEmit_KeyId指定_履歴記録オフ()
     {
         // 準備
         this.target.open(this.mockConfMap, this.mockContext, this.mockCollector);
@@ -149,20 +185,23 @@ public class AmBaseSpoutTest
 
         List<Object> argList = tupleArgument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
+        assertThat(argList.size(), equalTo(2));
+
         assertThat(argList.get(0).toString(), equalTo(""));
-        assertThat(argList.get(1), instanceOf(KeyHistory.class));
-        assertThat(argList.get(1).toString(), equalTo("KeyHistory=[MessageKeyId]"));
-        assertThat((StreamMessage) argList.get(2), sameInstance(message));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory().toString(),
+                equalTo("KeyHistory=[MessageKeyId]"));
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
     /**
      * Emitメソッド呼び出し時（KeyId指定、GroupingKey指定）の引数確認を行う。
      *
      * @target {@link AmBaseSpout#emitWithGrouping(StreamMessage, Object, String)}
-     * @test collectorにemitされるTupleはGroupingKey、KeyHistory、StreamMessageの順となっていること。<br>
+     * @test collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること。<br>
      *    condition:: MessageKey、MessageId、GroupingKeyを指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey、KeyHistory、StreamMessageの順となっていること
+     *    result:: collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
@@ -183,20 +222,23 @@ public class AmBaseSpoutTest
 
         List<Object> argList = tupleArgument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
+        assertThat(argList.size(), equalTo(2));
+
         assertThat(argList.get(0).toString(), equalTo("GroupingKey"));
-        assertThat(argList.get(1), instanceOf(KeyHistory.class));
-        assertThat(argList.get(1).toString(), equalTo("KeyHistory=[MessageKeyId]"));
-        assertThat((StreamMessage) argList.get(2), sameInstance(message));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory().toString(),
+                equalTo("KeyHistory=[MessageKeyId]"));
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
     /**
      * Emitメソッド呼び出し時（KeyId指定、StreamId指定）の引数確認を行う。
      *
      * @target {@link AmBaseSpout#emitWithStream(StreamMessage, Object, String)}
-     * @test collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること。<br>
+     * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
      *    condition:: MessageKey、MessageIdを指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること
+     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
@@ -218,20 +260,23 @@ public class AmBaseSpoutTest
 
         List<Object> argList = tupleArgument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
+        assertThat(argList.size(), equalTo(2));
+
         assertThat(argList.get(0).toString(), equalTo(""));
-        assertThat(argList.get(1), instanceOf(KeyHistory.class));
-        assertThat(argList.get(1).toString(), equalTo("KeyHistory=[MessageKeyId]"));
-        assertThat((StreamMessage) argList.get(2), sameInstance(message));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory().toString(),
+                equalTo("KeyHistory=[MessageKeyId]"));
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
     /**
      * Emitメソッド呼び出し時（KeyId指定、GroupingKey&StreamId指定）の引数確認を行う。
      *
      * @target {@link AmBaseSpout#emitWithGroupingStream(StreamMessage, Object, String, String)}
-     * @test collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること。<br>
+     * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
      *    condition:: MessageKey、MessageIdを指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること
+     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
@@ -253,20 +298,23 @@ public class AmBaseSpoutTest
 
         List<Object> argList = tupleArgument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
+        assertThat(argList.size(), equalTo(2));
+
         assertThat(argList.get(0).toString(), equalTo("GroupingKey"));
-        assertThat(argList.get(1), instanceOf(KeyHistory.class));
-        assertThat(argList.get(1).toString(), equalTo("KeyHistory=[MessageKeyId]"));
-        assertThat((StreamMessage) argList.get(2), sameInstance(message));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory().toString(),
+                equalTo("KeyHistory=[MessageKeyId]"));
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
     /**
      * Emitメソッド呼び出し時（KeyId未指定）の引数確認を行う。
      *
      * @target {@link AmBaseSpout#emitWithNoKeyId(StreamMessage)}
-     * @test collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること。<br>
+     * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
      *    condition:: MessageKey、MessageIdを指定せずにTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること
+     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
@@ -287,21 +335,22 @@ public class AmBaseSpoutTest
 
         List<Object> argList = argument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
+        assertThat(argList.size(), equalTo(2));
 
         assertThat(argList.get(0).toString(), equalTo(""));
-        assertThat(argList.get(1), instanceOf(KeyHistory.class));
-        assertThat(argList.get(1).toString(), equalTo("KeyHistory=[]"));
-        assertThat((StreamMessage) argList.get(2), sameInstance(message));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory(), nullValue());
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
     /**
      * Emitメソッド呼び出し時（KeyId未指定、GroupingKey指定）の引数確認を行う。
      *
      * @target {@link AmBaseSpout#emitWithNoKeyIdAndGrouping(StreamMessage, String)}
-     * @test collectorにemitされるTupleはGroupingKey、KeyHistory、StreamMessageの順となっていること。<br>
+     * @test collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること。<br>
      *    condition:: MessageKey、MessageIdを指定せずにTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey、KeyHistory、StreamMessageの順となっていること
+     *    result:: collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
@@ -322,21 +371,22 @@ public class AmBaseSpoutTest
 
         List<Object> argList = argument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
+        assertThat(argList.size(), equalTo(2));
 
         assertThat(argList.get(0).toString(), equalTo("GroupingKey"));
-        assertThat(argList.get(1), instanceOf(KeyHistory.class));
-        assertThat(argList.get(1).toString(), equalTo("KeyHistory=[]"));
-        assertThat((StreamMessage) argList.get(2), sameInstance(message));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory(), nullValue());
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
     /**
      * Emitメソッド呼び出し時（KeyId未指定、StreamId指定）の引数確認を行う。
      *
      * @target {@link AmBaseSpout#emitWithNoKeyIdAndStream(StreamMessage, String)}
-     * @test collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること。<br>
+     * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
      *    condition:: MessageKey、MessageIdを指定せずにTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること
+     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
@@ -357,21 +407,22 @@ public class AmBaseSpoutTest
 
         List<Object> argList = argument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
+        assertThat(argList.size(), equalTo(2));
 
         assertThat(argList.get(0).toString(), equalTo(""));
-        assertThat(argList.get(1), instanceOf(KeyHistory.class));
-        assertThat(argList.get(1).toString(), equalTo("KeyHistory=[]"));
-        assertThat((StreamMessage) argList.get(2), sameInstance(message));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory(), nullValue());
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
     /**
      * Emitメソッド呼び出し時（KeyId未指定、GroupingKey&StreamId指定）の引数確認を行う。
      *
      * @target {@link AmBaseSpout#emitWithNoKeyIdAndGroupingStream(StreamMessage, String, String)}
-     * @test collectorにemitされるTupleはGroupingKey、KeyHistory、StreamMessageの順となっていること。<br>
+     * @test collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること。<br>
      *    condition:: MessageKey、MessageIdを指定せずにTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey、KeyHistory、StreamMessageの順となっていること
+     *    result:: collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
@@ -392,21 +443,22 @@ public class AmBaseSpoutTest
 
         List<Object> argList = argument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
+        assertThat(argList.size(), equalTo(2));
 
         assertThat(argList.get(0).toString(), equalTo("GroupingKey"));
-        assertThat(argList.get(1), instanceOf(KeyHistory.class));
-        assertThat(argList.get(1).toString(), equalTo("KeyHistory=[]"));
-        assertThat((StreamMessage) argList.get(2), sameInstance(message));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory(), nullValue());
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
     /**
      * Emitメソッド呼び出し時（Key指定）の引数確認を行う。
      *
      * @target {@link AmBaseSpout#emitWithKey(StreamMessage, Object)}
-     * @test collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること。<br>
+     * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
      *    condition:: MessageKeyを指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること
+     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
@@ -427,20 +479,23 @@ public class AmBaseSpoutTest
 
         List<Object> argList = argument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
+        assertThat(argList.size(), equalTo(2));
+
         assertThat(argList.get(0).toString(), equalTo(""));
-        assertThat(argList.get(1), instanceOf(KeyHistory.class));
-        assertThat(argList.get(1).toString(), equalTo("KeyHistory=[MessageKey]"));
-        assertThat((StreamMessage) argList.get(2), sameInstance(message));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory().toString(),
+                equalTo("KeyHistory=[MessageKey]"));
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
     /**
      * Emitメソッド呼び出し時（Key指定、GroupingKey指定）の引数確認を行う。
      *
      * @target {@link AmBaseSpout#emitWithKeyAndGrouping(StreamMessage, Object, String)}
-     * @test collectorにemitされるTupleはGroupingKey、KeyHistory、StreamMessageの順となっていること。<br>
+     * @test collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること。<br>
      *    condition:: MessageKeyを指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey、KeyHistory、StreamMessageの順となっていること
+     *    result:: collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
@@ -461,20 +516,23 @@ public class AmBaseSpoutTest
 
         List<Object> argList = argument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
+        assertThat(argList.size(), equalTo(2));
+
         assertThat(argList.get(0).toString(), equalTo("GroupingKey"));
-        assertThat(argList.get(1), instanceOf(KeyHistory.class));
-        assertThat(argList.get(1).toString(), equalTo("KeyHistory=[MessageKey]"));
-        assertThat((StreamMessage) argList.get(2), sameInstance(message));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory().toString(),
+                equalTo("KeyHistory=[MessageKey]"));
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
     /**
      * Emitメソッド呼び出し時（Key指定、StreamId指定）の引数確認を行う。
      *
      * @target {@link AmBaseSpout#emitWithKeyAndStream(StreamMessage, Object, String)}
-     * @test collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること。<br>
+     * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
      *    condition:: MessageKeyを指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること
+     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
@@ -495,20 +553,23 @@ public class AmBaseSpoutTest
 
         List<Object> argList = argument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
+        assertThat(argList.size(), equalTo(2));
+
         assertThat(argList.get(0).toString(), equalTo(""));
-        assertThat(argList.get(1), instanceOf(KeyHistory.class));
-        assertThat(argList.get(1).toString(), equalTo("KeyHistory=[MessageKey]"));
-        assertThat((StreamMessage) argList.get(2), sameInstance(message));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory().toString(),
+                equalTo("KeyHistory=[MessageKey]"));
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
     /**
      * Emitメソッド呼び出し時（Key指定、GroupingKey&StreamId指定）の引数確認を行う。
      *
      * @target {@link AmBaseSpout#emitWithKeyAndGroupingStream(StreamMessage, Object, String, String)}
-     * @test collectorにemitされるTupleはGroupingKey、KeyHistory、StreamMessageの順となっていること。<br>
+     * @test collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること。<br>
      *    condition:: MessageKeyを指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey、KeyHistory、StreamMessageの順となっていること
+     *    result:: collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
@@ -529,20 +590,23 @@ public class AmBaseSpoutTest
 
         List<Object> argList = argument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
+        assertThat(argList.size(), equalTo(2));
+
         assertThat(argList.get(0).toString(), equalTo("GroupingKey"));
-        assertThat(argList.get(1), instanceOf(KeyHistory.class));
-        assertThat(argList.get(1).toString(), equalTo("KeyHistory=[MessageKey]"));
-        assertThat((StreamMessage) argList.get(2), sameInstance(message));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory().toString(),
+                equalTo("KeyHistory=[MessageKey]"));
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
     /**
      * Emitメソッド呼び出し時（KeyId個別指定）の引数確認を行う。
      *
      * @target {@link AmBaseSpout#emitWithKeyId(StreamMessage, Object, Object)}
-     * @test collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること。<br>
+     * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
      *    condition:: MessageKey、MessageIdを個別指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること
+     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
@@ -563,20 +627,22 @@ public class AmBaseSpoutTest
 
         List<Object> argList = tupleArgument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
+        assertThat(argList.size(), equalTo(2));
         assertThat(argList.get(0).toString(), equalTo(""));
-        assertThat(argList.get(1), instanceOf(KeyHistory.class));
-        assertThat(argList.get(1).toString(), equalTo("KeyHistory=[MessageKey]"));
-        assertThat((StreamMessage) argList.get(2), sameInstance(message));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory().toString(),
+                equalTo("KeyHistory=[MessageKey]"));
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
     /**
      * Emitメソッド呼び出し時（KeyId個別指定、GroupingKey指定）の引数確認を行う。
      *
      * @target {@link AmBaseSpout#emitWithKeyIdAndGrouping(StreamMessage, Object, Object, String)}
-     * @test collectorにemitされるTupleはGroupingKey、KeyHistory、StreamMessageの順となっていること。<br>
+     * @test collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること。<br>
      *    condition:: MessageKey、MessageIdを個別指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey、KeyHistory、StreamMessageの順となっていること
+     *    result:: collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
@@ -597,20 +663,22 @@ public class AmBaseSpoutTest
 
         List<Object> argList = tupleArgument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
+        assertThat(argList.size(), equalTo(2));
         assertThat(argList.get(0).toString(), equalTo("GroupingKey"));
-        assertThat(argList.get(1), instanceOf(KeyHistory.class));
-        assertThat(argList.get(1).toString(), equalTo("KeyHistory=[MessageKey]"));
-        assertThat((StreamMessage) argList.get(2), sameInstance(message));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory().toString(),
+                equalTo("KeyHistory=[MessageKey]"));
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
     /**
      * Emitメソッド呼び出し時（KeyId個別指定、StreamId指定）の引数確認を行う。
      *
      * @target {@link AmBaseSpout#emitWithKeyIdAndStream(StreamMessage, Object, Object, String)}
-     * @test collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること。<br>
+     * @test collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること。<br>
      *    condition:: MessageKey、MessageIdを個別指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、KeyHistory、StreamMessageの順となっていること
+     *    result:: collectorにemitされるTupleはGroupingKey(空文字)、StreamMessageの順となっていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
@@ -632,20 +700,22 @@ public class AmBaseSpoutTest
 
         List<Object> argList = tupleArgument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
+        assertThat(argList.size(), equalTo(2));
         assertThat(argList.get(0).toString(), equalTo(""));
-        assertThat(argList.get(1), instanceOf(KeyHistory.class));
-        assertThat(argList.get(1).toString(), equalTo("KeyHistory=[MessageKey]"));
-        assertThat((StreamMessage) argList.get(2), sameInstance(message));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory().toString(),
+                equalTo("KeyHistory=[MessageKey]"));
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 
     /**
      * Emitメソッド呼び出し時（KeyId個別指定、GroupingKey&StreamId指定）の引数確認を行う。
      *
      * @target {@link AmBaseSpout#emitWithKeyIdAndGroupingStream(StreamMessage, Object, Object, String, String)}
-     * @test collectorにemitされるTupleはGroupingKey、KeyHistory、StreamMessageの順となっていること。<br>
+     * @test collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること。<br>
      *    condition:: MessageKey、MessageIdを個別指定してTupleのemitを行う。<br>
-     *    result:: collectorにemitされるTupleはGroupingKey、KeyHistory、StreamMessageの順となっていること
+     *    result:: collectorにemitされるTupleはGroupingKey、StreamMessageの順となっていること
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
@@ -668,10 +738,12 @@ public class AmBaseSpoutTest
 
         List<Object> argList = tupleArgument.getValue();
 
-        assertThat(argList.size(), equalTo(3));
+        assertThat(argList.size(), equalTo(2));
         assertThat(argList.get(0).toString(), equalTo("GroupingKey"));
-        assertThat(argList.get(1), instanceOf(KeyHistory.class));
-        assertThat(argList.get(1).toString(), equalTo("KeyHistory=[MessageKey]"));
-        assertThat((StreamMessage) argList.get(2), sameInstance(message));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getHeader().getHistory().toString(),
+                equalTo("KeyHistory=[MessageKey]"));
+        assertThat((StreamMessage) argList.get(1), sameInstance(message));
     }
 }
