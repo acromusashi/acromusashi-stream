@@ -1,7 +1,8 @@
 package acromusashi.stream.component.infinispan.bolt;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
 
@@ -22,6 +23,7 @@ import acromusashi.stream.component.infinispan.CacheHelper;
 import acromusashi.stream.component.infinispan.SimpleCacheMapper;
 import acromusashi.stream.component.infinispan.TupleCacheMapper;
 import acromusashi.stream.constants.FieldName;
+import acromusashi.stream.entity.StreamMessage;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Tuple;
 
@@ -40,9 +42,9 @@ public class InfinispanLookupBoltTest
     @Mock
     private OutputCollector                      mockCollector;
 
-    /** テスト用のTuple */
+    /** テスト用のStreamMessage */
     @Mock
-    private Tuple                                mockTuple;
+    private StreamMessage                        mockMessage;
 
     /** テスト用のCache */
     @Mock
@@ -79,15 +81,14 @@ public class InfinispanLookupBoltTest
     public void testExecute_Key変換失敗()
     {
         // 準備
-        Mockito.when(this.mockTuple.getValueByField(FieldName.MESSAGE_KEY)).thenThrow(
+        Mockito.when(this.mockMessage.getField(FieldName.MESSAGE_KEY)).thenThrow(
                 new IllegalArgumentException(FieldName.MESSAGE_KEY + " does not exist"));
 
         // 実施
-        this.target.execute(this.mockTuple);
+        this.target.onExecute(this.mockMessage);
 
         // 検証
         Mockito.verify(this.mockCache, Mockito.never()).get(anyString());
-        Mockito.verify(this.mockCollector).ack(this.mockTuple);
     }
 
     /**
@@ -104,15 +105,14 @@ public class InfinispanLookupBoltTest
         // 準備
         this.target = Mockito.spy(this.target);
 
-        Mockito.when(this.mockTuple.getValueByField(FieldName.MESSAGE_KEY)).thenReturn(null);
+        Mockito.when(this.mockMessage.getField(FieldName.MESSAGE_KEY)).thenReturn(null);
 
         // 実施
-        this.target.execute(this.mockTuple);
+        this.target.onExecute(this.mockMessage);
 
         // 検証
         Mockito.verify(this.mockCache, Mockito.never()).get(anyString());
-        Mockito.verify(this.target).onLookupAfter(this.mockTuple, null, null);
-        Mockito.verify(this.mockCollector).ack(this.mockTuple);
+        Mockito.verify(this.target).onLookupAfter(this.mockMessage, null, null);
     }
 
     /**
@@ -129,16 +129,15 @@ public class InfinispanLookupBoltTest
         // 準備
         this.target = Mockito.spy(this.target);
 
-        Mockito.when(this.mockTuple.getValueByField(FieldName.MESSAGE_KEY)).thenReturn("MessageKey");
+        Mockito.when(this.mockMessage.getField(FieldName.MESSAGE_KEY)).thenReturn("MessageKey");
         Mockito.when(this.mockCache.get("MessageKey")).thenThrow(
                 new HotRodClientException("Get failed."));
 
         // 実施
-        this.target.execute(this.mockTuple);
+        this.target.onExecute(this.mockMessage);
 
         // 検証
-        Mockito.verify(this.target).onLookupAfter(this.mockTuple, "MessageKey", null);
-        Mockito.verify(this.mockCollector).ack(this.mockTuple);
+        Mockito.verify(this.target).onLookupAfter(this.mockMessage, "MessageKey", null);
     }
 
     /**
@@ -155,15 +154,14 @@ public class InfinispanLookupBoltTest
         // 準備
         this.target = Mockito.spy(this.target);
 
-        Mockito.when(this.mockTuple.getValueByField(FieldName.MESSAGE_KEY)).thenReturn("MessageKey");
+        Mockito.when(this.mockMessage.getField(FieldName.MESSAGE_KEY)).thenReturn("MessageKey");
         Mockito.when(this.mockCache.get("MessageKey")).thenReturn(null);
 
         // 実施
-        this.target.execute(this.mockTuple);
+        this.target.onExecute(this.mockMessage);
 
         // 検証
-        Mockito.verify(this.target).onLookupAfter(this.mockTuple, "MessageKey", null);
-        Mockito.verify(this.mockCollector).ack(this.mockTuple);
+        Mockito.verify(this.target).onLookupAfter(this.mockMessage, "MessageKey", null);
     }
 
     /**
@@ -181,22 +179,25 @@ public class InfinispanLookupBoltTest
         // 準備
         this.target = Mockito.spy(this.target);
 
-        Mockito.when(this.mockTuple.getValueByField(FieldName.MESSAGE_KEY)).thenReturn("MessageKey");
+        Mockito.when(this.mockMessage.getField(FieldName.MESSAGE_KEY)).thenReturn("MessageKey");
         Mockito.when(this.mockCache.get("MessageKey")).thenReturn("MessageValue");
 
         // 実施
-        this.target.execute(this.mockTuple);
+        this.target.onExecute(this.mockMessage);
 
         // 検証
-        Mockito.verify(this.target).onLookupAfter(this.mockTuple, "MessageKey", "MessageValue");
-        Mockito.verify(this.mockCollector).ack(this.mockTuple);
+        Mockito.verify(this.target).onLookupAfter(this.mockMessage, "MessageKey", "MessageValue");
 
         ArgumentCaptor<Tuple> anchorCaptor = ArgumentCaptor.forClass(Tuple.class);
         ArgumentCaptor<List> tupleCaptor = ArgumentCaptor.forClass(List.class);
         Mockito.verify(this.mockCollector).emit(anchorCaptor.capture(), tupleCaptor.capture());
 
-        assertThat(anchorCaptor.getValue(), equalTo(this.mockTuple));
-        assertThat((String) tupleCaptor.getValue().get(0), is("MessageKey"));
-        assertThat((String) tupleCaptor.getValue().get(1), is("MessageValue"));
+        assertThat(anchorCaptor.getValue(), nullValue());
+        List<Object> argList = tupleCaptor.getValue();
+
+        assertThat((String) argList.get(0), is("MessageKey"));
+        assertThat(argList.get(1), instanceOf(StreamMessage.class));
+        StreamMessage sendMessage = (StreamMessage) argList.get(1);
+        assertThat(sendMessage.getField(FieldName.MESSAGE_VALUE).toString(), is("MessageValue"));
     }
 }
