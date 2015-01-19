@@ -101,7 +101,7 @@ public class CamelJdbcStoreBolt extends AmConfigurationBolt
     {
         String endopointUri = getEndpointUri();
 
-        Map<String, Object> resultMap = null;
+        Map<String, Object> resultMap;
 
         try
         {

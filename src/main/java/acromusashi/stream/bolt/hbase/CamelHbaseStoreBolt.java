@@ -99,7 +99,7 @@ public class CamelHbaseStoreBolt extends AmConfigurationBolt
     @Override
     public void onMessage(StreamMessage message)
     {
-        Map<String, Object> values = null;
+        Map<String, Object> values;
 
         try
         {
