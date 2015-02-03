@@ -12,9 +12,15 @@
 */
 package acromusashi.stream.bolt;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import acromusashi.stream.config.ConfigFileWatcher;
+import acromusashi.stream.config.StormConfigGenerator;
 import acromusashi.stream.constants.FieldName;
 import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.trace.KeyHistory;
@@ -28,9 +34,16 @@ import com.google.common.collect.Lists;
 
 /**
  * AcroMUSASHI Stream's basis bolt class<br>
- * Spout that inherit this class has following function.<br>
+ * Bolt that inherit this class has following function.<br>
  * <ol>
  * <li>Has message's key history.</li>
+ * <li>If config updated, reload config.</li>
+ * </ol>
+ * 
+ * If needs config reload function, do following.
+ * <ol>
+ * <li>Call setReloadConfig(true)</li>
+ * <li>Override onUpdate method.</li>
  * </ol>
  *
  * @author kimura
@@ -38,19 +51,34 @@ import com.google.common.collect.Lists;
 public abstract class AmBaseBolt extends AmConfigurationBolt
 {
     /** serialVersionUID */
-    private static final long serialVersionUID = 1546366821557201305L;
+    private static final long             serialVersionUID        = 1546366821557201305L;
+
+    /** Logger */
+    private static final Logger           logger                  = LoggerFactory.getLogger(AmBaseBolt.class);
+
+    /** Default config update interval. */
+    protected static final long           DEFAULT_INTERVAL        = 30;
 
     /** Task id. */
-    protected String          taskId;
+    protected String                      taskId;
 
     /** Executing message's key history */
-    private KeyHistory        executingKeyHistory;
+    private KeyHistory                    executingKeyHistory;
 
     /** Message acked flag. */
-    private boolean           responsed;
+    private boolean                       responsed;
 
     /** Record key history flag. */
-    protected boolean         recordHistory    = true;
+    protected boolean                     recordHistory           = true;
+
+    /** Config reload flag. */
+    protected boolean                     reloadConfig            = false;
+
+    /** Config reload interval. */
+    protected long                        reloadConfigIntervalSec = DEFAULT_INTERVAL;
+
+    /** Config file watcher */
+    protected transient ConfigFileWatcher watcher;
 
     /**
      * Initialize method called after extracted for worker processes.<br>
@@ -68,6 +96,17 @@ public abstract class AmBaseBolt extends AmConfigurationBolt
         super.prepare(stormConf, context, collector);
 
         this.taskId = context.getThisComponentId() + "_" + context.getThisTaskId();
+
+        if (this.reloadConfig)
+        {
+            if (stormConf.containsKey(StormConfigGenerator.INIT_CONFIG_KEY))
+            {
+                this.watcher = new ConfigFileWatcher(stormConf.get(
+                        StormConfigGenerator.INIT_CONFIG_KEY).toString(),
+                        this.reloadConfigIntervalSec);
+            }
+        }
+
         onPrepare(stormConf, context);
     }
 
@@ -90,6 +129,26 @@ public abstract class AmBaseBolt extends AmConfigurationBolt
     @Override
     public void onMessage(StreamMessage received)
     {
+        if (this.reloadConfig && this.watcher != null)
+        {
+            Map<String, Object> reloadedConfig = null;
+
+            try
+            {
+                reloadedConfig = this.watcher.readIfUpdated();
+            }
+            catch (IOException ex)
+            {
+                String logFormat = "Config file reload failed. Skip reload config.";
+                logger.warn(logFormat, ex);
+            }
+
+            if (reloadedConfig != null)
+            {
+                onUpdate(reloadedConfig);
+            }
+        }
+
         this.executingKeyHistory = received.getHeader().getHistory();
         this.responsed = false;
 
@@ -110,6 +169,17 @@ public abstract class AmBaseBolt extends AmConfigurationBolt
         {
             super.ack();
         }
+    }
+
+    /**
+     * Notify updated config if config file updated.<br>
+     * If needs config reload, override this method.
+     * 
+     * @param reloadedConfig reloaded config
+     */
+    public void onUpdate(Map<String, Object> reloadedConfig)
+    {
+        // Default do nothing.
     }
 
     /**

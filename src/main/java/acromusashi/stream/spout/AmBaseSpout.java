@@ -12,9 +12,15 @@
 */
 package acromusashi.stream.spout;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import acromusashi.stream.config.ConfigFileWatcher;
+import acromusashi.stream.config.StormConfigGenerator;
 import acromusashi.stream.constants.FieldName;
 import acromusashi.stream.entity.StreamMessage;
 import backtype.storm.spout.SpoutOutputCollector;
@@ -30,6 +36,13 @@ import com.google.common.collect.Lists;
  * Spout that inherit this class has following function.<br>
  * <ol>
  * <li>Has message's key history.</li>
+ * <li>If config updated, reload config.</li>
+ * </ol>
+ * 
+ * If needs config reload function, do following.
+ * <ol>
+ * <li>Call setReloadConfig(true)</li>
+ * <li>Override onUpdate method.</li>
  * </ol>
  *
  * @author kimura
@@ -37,13 +50,28 @@ import com.google.common.collect.Lists;
 public abstract class AmBaseSpout extends AmConfigurationSpout
 {
     /** serialVersionUID */
-    private static final long serialVersionUID = -3966364804089682434L;
+    private static final long             serialVersionUID = -3966364804089682434L;
+
+    /** Logger */
+    private static final Logger           logger           = LoggerFactory.getLogger(AmBaseSpout.class);
+
+    /** Default config update interval. */
+    protected static final long           DEFAULT_INTERVAL = 30;
 
     /** Task id. */
-    protected String          taskId;
+    protected String                      taskId;
 
     /** Record key history flag. */
-    protected boolean         recordHistory    = true;
+    protected boolean                     recordHistory    = true;
+
+    /** Config reload flag. */
+    protected boolean                     reloadConfig     = false;
+
+    /** Config reload interval. */
+    protected long                        reloadConfigIntervalSec = DEFAULT_INTERVAL;
+
+    /** Config file watcher */
+    protected transient ConfigFileWatcher watcher;
 
     /**
      * Initialize method called after extracted for worker processes.<br>
@@ -61,6 +89,17 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
         super.open(conf, context, collector);
 
         this.taskId = context.getThisComponentId() + "_" + context.getThisTaskId();
+
+        if (this.reloadConfig)
+        {
+            if (conf.containsKey(StormConfigGenerator.INIT_CONFIG_KEY))
+            {
+                this.watcher = new ConfigFileWatcher(
+                        conf.get(StormConfigGenerator.INIT_CONFIG_KEY).toString(),
+                        this.reloadConfigIntervalSec);
+            }
+        }
+
         onOpen(conf, context);
     }
 
@@ -83,6 +122,26 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
     @Override
     public void nextTuple()
     {
+        if (this.reloadConfig && this.watcher != null)
+        {
+            Map<String, Object> reloadedConfig = null;
+
+            try
+            {
+                reloadedConfig = this.watcher.readIfUpdated();
+            }
+            catch (IOException ex)
+            {
+                String logFormat = "Config file reload failed. Skip reload config.";
+                logger.warn(logFormat, ex);
+            }
+
+            if (reloadedConfig != null)
+            {
+                onUpdate(reloadedConfig);
+            }
+        }
+
         onNextTuple();
     }
 
@@ -90,6 +149,17 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      * Get next message from message source.
      */
     public abstract void onNextTuple();
+
+    /**
+     * Notify updated config if config file updated.<br>
+     * If needs config reload, override this method.
+     * 
+     * @param reloadedConfig reloaded config
+     */
+    public void onUpdate(Map<String, Object> reloadedConfig)
+    {
+        // Default do nothing.
+    }
 
     /**
      * Declare output fields and streams.<br>
@@ -133,6 +203,22 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
     public void setRecordHistory(boolean recordHistory)
     {
         this.recordHistory = recordHistory;
+    }
+
+    /**
+     * @param reloadConfig the reloadConfig to set
+     */
+    public void setReloadConfig(boolean reloadConfig)
+    {
+        this.reloadConfig = reloadConfig;
+    }
+
+    /**
+     * @param reloadConfigIntervalSec the reloadConfigIntervalSec to set
+     */
+    public void setReloadConfigIntervalSec(long reloadConfigIntervalSec)
+    {
+        this.reloadConfigIntervalSec = reloadConfigIntervalSec;
     }
 
     /**

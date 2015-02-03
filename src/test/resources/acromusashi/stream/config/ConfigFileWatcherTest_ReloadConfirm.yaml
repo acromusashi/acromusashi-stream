@@ -1,0 +1,51 @@
+## WordCountTopology Sample Config
+## NimbusHost
+## Set StormCluster's Nimbus Host
+nimbus.host        : 192.168.100.100
+## NimbusPort
+nimbus.thrift.port : 6627
+## WorkerProcess Number
+topology.workers   : 4
+## Storm Debug Flag
+topology.debug     : false
+
+## TopologyDefine
+Kestrel.ImmediateAck : false
+TupleEmit.Interval : 0
+## Set Kestrel Host:Port List
+transactional.zookeeper.servers              : 
+  - 192.168.100.100
+transactional.zookeeper.port : 2181
+Kestrel.QueueName         : MessageQueue
+KestrelSpout.Parallelism  : 2
+SplitSentence.Parallelism : 20
+WordCount.Parallelism     : 20
+topology.message.timeout.secs : 600
+## Apache.LogFormat : '%h %l %u %t \"%r\" %>s %b %D  %T'
+## %b: レスポンスのバイト数    %D:　レスポンスにかかった時間(マイクロ秒単位)  %T:リクエストを扱うのにかかった時間(秒単位)
+Apache.LogFormat : '{0} {1} {2} [{3}] "{4}" {5} {6} {7} {8} {9}'
+Apache.responseTimePos : 7
+Apache.sizePos : 6
+Apache.serverPos : 9
+CassandraSpout.sleepTime : 100
+CassandraSpout.empId : 1
+CassandraSpout.clusterName : Test Cluster
+CassandraSpout.isDistributed : true
+CassandraSpout.keySpaceName : testKeySpace
+CassandraSpout.connectionPool : MyConnectionPool
+## tcp port:7000 , ssl port:7001 cassandra-cli起動時に書いてあった: 9160
+CassandraSpout.port : 9160
+CassandraSpout.maxConnsPerHost : 5
+CassandraSpout.seeds : 192.168.100.100:9160
+CassandraSpout.columnFamilyName : testColumnFamily
+CassandraSpout.rowKey : 1
+CassandraSpout.field : word
+casa.word   : 
+  - a
+  - b
+  - c
+casa : 
+    title: Test Frame
+    width: ff
+    height: rr
+  
