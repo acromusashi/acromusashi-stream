@@ -14,11 +14,8 @@ package acromusashi.stream.util;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 
 /**
@@ -28,12 +25,6 @@ import org.junit.Test;
  */
 public class JsonValueExtractorTest
 {
-    /** 試験用データファイル配置ディレクトリ*/
-    private static final String DATA_DIR = "src/test/resources/"
-                                                 + StringUtils.replaceChars(
-                                                         JsonValueExtractorTest.class.getPackage().getName(),
-                                                         '.', '/') + '/';
-
     /**
      * JSONから対象要素が抽出可能であることを確認する。
      * 
@@ -46,8 +37,7 @@ public class JsonValueExtractorTest
     public void testExtractValue_抽出確認() throws IOException
     {
         // 準備
-        String jsonStr = FileUtils.readFileToString(new File(DATA_DIR
-                + "JsonValueExtractorTest_testExtractValue_ExtractConfirm.txt"));
+        String jsonStr = ResourceResolver.readResource("JsonValueExtractorTest_testExtractValue_ExtractConfirm.txt");
 
         // 実施
         String actual = JsonValueExtractor.extractValue(jsonStr, "header", "messageId");

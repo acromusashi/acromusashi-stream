@@ -22,42 +22,71 @@ import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.scanner.ScannerException;
 
 import backtype.storm.Config;
 
 /**
- * 指定されたYamlファイルをベースにStorm設定オブジェクトを生成するユーティリティクラス
+ * Utility class for converting specified yaml file to Storm config object.
  * 
  * @author kimura
  */
 public class StormConfigGenerator
 {
+    /** Config key for initial config path */
+    public static final String INIT_CONFIG_KEY = "topology.init.config.path";
+
     /**
-     * インスタンス化を防止するためのコンストラクタ
+     * Constructor for preventing create instance.
      */
     private StormConfigGenerator()
     {}
 
     /**
-     * 指定されたパスに存在するYamlファイルを読み込み、Storm設定オブジェクトを生成する。
+     * Generate storm config object from the yaml file at specified path.
      * 
-     * @param filePath 読込先ファイルパス
-     * @return Storm設定オブジェクト
-     * @throws IOException 入出力例外発生時
+     * @param filePath target file path
+     * @return Storm config object
+     * @throws IOException Fail read yaml file or convert to storm config object.
      */
     public static Config loadStormConfig(String filePath) throws IOException
     {
         Map<String, Object> yamlConfig = readYaml(filePath);
-
         Config stormConf = convertYamlToStormConf(yamlConfig);
+
+        File file = new File(filePath);
+        String absolutePath = file.getAbsolutePath();
+
+        // For track update config, has init file path.
+        stormConf.put(INIT_CONFIG_KEY, absolutePath);
+
         return stormConf;
     }
 
     /**
-     * Yamlファイルから読み込んだ設定値をStorm設定オブジェクトに変換する。
+     * Generate storm config object from the yaml file at specified file.
      * 
-     * @param yamlConf Yamlファイルから読み込んだ設定値
-     * @return Storm設定オブジェクト
+     * @param targetFile target file
+     * @return Storm config object
+     * @throws IOException Fail read yaml file or convert to storm config object.
+     */
+    public static Config loadStormConfig(File targetFile) throws IOException
+    {
+        Map<String, Object> yamlConfig = readYaml(targetFile);
+        Config stormConf = convertYamlToStormConf(yamlConfig);
+        String absolutePath = targetFile.getAbsolutePath();
+
+        // For track update config, has init file path.
+        stormConf.put(INIT_CONFIG_KEY, absolutePath);
+
+        return stormConf;
+    }
+
+    /**
+     * Convert config read from yaml file config to storm config object.
+     * 
+     * @param yamlConf config read from yaml
+     * @return Storm config object
      */
     public static Config convertYamlToStormConf(Map<String, Object> yamlConf)
     {
@@ -72,32 +101,45 @@ public class StormConfigGenerator
     }
 
     /**
-     * ファイルパスで指定された設定ファイル（Yaml形式）を読み込み、Yaml設定値オブジェクトを返す。
+     * Read yaml config object from the yaml file at specified path.
      * 
-     * @param filePath 読込先ファイルパス
-     * @return 設定ファイルを読みこんだ設定値オブジェクト
-     * @throws IOException 入出力例外発生時
+     * @param filePath target file path
+     * @return config read from yaml
+     * @throws IOException Fail read yaml file or convert to config object.
      */
-    @SuppressWarnings({"unchecked"})
     public static Map<String, Object> readYaml(String filePath) throws IOException
+    {
+        File targetFile = new File(filePath);
+        Map<String, Object> configObject = readYaml(targetFile);
+        return configObject;
+    }
+
+    /**
+     * Read yaml config object from the yaml file at specified file.
+     * 
+     * @param targetFile target file
+     * @return config read from yaml
+     * @throws IOException Fail read yaml file or convert to config object.
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> readYaml(File targetFile) throws IOException
     {
         Map<String, Object> configObject = null;
         Yaml yaml = new Yaml();
 
         InputStream inputStream = null;
         InputStreamReader steamReader = null;
-        File file = new File(filePath);
 
         try
         {
-            inputStream = new FileInputStream(file.getAbsolutePath());
+            inputStream = new FileInputStream(targetFile);
             steamReader = new InputStreamReader(inputStream, "UTF-8");
             configObject = (Map<String, Object>) yaml.load(steamReader);
         }
-        catch (Exception ex)
+        catch (ScannerException ex)
         {
-            // ScannerException/IOExceptionが発生する可能性がある。
-            // 2つの例外間に継承関係がなく、ハンドリングが同じのためExceptionでキャッチしている。
+            // ScannerException/IOException are occured.
+            // throw IOException because handling is same.
             throw new IOException(ex);
         }
         finally
@@ -107,5 +149,4 @@ public class StormConfigGenerator
 
         return configObject;
     }
-
 }

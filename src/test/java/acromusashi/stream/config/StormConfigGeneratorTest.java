@@ -16,9 +16,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 
-import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 
+import acromusashi.stream.util.ResourceResolver;
 import backtype.storm.Config;
 
 /**
@@ -28,12 +28,6 @@ import backtype.storm.Config;
  */
 public class StormConfigGeneratorTest
 {
-    /** 試験用データファイル配置ディレクトリ*/
-    private static final String DATA_DIR = "src/test/resources/"
-                                                 + StringUtils.replaceChars(
-                                                         StormConfigGeneratorTest.class.getPackage().getName(),
-                                                         '.', '/') + '/';
-
     /**
      * ファイルパスを指定し、設定オブジェクトを取得できることを確認する。
      * 
@@ -46,8 +40,7 @@ public class StormConfigGeneratorTest
     public void testLoadStormConfig_読込成功() throws IOException
     {
         // 実施
-        Config actual = StormConfigGenerator.loadStormConfig(DATA_DIR
-                + "StormConfigGeneratorTest_testLoadStormConfig_ReadSuccess.yaml");
+        Config actual = StormConfigGenerator.loadStormConfig(ResourceResolver.resolve("StormConfigGeneratorTest_testLoadStormConfig_ReadSuccess.yaml"));
 
         // 検証
         assertEquals("192.168.100.100", actual.get("nimbus.host"));
@@ -67,7 +60,6 @@ public class StormConfigGeneratorTest
     public void testLoadStormConfig_ファイル未存在() throws IOException
     {
         // 実施
-        StormConfigGenerator.loadStormConfig(DATA_DIR
-                + "StormConfigGeneratorTest_testLoadStormConfig_NotFound.yaml");
+        StormConfigGenerator.loadStormConfig("StormConfigGeneratorTest_testLoadStormConfig_NotFound.yaml");
     }
 }
