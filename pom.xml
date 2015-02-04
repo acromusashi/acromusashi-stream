@@ -70,7 +70,7 @@
     </profile>
   </profiles>
 
-  <!-- プロジェクトプロパティ -->
+  <!-- Project Property -->
   <properties>
     <jdk.version>1.7</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -82,7 +82,7 @@
     <jacoco.include.package>acromusashi.stream.*</jacoco.include.package>
   </properties>
 
-  <!-- リポジトリ設定 -->
+  <!-- Repository Settings -->
   <repositories>
     <repository>
       <id>maven.org</id>
@@ -111,9 +111,8 @@
     </repository>
   </repositories>
 
-  <!-- 依存関係 -->
+  <!-- Dependency Settings -->
   <dependencies>
-
     <!-- Test -->
     <dependency>
       <groupId>junit</groupId>
@@ -134,7 +133,7 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- 個別 -->
+    <!-- Individual -->
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
@@ -172,7 +171,7 @@
       <groupId>org.apache.storm</groupId>
       <artifactId>storm-core</artifactId>
       <version>${storm.version}</version>
-      <!-- Storm本体は実行環境で提供 -->
+      <!-- Storm provided in runtime environment -->
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -362,17 +361,17 @@
     </dependency>
   </dependencies>
 
-  <!-- ビルド設定 -->
+  <!-- Build settings -->
   <build>
     <finalName>${project.artifactId}-${project.version}</finalName>
-    <!-- ソースコードのルートパスの指定 -->
+    <!-- source code root path setting -->
     <sourceDirectory>src/main/java</sourceDirectory>
     <resources>
       <resource>
         <directory>src/main/resources</directory>
       </resource>
     </resources>
-    <!-- テストコードのルートパスの指定 -->
+    <!-- test code root path setting -->
     <testSourceDirectory>src/test/java</testSourceDirectory>
     <testResources>
       <testResource>
@@ -489,7 +488,7 @@
     </plugins>
   </build>
 
-  <!-- レポート -->
+  <!-- Report settings -->
   <reporting>
     <plugins>
       <plugin>
