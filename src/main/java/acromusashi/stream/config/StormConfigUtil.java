@@ -70,7 +70,7 @@ public class StormConfigUtil
             return defaultValue;
         }
 
-        return Integer.valueOf(config.toString());
+        return Integer.parseInt(config.toString());
     }
 
     /**

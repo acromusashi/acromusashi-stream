@@ -123,7 +123,7 @@ public class KestrelSpout extends BaseRichSpout
         for (String host : hostStrs)
         {
             String[] array = host.split(":");
-            this.hostInfos.add(new HostInfo(array[0], Integer.valueOf(array[1])));
+            this.hostInfos.add(new HostInfo(array[0], Integer.parseInt(array[1])));
         }
         this.queueName = queueName;
         this.messageScheme = multiScheme;

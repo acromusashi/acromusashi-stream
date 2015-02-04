@@ -105,13 +105,13 @@ public class DrpcRequestClient
         int drpcPort = DEFAULT_PORT;
         if (commandLine.hasOption("p") == true)
         {
-            drpcPort = Integer.valueOf(commandLine.getOptionValue("p"));
+            drpcPort = Integer.parseInt(commandLine.getOptionValue("p"));
         }
 
         int timeout = DEFAULT_TIMEOUT;
         if (commandLine.hasOption("t") == true)
         {
-            timeout = Integer.valueOf(commandLine.getOptionValue("t"));
+            timeout = Integer.parseInt(commandLine.getOptionValue("t"));
         }
 
         sendRequest(drpcHost, drpcPort, timeout, function, funcArg);
