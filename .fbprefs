@@ -1,5 +1,5 @@
 #FindBugs User Preferences
-#Thu Sep 05 15:57:50 JST 2013
+#Thu Feb 05 09:31:30 JST 2015
 cloud_id=edu.umd.cs.findbugs.cloud.doNothingCloud
 detectorAppendingToAnObjectOutputStream=AppendingToAnObjectOutputStream|true
 detectorAtomicityProblem=AtomicityProblem|true
@@ -12,6 +12,7 @@ detectorBooleanReturnNull=BooleanReturnNull|true
 detectorCallToUnsupportedMethod=CallToUnsupportedMethod|false
 detectorCheckExpectedWarnings=CheckExpectedWarnings|false
 detectorCheckImmutableAnnotation=CheckImmutableAnnotation|true
+detectorCheckRelaxingNullnessAnnotation=CheckRelaxingNullnessAnnotation|true
 detectorCheckTypeQualifiers=CheckTypeQualifiers|true
 detectorCloneIdiom=CloneIdiom|true
 detectorComparatorIdiom=ComparatorIdiom|true
@@ -56,6 +57,7 @@ detectorFindOpenStream=FindOpenStream|true
 detectorFindPuzzlers=FindPuzzlers|true
 detectorFindRefComparison=FindRefComparison|true
 detectorFindReturnRef=FindReturnRef|true
+detectorFindRoughConstants=FindRoughConstants|true
 detectorFindRunInvocations=FindRunInvocations|true
 detectorFindSelfComparison=FindSelfComparison|true
 detectorFindSelfComparison2=FindSelfComparison2|true
@@ -77,6 +79,7 @@ detectorHugeSharedStringConstants=HugeSharedStringConstants|true
 detectorIDivResultCastToDouble=IDivResultCastToDouble|true
 detectorIncompatMask=IncompatMask|true
 detectorInconsistentAnnotations=InconsistentAnnotations|true
+detectorInefficientIndexOf=InefficientIndexOf|true
 detectorInefficientMemberAccess=InefficientMemberAccess|false
 detectorInefficientToArray=InefficientToArray|true
 detectorInfiniteLoop=InfiniteLoop|true
@@ -99,6 +102,7 @@ detectorMutableStaticFields=MutableStaticFields|true
 detectorNaming=Naming|true
 detectorNoteUnconditionalParamDerefs=NoteUnconditionalParamDerefs|true
 detectorNumberConstructor=NumberConstructor|true
+detectorOptionalReturnNull=OptionalReturnNull|true
 detectorOverridingEqualsNotSymmetrical=OverridingEqualsNotSymmetrical|true
 detectorPreferZeroLengthArrays=PreferZeroLengthArrays|true
 detectorPublicSemaphores=PublicSemaphores|false
@@ -115,6 +119,7 @@ detectorStringConcatenation=StringConcatenation|true
 detectorSuperfluousInstanceOf=SuperfluousInstanceOf|true
 detectorSuspiciousThreadInterrupted=SuspiciousThreadInterrupted|true
 detectorSwitchFallthrough=SwitchFallthrough|true
+detectorSynchronizationOnSharedBuiltinConstant=SynchronizationOnSharedBuiltinConstant|true
 detectorSynchronizeAndNullCheckField=SynchronizeAndNullCheckField|true
 detectorSynchronizeOnClassLiteralNotGetClass=SynchronizeOnClassLiteralNotGetClass|true
 detectorSynchronizingOnContentsOfFieldToProtectField=SynchronizingOnContentsOfFieldToProtectField|true
