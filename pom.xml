@@ -144,6 +144,7 @@
       <artifactId>json-lib</artifactId>
       <version>2.4</version>
       <classifier>jdk15</classifier>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -154,11 +155,13 @@
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjweaver</artifactId>
       <version>1.6.2</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>cglib</groupId>
       <artifactId>cglib-nodep</artifactId>
       <version>2.2.2</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>commons-cli</groupId>
@@ -188,6 +191,7 @@
       <groupId>com.hmsonline</groupId>
       <artifactId>storm-cassandra</artifactId>
       <version>0.4.0-rc4</version>
+      <optional>true</optional>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -203,6 +207,7 @@
       <groupId>storm</groupId>
       <artifactId>storm-kestrel</artifactId>
       <version>0.9.0-wip5-multischeme</version>
+      <optional>true</optional>
     </dependency>
 
     <!-- Camel -->
@@ -210,16 +215,19 @@
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-core</artifactId>
       <version>${camel.version}</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-spring</artifactId>
       <version>${camel.version}</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-hbase</artifactId>
       <version>${camel.version}</version>
+      <optional>true</optional>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -283,16 +291,19 @@
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-xmljson</artifactId>
       <version>${camel.version}</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-jdbc</artifactId>
       <version>${camel.version}</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.snmp4j</artifactId>
       <version>1.10.1_1</version>
+      <optional>true</optional>
       <exclusions>
         <exclusion>
           <groupId>log4j</groupId>
@@ -306,6 +317,7 @@
       <groupId>org.springframework.amqp</groupId>
       <artifactId>spring-amqp</artifactId>
       <version>1.2.0.RELEASE</version>
+      <optional>true</optional>
       <exclusions>
         <exclusion>
           <groupId>org.springframework</groupId>
@@ -317,6 +329,7 @@
       <groupId>org.springframework.amqp</groupId>
       <artifactId>spring-rabbit</artifactId>
       <version>1.2.0.RELEASE</version>
+      <optional>true</optional>
       <exclusions>
         <exclusion>
           <groupId>org.springframework</groupId>
@@ -330,6 +343,7 @@
       <groupId>org.elasticsearch</groupId>
       <artifactId>elasticsearch</artifactId>
       <version>${elasticsearch.version}</version>
+      <optional>true</optional>
     </dependency>
 
     <!-- MQTT -->
@@ -337,6 +351,7 @@
       <groupId>org.fusesource.mqtt-client</groupId>
       <artifactId>mqtt-client</artifactId>
       <version>1.10</version>
+      <optional>true</optional>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -358,6 +373,7 @@
       <groupId>org.infinispan</groupId>
       <artifactId>infinispan-client-hotrod</artifactId>
       <version>${infinispan.version}</version>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 
