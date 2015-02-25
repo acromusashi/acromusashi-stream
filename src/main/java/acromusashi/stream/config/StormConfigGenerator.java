@@ -54,11 +54,13 @@ public class StormConfigGenerator
         Map<String, Object> yamlConfig = readYaml(filePath);
         Config stormConf = convertYamlToStormConf(yamlConfig);
 
-        File file = new File(filePath);
-        String absolutePath = file.getAbsolutePath();
-
         // For track update config, has init file path.
-        stormConf.put(INIT_CONFIG_KEY, absolutePath);
+        if (stormConf.containsKey(INIT_CONFIG_KEY) == false)
+        {
+            File file = new File(filePath);
+            String absolutePath = file.getAbsolutePath();
+            stormConf.put(INIT_CONFIG_KEY, absolutePath);
+        }
 
         return stormConf;
     }
@@ -74,10 +76,13 @@ public class StormConfigGenerator
     {
         Map<String, Object> yamlConfig = readYaml(targetFile);
         Config stormConf = convertYamlToStormConf(yamlConfig);
-        String absolutePath = targetFile.getAbsolutePath();
 
         // For track update config, has init file path.
-        stormConf.put(INIT_CONFIG_KEY, absolutePath);
+        if (stormConf.containsKey(INIT_CONFIG_KEY) == false)
+        {
+            String absolutePath = targetFile.getAbsolutePath();
+            stormConf.put(INIT_CONFIG_KEY, absolutePath);
+        }
 
         return stormConf;
     }
