@@ -34,9 +34,9 @@ import backtype.storm.utils.NimbusClient;
 public class TopologyExecutionGetter
 {
     /**
-     * 外部からのインスタンス化を防止するデフォルトコンストラクタ。
+     * パラメータを指定せずにインスタンスを生成する。
      */
-    private TopologyExecutionGetter()
+    public TopologyExecutionGetter()
     {
         // Do nothing.
     }
