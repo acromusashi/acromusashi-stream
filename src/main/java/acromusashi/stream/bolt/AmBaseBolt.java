@@ -13,6 +13,7 @@
 package acromusashi.stream.bolt;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -101,9 +102,12 @@ public abstract class AmBaseBolt extends AmConfigurationBolt
         {
             if (stormConf.containsKey(StormConfigGenerator.INIT_CONFIG_KEY))
             {
-                this.watcher = new ConfigFileWatcher(stormConf.get(
-                        StormConfigGenerator.INIT_CONFIG_KEY).toString(),
-                        this.reloadConfigIntervalSec);
+                String watchPath = stormConf.get(StormConfigGenerator.INIT_CONFIG_KEY).toString();
+                String logFormat = "Config reload watch start. : WatchPath={0}, Interval(Sec)={1}";
+                logger.info(MessageFormat.format(logFormat, watchPath, this.reloadConfigIntervalSec));
+
+                this.watcher = new ConfigFileWatcher(watchPath, this.reloadConfigIntervalSec);
+                this.watcher.init();
             }
         }
 
@@ -232,7 +236,7 @@ public abstract class AmBaseBolt extends AmConfigurationBolt
     {
         return Lists.newArrayList();
     }
-    
+
     /**
      * @param recordHistory the recordHistory to set
      */

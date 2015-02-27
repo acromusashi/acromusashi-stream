@@ -13,6 +13,7 @@
 package acromusashi.stream.spout;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -50,22 +51,22 @@ import com.google.common.collect.Lists;
 public abstract class AmBaseSpout extends AmConfigurationSpout
 {
     /** serialVersionUID */
-    private static final long             serialVersionUID = -3966364804089682434L;
+    private static final long             serialVersionUID        = -3966364804089682434L;
 
     /** Logger */
-    private static final Logger           logger           = LoggerFactory.getLogger(AmBaseSpout.class);
+    private static final Logger           logger                  = LoggerFactory.getLogger(AmBaseSpout.class);
 
     /** Default config update interval. */
-    protected static final long           DEFAULT_INTERVAL = 30;
+    protected static final long           DEFAULT_INTERVAL        = 30;
 
     /** Task id. */
     protected String                      taskId;
 
     /** Record key history flag. */
-    protected boolean                     recordHistory    = true;
+    protected boolean                     recordHistory           = true;
 
     /** Config reload flag. */
-    protected boolean                     reloadConfig     = false;
+    protected boolean                     reloadConfig            = false;
 
     /** Config reload interval. */
     protected long                        reloadConfigIntervalSec = DEFAULT_INTERVAL;
@@ -94,9 +95,12 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
         {
             if (conf.containsKey(StormConfigGenerator.INIT_CONFIG_KEY))
             {
-                this.watcher = new ConfigFileWatcher(
-                        conf.get(StormConfigGenerator.INIT_CONFIG_KEY).toString(),
-                        this.reloadConfigIntervalSec);
+                String watchPath = conf.get(StormConfigGenerator.INIT_CONFIG_KEY).toString();
+                String logFormat = "Config reload watch start. : WatchPath={0}, Interval(Sec)={1}";
+                logger.info(MessageFormat.format(logFormat, watchPath, this.reloadConfigIntervalSec));
+
+                this.watcher = new ConfigFileWatcher(watchPath, this.reloadConfigIntervalSec);
+                this.watcher.init();
             }
         }
 

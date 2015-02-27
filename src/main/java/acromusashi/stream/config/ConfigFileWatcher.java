@@ -14,8 +14,12 @@ package acromusashi.stream.config;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Config file watch class.
@@ -24,17 +28,20 @@ import java.util.concurrent.TimeUnit;
  */
 public class ConfigFileWatcher
 {
+    /** Logger */
+    private static final Logger logger = LoggerFactory.getLogger(ConfigFileWatcher.class);
+
     /** Target file */
-    protected File targetFile;
+    protected File              targetFile;
 
     /** Target file watch interval. */
-    protected long watchInterval;
+    protected long              watchInterval;
 
     /** Target file last watch time. */
-    protected long lastWatchTime;
+    protected long              lastWatchTime;
 
     /** Target file last modify time. */
-    protected long lastModifytime;
+    protected long              lastModifytime;
 
     /**
      * Constructs instance with watch target path.
@@ -73,12 +80,13 @@ public class ConfigFileWatcher
      */
     public Map<String, Object> readIfUpdated() throws IOException
     {
-        if ((getNowTime() - this.lastWatchTime) <= this.watchInterval)
+        long nowTime = getNowTime();
+        if ((nowTime - this.lastWatchTime) <= this.watchInterval)
         {
             return null;
         }
 
-        this.lastWatchTime = getNowTime();
+        this.lastWatchTime = nowTime;
 
         if (this.targetFile.exists() == false)
         {
