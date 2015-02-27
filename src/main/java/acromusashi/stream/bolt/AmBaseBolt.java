@@ -232,6 +232,30 @@ public abstract class AmBaseBolt extends AmConfigurationBolt
     {
         return Lists.newArrayList();
     }
+    
+    /**
+     * @param recordHistory the recordHistory to set
+     */
+    public void setRecordHistory(boolean recordHistory)
+    {
+        this.recordHistory = recordHistory;
+    }
+
+    /**
+     * @param reloadConfig the reloadConfig to set
+     */
+    public void setReloadConfig(boolean reloadConfig)
+    {
+        this.reloadConfig = reloadConfig;
+    }
+
+    /**
+     * @param reloadConfigIntervalSec the reloadConfigIntervalSec to set
+     */
+    public void setReloadConfigIntervalSec(long reloadConfigIntervalSec)
+    {
+        this.reloadConfigIntervalSec = reloadConfigIntervalSec;
+    }
 
     /**
      * Notify ack for inputed tuple.
