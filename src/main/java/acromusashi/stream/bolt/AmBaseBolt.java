@@ -78,6 +78,9 @@ public abstract class AmBaseBolt extends AmConfigurationBolt
     /** Config reload interval. */
     protected long                        reloadConfigIntervalSec = DEFAULT_INTERVAL;
 
+    /** Component Specific Config */
+    protected Map<String, Object>         specificConfig;
+
     /** Config file watcher */
     protected transient ConfigFileWatcher watcher;
 
@@ -238,30 +241,6 @@ public abstract class AmBaseBolt extends AmConfigurationBolt
     }
 
     /**
-     * @param recordHistory the recordHistory to set
-     */
-    public void setRecordHistory(boolean recordHistory)
-    {
-        this.recordHistory = recordHistory;
-    }
-
-    /**
-     * @param reloadConfig the reloadConfig to set
-     */
-    public void setReloadConfig(boolean reloadConfig)
-    {
-        this.reloadConfig = reloadConfig;
-    }
-
-    /**
-     * @param reloadConfigIntervalSec the reloadConfigIntervalSec to set
-     */
-    public void setReloadConfigIntervalSec(long reloadConfigIntervalSec)
-    {
-        this.reloadConfigIntervalSec = reloadConfigIntervalSec;
-    }
-
-    /**
      * Notify ack for inputed tuple.
      */
     @Override
@@ -329,6 +308,22 @@ public abstract class AmBaseBolt extends AmConfigurationBolt
         result.addKey(messageKey.toString());
 
         return result;
+    }
+
+    /**
+     * Get config value from specific config.
+     * 
+     * @param key Config key
+     * @return Specific Config value
+     */
+    protected Object retrieveSpecificConfig(String key)
+    {
+        if (this.specificConfig == null)
+        {
+            return null;
+        }
+
+        return this.specificConfig.get(key);
     }
 
     /**
@@ -711,5 +706,37 @@ public abstract class AmBaseBolt extends AmConfigurationBolt
             String streamId)
     {
         getCollector().emit(streamId, this.getExecutingTuple(), new Values(groupingKey, message));
+    }
+
+    /**
+     * @param recordHistory the recordHistory to set
+     */
+    public void setRecordHistory(boolean recordHistory)
+    {
+        this.recordHistory = recordHistory;
+    }
+
+    /**
+     * @param reloadConfig the reloadConfig to set
+     */
+    public void setReloadConfig(boolean reloadConfig)
+    {
+        this.reloadConfig = reloadConfig;
+    }
+
+    /**
+     * @param reloadConfigIntervalSec the reloadConfigIntervalSec to set
+     */
+    public void setReloadConfigIntervalSec(long reloadConfigIntervalSec)
+    {
+        this.reloadConfigIntervalSec = reloadConfigIntervalSec;
+    }
+
+    /**
+     * @param specificConfig the specificConfig to set
+     */
+    public void setSpecificConfig(Map<String, Object> specificConfig)
+    {
+        this.specificConfig = specificConfig;
     }
 }
