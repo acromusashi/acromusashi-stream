@@ -16,7 +16,7 @@ acromusashi-stream を用いて開発を行うためには、Mavenのビルド�
 <dependency>
   <groupId>jp.co.acroquest.acromusashi</groupId>
   <artifactId>acromusashi-stream</artifactId>
-  <version>0.5.4</version>
+  <version>0.6.2</version>
 </dependency>
 ```
 acromusashi-stream を利用して、StormのTopologyを開発してください。
