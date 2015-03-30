@@ -23,7 +23,7 @@ import acromusashi.stream.entity.StreamMessageHeader;
 import acromusashi.stream.exception.ConvertFailException;
 
 /**
- * JSON形式のTweetを共通メッセージに変換するコンバータ。<br/>
+ * JSON形式のTweetを共通メッセージに変換するコンバータ。<br>
  * 
  * @author kimura
  */

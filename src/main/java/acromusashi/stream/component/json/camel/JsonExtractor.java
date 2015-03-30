@@ -26,8 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Exchangeオブジェクトに含まれるHTTP Post Resuestを取得し、第一要素のValueを抽出するクラス<br/>
- * HTTP Post Resuestとして1個のKey(任意)-Valueを持つリクエストからValueを抽出する。<br/>
+ * Exchangeオブジェクトに含まれるHTTP Post Resuestを取得し、第一要素のValueを抽出するクラス<br>
+ * HTTP Post Resuestとして1個のKey(任意)-Valueを持つリクエストからValueを抽出する。<br>
  * 抽出後、isDoValidateの値に応じてJSON形式かのバリデーションを実施（JSONオブジェクトに変換して確認）
  * 
  * @author kimura
@@ -50,8 +50,8 @@ public class JsonExtractor
     {}
 
     /**
-     * ExchangeからValueを抽出する。<br/>
-     * Valueを抽出できないオブジェクトの場合はログを出力して破棄する。<br/>
+     * ExchangeからValueを抽出する。<br>
+     * Valueを抽出できないオブジェクトの場合はログを出力して破棄する。<br>
      * isDoValidate==trueの場合、JSONオブジェクトに一度変換したうえで文字列出力し、もちいる。
      * 
      * @param exchange 抽出元のExchange

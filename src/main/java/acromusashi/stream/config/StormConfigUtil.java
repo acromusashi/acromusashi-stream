@@ -32,7 +32,7 @@ public class StormConfigUtil
     {}
 
     /**
-     * Storm設定オブジェクトから文字列型の設定値を取得する。<br/>
+     * Storm設定オブジェクトから文字列型の設定値を取得する。<br>
      * 存在しない場合はデフォルト値を返す。
      * 
      * @param stormConf Storm設定オブジェクト
@@ -53,7 +53,7 @@ public class StormConfigUtil
     }
 
     /**
-     * Storm設定オブジェクトから文字列型の設定値を取得する。<br/>
+     * Storm設定オブジェクトから文字列型の設定値を取得する。<br>
      * 存在しない場合はデフォルト値を返す。
      * 
      * @param stormConf Storm設定オブジェクト
@@ -74,12 +74,12 @@ public class StormConfigUtil
     }
 
     /**
-     * Storm設定オブジェクトから文字列型の設定値を取得する。<br/>
+     * Storm設定オブジェクトから文字列型の設定値を取得する。<br>
      * 存在しない場合は空リストを返す。
      * 
      * @param stormConf Storm設定オブジェクト
      * @param key 設定値のキー
-     * @return 個別設定値(List<String>型)
+     * @return 個別設定値({@literal List<String>}型)
      */
     @SuppressWarnings("unchecked")
     public static List<String> getStringListValue(Config stormConf, String key)
@@ -95,7 +95,7 @@ public class StormConfigUtil
     }
 
     /**
-     * Storm設定オブジェクトからMap型の設定値を取得する。<br/>
+     * Storm設定オブジェクトからMap型の設定値を取得する。<br>
      * 存在しない場合はnullを返す。
      * 
      * @param stormConf Storm設定オブジェクト

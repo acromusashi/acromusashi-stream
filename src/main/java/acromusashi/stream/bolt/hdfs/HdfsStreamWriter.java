@@ -19,7 +19,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
 /**
- * HDFS上のファイルに対してテキストを出力するWriterクラス。<br/>
+ * HDFS上のファイルに対してテキストを出力するWriterクラス。<br>
  * HDFS上のファイル1個に対して1インスタンスが対応。
  * 
  * @author kimura

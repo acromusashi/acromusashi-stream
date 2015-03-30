@@ -17,7 +17,7 @@ import java.io.File;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * KestrelSpoutの規制状態を管理するクラス。<br/>
+ * KestrelSpoutの規制状態を管理するクラス。<br>
  * 指定されたパスを基に規制ファイルの存在を確認し、規制の有無を返す。
  * 
  * @author kimura

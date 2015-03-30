@@ -107,7 +107,7 @@ public class SnmpConverter extends AbstractMessageConverter
     }
 
     /**
-     * メッセージをKey-ValueのMapに変換する。<br/>
+     * メッセージをKey-ValueのMapに変換する。<br>
      * 
      * @param message メッセージ
      * @return 変換したKey-ValueのMap

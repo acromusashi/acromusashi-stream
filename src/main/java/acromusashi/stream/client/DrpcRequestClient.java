@@ -48,9 +48,9 @@ public class DrpcRequestClient
     {}
 
     /**
-     * プログラムエントリポイント<br/>
-     * <br/>
-     * 下記の引数/オプションを使用する。<br/>
+     * プログラムエントリポイント<br>
+     * <br>
+     * 下記の引数/オプションを使用する。<br>
      * <ul>
      * <li>-h DRPCServerホスト(必須入力）</li>
      * <li>-p DRPCServerポート(任意指定 デフォルト3772)</li>

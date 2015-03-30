@@ -34,11 +34,13 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 
 /**
- * Camel-HBase Componentを利用して、受信したMessageをHBaseに保存するBolt。<br/>
- * 指定したテーブル(endpointUriTo参照)に対して下記の法則でDataを生成して投入を行う。<br/>
- * <br/>
+ * Camel-HBase Componentを利用して、受信したMessageをHBaseに保存するBolt。<br>
+ * 指定したテーブル(endpointUriTo参照)に対して下記の法則でDataを生成して投入を行う。<br>
+ * <br>
+ * <ol>
  * <li>rowId = Message:HeaderのTimeStamp + "_" + Message:HeaderのSource</li>
  * <li>Message:Bodyの内容をリスト化し、変数cellDefineListの値に併せてFamily/Quantifierを設定</li>
+ * </ol>
  *
  * @author otoda
  */

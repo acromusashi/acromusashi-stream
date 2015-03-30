@@ -30,7 +30,7 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 
 /**
- * 受信したメッセージをHDFSに出力するBolt<br/>
+ * 受信したメッセージをHDFSに出力するBolt<br>
  *
  * @author kimura
  */

@@ -37,7 +37,7 @@ import com.rabbitmq.client.Address;
 import com.rabbitmq.client.Channel;
 
 /**
- * A {@link ConnectionFactory} implementation that returns the same Connections from all {@link #createConnection()}
+ * A ConnectionFactory implementation that returns the same Connections from all {@link #createConnection()}
  * calls, and ignores calls to {@link com.rabbitmq.client.Connection#close()} and caches
  * {@link com.rabbitmq.client.Channel}.
  *

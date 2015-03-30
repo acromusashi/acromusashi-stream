@@ -28,8 +28,8 @@ import backtype.storm.tuple.Fields;
 
 /**
  * Kestrelからのメッセージ取得用のTopologyを起動する。
- * <br/>
- * Topologyの動作フローは下記の通り。<br/>
+ * <br>
+ * Topologyの動作フローは下記の通り。<br>
  * <ol>
  * <li>KestrelThriftSpoutにてSNMPメッセージをJSON形式で受信する</li>
  * <li>StreamMessagePrintBoltにて受信したメッセージをログ出力する</li>
@@ -58,7 +58,7 @@ public class CommonMessagePrintTopology extends BaseTopology
     }
 
     /**
-     * プログラムエントリポイント<br/>
+     * プログラムエントリポイント<br>
      * <ul>
      * <li>起動引数:arg[0] 設定値を記述したyamlファイルパス</li>
      * <li>起動引数:arg[1] Stormの起動モード(true:LocalMode、false:DistributeMode)</li>

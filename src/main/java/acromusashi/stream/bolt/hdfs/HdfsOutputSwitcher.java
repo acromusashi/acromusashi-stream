@@ -29,7 +29,7 @@ import acromusashi.stream.util.TimeIntervalFormatUtil;
 import acromusashi.stream.util.TimeUnitUtil;
 
 /**
- * HDFSのWriterを保持し、出力先の切り替えを行うコンポーネント。<br/>
+ * HDFSのWriterを保持し、出力先の切り替えを行うコンポーネント。<br>
  * シングルスレッドから呼び出すことを前提としているため、マルチスレッドから並行して書き込みを行う必要がある場合は複数のコンポーネントを用意すること。
  * 
  * @author kimura
@@ -294,8 +294,8 @@ public class HdfsOutputSwitcher
     }
 
     /**
-     * ファイル切替インターバルの値が閾値内に収まっているかの確認を行う。<br/>
-     * 下記の値に収まっていることの確認を行い、収まっていない場合はデフォルト値(10分)を適用する。<br/>
+     * ファイル切替インターバルの値が閾値内に収まっているかの確認を行う。<br>
+     * 下記の値に収まっていることの確認を行い、収まっていない場合はデフォルト値(10分)を適用する。<br>
      * 
      * @param interval ファイル切替インターバル
      * @param unit ファイル切替単位

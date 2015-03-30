@@ -34,8 +34,8 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import com.google.common.collect.Lists;
 
 /**
- * Camel-SQL Componentを利用して、受信したMessageをDBに保存するBolt。<br/>
- * 指定したテーブルに対して下記の順にカラムにマッピングさせ、データを投入する。<br/>
+ * Camel-SQL Componentを利用して、受信したMessageをDBに保存するBolt。<br>
+ * 指定したテーブルに対して下記の順にカラムにマッピングさせ、データを投入する。<br>
  *
  * <ol>
  * <li>Message:HeaderのMessageId</li>

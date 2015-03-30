@@ -28,7 +28,7 @@ public class JsonValueExtractor
     {}
 
     /**
-     * 指定したJSONオブジェクトから「parentKey」要素中の「key」の要素を抽出する。<br/>
+     * 指定したJSONオブジェクトから「parentKey」要素中の「key」の要素を抽出する。<br>
      * 抽出に失敗した場合は例外が発生する。
      * 
      * @param target JSONオブジェクト

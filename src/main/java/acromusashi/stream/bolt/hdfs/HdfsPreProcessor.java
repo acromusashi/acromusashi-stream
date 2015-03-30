@@ -38,7 +38,7 @@ public class HdfsPreProcessor
     {}
 
     /**
-     * HDFSSink起動時の前処理を行う。<br/>
+     * HDFSSink起動時の前処理を行う。<br>
      * 末尾に一時ファイル名称パターンを持ち、かつリネーム先にファイルが存在しない場合リネームを行う。
      * 
      * @param hdfs ファイルシステム
@@ -110,7 +110,7 @@ public class HdfsPreProcessor
     }
 
     /**
-     * 前処理対象ファイルをリネームする。<br/>
+     * 前処理対象ファイルをリネームする。<br>
      * リネーム先にファイルが存在していた場合はリネームをスキップする。
      * 
      * @param hdfs ファイルシステム

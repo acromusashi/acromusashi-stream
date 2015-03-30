@@ -24,7 +24,7 @@ import acromusashi.stream.entity.StreamMessage;
 import acromusashi.stream.exception.ConvertFailException;
 
 /**
- * メッセージコンバータ基底クラス<br/>
+ * メッセージコンバータ基底クラス<br>
  * 本クラスを継承して個別のコンバータクラスを作成すること。
  * 
  * @author kimura
@@ -45,7 +45,7 @@ public abstract class AbstractMessageConverter implements Serializable
     public abstract String getType();
 
     /**
-      * 受信Objectを基に共通メッセージのHeaderを生成する。<br/>
+      * 受信Objectを基に共通メッセージのHeaderを生成する。<br>
       * デフォルト動作としてはgetType()の結果をTypeに詰める。
       * Type以外のパラメータについては何もしない。
       * 
@@ -62,7 +62,7 @@ public abstract class AbstractMessageConverter implements Serializable
     }
 
     /**
-     * 受信Objectを基に共通メッセージのBodyを生成する。<br/>
+     * 受信Objectを基に共通メッセージのBodyを生成する。<br>
      * デフォルト動作はinput.toString()の結果をBodyとして返す。
      * 
      * @param input 受信Object
@@ -76,7 +76,7 @@ public abstract class AbstractMessageConverter implements Serializable
     }
 
     /**
-     * メッセージをKey-ValueのMapに変換する。<br/>
+     * メッセージをKey-ValueのMapに変換する。<br>
      * 
      * @param message メッセージ
      * @return 変換したKey-ValueのMap

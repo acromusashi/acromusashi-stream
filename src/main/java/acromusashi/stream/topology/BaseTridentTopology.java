@@ -61,7 +61,7 @@ public abstract class BaseTridentTopology
      * 
      * @param topology StormTopology
      * @param isLocal true:ローカルモード、false:分散モード
-     * @throws Exception 
+     * @throws Exception Topology実行失敗時
      */
     public void submitTopology(StormTopology topology, boolean isLocal) throws Exception
     {
