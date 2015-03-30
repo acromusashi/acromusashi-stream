@@ -18,8 +18,8 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 切替インターバルを受け取り、整時用の基準時刻の生成/切替タイミングの生成を行うユーティリティクラス<br/>
- * 例として、8:35を初期化時刻とし、10分を切替インターバルとして受け取った場合、ファイル名称用の時刻として8:30を返す。<br/>
+ * 切替インターバルを受け取り、整時用の基準時刻の生成/切替タイミングの生成を行うユーティリティクラス<br>
+ * 例として、8:35を初期化時刻とし、10分を切替インターバルとして受け取った場合、ファイル名称用の時刻として8:30を返す。<br>
  * 
  * @author kimura
  */
@@ -35,10 +35,10 @@ public class TimeIntervalFormatUtil
     {}
 
     /**
-     * 切替インターバルの値が閾値内に収まっているかの確認を行う。<br/>
-     * <br/>
-     * 切替インターバル　1<= interval <= 100<br/>
-     * 切替単位 MillSecond、Second、Minute、Hourのいずれか<br/>
+     * 切替インターバルの値が閾値内に収まっているかの確認を行う。<br>
+     * <br>
+     * 切替インターバル　{@literal 1<= interval <= 100} <br>
+     * 切替単位 MillSecond、Second、Minute、Hourのいずれか<br>
      * 
      * @param interval 切替インターバル
      * @param unit 切替単位
