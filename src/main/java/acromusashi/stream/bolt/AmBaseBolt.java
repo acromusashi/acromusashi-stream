@@ -14,6 +14,7 @@ package acromusashi.stream.bolt;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -316,14 +317,31 @@ public abstract class AmBaseBolt extends AmConfigurationBolt
      * @param key Config key
      * @return Specific Config value
      */
-    protected Object retrieveSpecificConfig(String key)
+    protected Object extractSpecificConfig(String key)
     {
         if (this.specificConfig == null)
         {
             return null;
         }
 
-        return this.specificConfig.get(key);
+        Object result = this.specificConfig.get(key);
+        return result;
+    }
+
+    /**
+     * Get unmodifiable specific config.
+     * 
+     * @return Unmodifiable specific config.
+     */
+    protected Map<String, Object> getSpecificConfig()
+    {
+        if (this.specificConfig == null)
+        {
+            return null;
+        }
+
+        Map<String, Object> result = Collections.unmodifiableMap(this.specificConfig);
+        return result;
     }
 
     /**

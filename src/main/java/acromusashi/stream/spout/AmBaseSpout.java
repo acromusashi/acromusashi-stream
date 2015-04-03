@@ -14,6 +14,7 @@ package acromusashi.stream.spout;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -70,7 +71,7 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
 
     /** Config reload interval. */
     protected long                        reloadConfigIntervalSec = DEFAULT_INTERVAL;
-    
+
     /** Component Specific Config */
     protected Map<String, Object>         specificConfig;
 
@@ -203,7 +204,6 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
     {
         return Lists.newArrayList();
     }
-    
 
     /**
      * Get config value from specific config.
@@ -211,14 +211,31 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
      * @param key Config key
      * @return Specific Config value
      */
-    protected Object retrieveSpecificConfig(String key)
+    protected Object extractSpecificConfig(String key)
     {
         if (this.specificConfig == null)
         {
             return null;
         }
 
-        return this.specificConfig.get(key);
+        Object result = this.specificConfig.get(key);
+        return result;
+    }
+
+    /**
+     * Get unmodifiable specific config.
+     * 
+     * @return Unmodifiable specific config.
+     */
+    protected Map<String, Object> getSpecificConfig()
+    {
+        if (this.specificConfig == null)
+        {
+            return null;
+        }
+
+        Map<String, Object> result = Collections.unmodifiableMap(this.specificConfig);
+        return result;
     }
 
     /**
@@ -487,7 +504,7 @@ public abstract class AmBaseSpout extends AmConfigurationSpout
 
         this.getCollector().emit(streamId, new Values(groupingKey, message));
     }
-    
+
     /**
      * @param recordHistory the recordHistory to set
      */
