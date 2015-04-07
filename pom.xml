@@ -75,7 +75,7 @@
     <jdk.version>1.7</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <site.encoding>UTF-8</site.encoding>
-    <storm.version>0.9.3</storm.version>
+    <storm.version>0.9.4</storm.version>
     <infinispan.version>7.0.2.Final</infinispan.version>
     <camel.version>2.13.3</camel.version>
     <elasticsearch.version>1.4.1</elasticsearch.version>
