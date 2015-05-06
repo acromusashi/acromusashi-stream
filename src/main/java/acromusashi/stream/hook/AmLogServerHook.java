@@ -45,7 +45,7 @@ public class AmLogServerHook extends BaseTaskHook
     public void prepare(Map conf, TopologyContext context)
     {
         this.componentInfo = new ComponentInfo(context.getThisComponentId(),
-                context.getThisTaskId(), context.getThisTaskIndex());
+                context.getThisTaskId());
 
         int workerPort = context.getThisWorkerPort();
         int portAdjust = DEFAULT_PORT_ADJUST;

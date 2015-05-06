@@ -80,7 +80,11 @@ public class AmLogServerAdapter
      */
     public static synchronized AmLogServerAdapter getInstance()
     {
-        instance = new AmLogServerAdapter();
+        if (instance == null)
+        {
+            instance = new AmLogServerAdapter();
+        }
+
         return instance;
     }
 
@@ -107,8 +111,8 @@ public class AmLogServerAdapter
             logger.warn("Get host failed. Use localhost.", ex);
         }
 
-        logger.info("Websocket server initialize. : HostName={}, Port={}, Path={}", hostname,
-                serverPort, "/");
+        logger.info("Websocket server initialize. : HostName={}, Port={}, Path={}, Object={}",
+                hostname, serverPort, "/", this.toString());
         this.server = new Server(hostname, serverPort, "/", null, AmLogServerEndPoint.class);
         try
         {

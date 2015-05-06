@@ -28,21 +28,16 @@ public class ComponentInfo
     /** Task id */
     private int    taskId;
 
-    /** Task index */
-    private int    taskIndex;
-
     /**
      * Constructor with params.
      * 
      * @param componentId Component Id
      * @param taskId Task id
-     * @param taskIndex Task index
      */
-    public ComponentInfo(String componentId, int taskId, int taskIndex)
+    public ComponentInfo(String componentId, int taskId)
     {
         this.componentId = componentId;
         this.taskId = taskId;
-        this.taskIndex = taskIndex;
     }
 
     /**
@@ -75,22 +70,6 @@ public class ComponentInfo
     public void setTaskId(int taskId)
     {
         this.taskId = taskId;
-    }
-
-    /**
-     * @return the taskIndex
-     */
-    public int getTaskIndex()
-    {
-        return this.taskIndex;
-    }
-
-    /**
-     * @param taskIndex the taskIndex to set
-     */
-    public void setTaskIndex(int taskIndex)
-    {
-        this.taskIndex = taskIndex;
     }
 
     /**
