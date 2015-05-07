@@ -114,7 +114,7 @@ public class AmLogServerAdapter
             logger.warn("Get host failed. Use localhost.", ex);
         }
 
-        logger.info("Websocket server initialize. : HostName={}, Port={}, Path={}, Object={}",
+        logger.info("WebSocket server initialize. : HostName={}, Port={}, Path={}, Object={}",
                 hostname, serverPort, "/", this.toString());
         this.server = new Server(hostname, serverPort, "/", null, AmLogServerEndPoint.class);
         try
@@ -123,7 +123,7 @@ public class AmLogServerAdapter
         }
         catch (DeploymentException ex)
         {
-            logger.warn("Websocket server initialize failed. Skip initialize.", ex);
+            logger.warn("WebSocket server initialize failed. Skip initialize.", ex);
         }
 
         this.initialized = true;
