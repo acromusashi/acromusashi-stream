@@ -15,6 +15,7 @@ package acromusashi.stream.hook;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -173,7 +174,10 @@ public class AmLogServerAdapter
             return;
         }
 
+        Date nowTime = new Date();
+
         Map<String, Object> objectMap = Maps.newHashMap();
+        objectMap.put("time", nowTime);
         objectMap.put("component", componentInfo);
         objectMap.put("emitinfo", info);
 
