@@ -34,6 +34,7 @@ import backtype.storm.hooks.info.EmitInfo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * Storm Topology's Log Server adapter.
@@ -69,6 +70,7 @@ public class AmLogServerAdapter
     private AmLogServerAdapter()
     {
         this.mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         this.sessions = new ConcurrentHashMap<>();
         this.handler = new AmLogSendHandler();
     }

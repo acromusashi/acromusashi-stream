@@ -47,6 +47,7 @@ public class AmLogServerEndPoint
     public void onOpen(Session session)
     {
         logger.info("WebSocket connected. : SessionId={}", session.getId());
+        AmLogServerAdapter.getInstance().onOpen(session);
     }
 
     /**
@@ -60,5 +61,6 @@ public class AmLogServerEndPoint
     {
         logger.info("WebSocket closed. : SessionId={}, Reason={}", session.getId(),
                 closeReason.toString());
+        AmLogServerAdapter.getInstance().onClose(session);
     }
 }
