@@ -14,7 +14,9 @@ package acromusashi.stream.hook;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.DateFormat;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -44,6 +46,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  */
 public class AmLogServerAdapter
 {
+    /** DatePattern */
+    private static final String        DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+    
     /** Logger */
     private static final Logger       logger      = LoggerFactory.getLogger(AmLogServerAdapter.class);
 
@@ -175,9 +180,11 @@ public class AmLogServerAdapter
         }
 
         Date nowTime = new Date();
+        DateFormat format = new SimpleDateFormat(DATE_PATTERN);
+        String nowTimeStr = format.format(nowTime);
 
         Map<String, Object> objectMap = Maps.newHashMap();
-        objectMap.put("time", nowTime);
+        objectMap.put("time", nowTimeStr);
         objectMap.put("component", componentInfo);
         objectMap.put("emitinfo", info);
 
