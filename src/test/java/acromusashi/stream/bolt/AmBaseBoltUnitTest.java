@@ -158,10 +158,11 @@ public class AmBaseBoltUnitTest
 
             assertThat(resultTuple.get(1), instanceOf(StreamMessage.class));
             StreamMessage sendMessage = (StreamMessage) resultTuple.get(1);
+            assertThat(sendMessage.getHeader().getMessageKey(), equalTo("GroupingKey"));
             assertThat(sendMessage.getHeader().getHistory().toString(),
                     equalTo("KeyHistory=[BeforeMessageKey, KeyHistory]"));
             assertThat(sendMessage.getField(FieldName.MESSAGE_KEY).toString(),
-                    equalTo("GroupingKey"));
+                    equalTo("StreamMessageKey"));
             assertThat(sendMessage.getField(FieldName.MESSAGE_VALUE).toString(),
                     equalTo("StreamMessageValue"));
 

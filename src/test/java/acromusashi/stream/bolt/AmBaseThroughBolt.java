@@ -59,6 +59,7 @@ public class AmBaseThroughBolt extends AmBaseBolt
     public void onExecute(StreamMessage input)
     {
         StreamMessage result = new StreamMessage();
+        result.setHeader(input.getHeader());
         for (String field : this.fields)
         {
             result.addField(field, input.getField(field));
