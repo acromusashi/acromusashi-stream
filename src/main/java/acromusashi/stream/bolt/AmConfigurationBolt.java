@@ -94,6 +94,16 @@ public abstract class AmConfigurationBolt extends BaseRichBolt
                 continue;
             }
 
+            if (messageGet && FieldName.MESSAGE_KEY.equals(field))
+            {
+                Object obj = input.getValueByField(field);
+                if (message.getHeader() != null)
+                {
+                    message.getHeader().setMessageKey(obj.toString());
+                }
+                continue;
+            }
+
             Object obj = input.getValueByField(field);
             message.addField(field, obj);
         }
