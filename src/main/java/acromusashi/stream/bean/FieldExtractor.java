@@ -35,12 +35,18 @@ public class FieldExtractor
      * 
      * @param target is used to get object data.
      * @param key is used to get key value.
+     * @param delimeter key delimeter
      * @return is used to return object data.
      */
-    public static Object extract(Object target, String key)
+    public static Object extract(Object target, String key, String delimeter)
     {
-        String keyHead = getKeyHead(key); // the return value of keyHead 
-        String keyTail = getKeyTail(key); // the return value of keyTail 
+        if (target == null)
+        {
+            return target;
+        }
+
+        String keyHead = extractKeyHead(key, delimeter); // the return value of keyHead 
+        String keyTail = extractKeyTail(key, delimeter); // the return value of keyTail 
 
         Object innerObject = null;
 
@@ -67,19 +73,20 @@ public class FieldExtractor
         }
         else
         {
-            return extract(innerObject, keyTail); // recursive method for calling self function again.
+            return extract(innerObject, keyTail, delimeter); // recursive method for calling self function again.
         }
     }
 
     /**
-     * To get the value of keyHead.
+     * Extract the value of keyHead.
      * 
      * @param key is used to get string.
+     * @param delimeter key delimeter
      * @return the  value of keyHead .
      */
-    public static String getKeyHead(String key)
+    public static String extractKeyHead(String key, String delimeter)
     {
-        int index = key.indexOf(".");
+        int index = key.indexOf(delimeter);
         if (index == -1)
         {
             return key;
@@ -90,19 +97,20 @@ public class FieldExtractor
     }
 
     /**
-     * To get the value of keyTail.
+     * Extract the value of keyTail.
      * 
      * @param key is used to get string.
+     * @param delimeter key delimeter
      * @return the  value of keyTail .
      */
-    public static String getKeyTail(String key)
+    public static String extractKeyTail(String key, String delimeter)
     {
-        int index = key.indexOf(".");
+        int index = key.indexOf(delimeter);
         if (index == -1)
         {
             return null;
         }
-        String result = key.substring(index + 1);
+        String result = key.substring(index + delimeter.length());
         return result;
     }
 }
